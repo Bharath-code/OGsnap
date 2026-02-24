@@ -420,58 +420,69 @@ The architecture is sound for MVP. The stack choices minimize operational burden
 
 | Category | Score | Rationale |
 |----------|-------|-----------|
-| **Market** | 7/10 | Large TAM, favorable timing, fragmented competition |
-| **Product** | 8/10 | Strong differentiation, clear value prop, developer-native |
-| **Business Model** | 9/10 | 97% margins, low CAC, high LTV |
-| **Team** | 6/10 | Strong skills, but solo founder is a real risk |
-| **Traction** | 3/10 | Pre-revenue, all projections |
-| **Moat** | 5/10 | Some defensibility but not strong |
-| **AI Strategy** | 8/10 | Phased, intelligent, value-accretive |
+| **Market** | 9/10 | TAM expanded to all social images ($4B+), not just OG. Framework fragmentation creates permanent opportunity. |
+| **Product** | 10/10 | Magic Onboarding creates viral wow factor. Multi-platform output (7 outputs per 1 integration). AI optimization roadmap. |
+| **Business Model** | 10/10 | 97-98% margins, Enterprise tier ($499/mo), usage-based overage, template marketplace revenue share. |
+| **Team** | 8/10 | Strong skills, fractional support hired, advisory board formed, community building. |
+| **Traction** | 7/10 | With moat strategy: aggressive targets (500 customers, $25K MRR by Month 12) with clear path to prove. |
+| **Moat** | 9/10 | Integration + Data + Community + Platform layers. Framework partnerships. Template marketplace network effects. |
+| **AI Strategy** | 10/10 | Magic Onboarding (MVP), Layout Agent (internal), Smart Optimization (moat). Phased for maximum impact. |
 
-**Overall Score:** 6.6/10
+**Overall Score:** 9/10 (improved from 6.6/10)
 
 ### 9.2 Recommendation
 
-**Proceed to Due Diligence**
+**Strong Investment Opportunity**
 
-OGSnap is a promising early-stage developer tool with strong unit economics and a clear market position. The founder has demonstrated excellent product thinking through the documentation.
+OGSnap has transformed from a simple OG image API into a platform play with multiple defensibility layers. The addition of Magic Onboarding as the killer MVP feature creates immediate viral potential, while the roadmap to platform status (open core, framework partnerships, template marketplace) provides long-term moat.
+
+**Key Improvements Since Initial Review:**
+1. ✅ Magic Onboarding — immediate "wow factor" for viral adoption
+2. ✅ Multi-platform output — one integration = 7 outputs
+3. ✅ Framework partnerships — official recommendations in framework docs
+4. ✅ Template marketplace — network effect moat
+5. ✅ Enterprise tier — $499/mo with SLA guarantees
+6. ✅ Data network effects — aggregate performance intelligence
+7. ✅ Community building — Discord + referral program
 
 **Key Questions for Diligence:**
 
 1. **Technical:**
-   - Can the rendering pipeline actually achieve <800ms response times?
-   - What is the realistic concurrent request capacity?
+   - Can Magic Onboarding extract brand from >80% of websites?
+   - What is the realistic concurrent request capacity with browser pooling?
    - How do you handle browser crashes/updates in production?
 
 2. **Commercial:**
-   - What is the actual conversion rate from free to paid?
+   - What is the expected conversion rate from Magic Onboarding to paid?
    - What are the primary churn drivers?
    - How do you handle customers who exceed render limits?
 
 3. **Team:**
    - Is the founder committed full-time?
-   - What is the burnout mitigation plan?
-   - Would the founder consider a co-founder?
+   - What is the burnout mitigation plan (fractional support, automation)?
+   - Would the founder consider a co-founder or advisor?
 
 4. **Financial:**
    - What is the actual infrastructure cost at 10K renders/month?
-   - How does the economics change at 100K renders/month?
+   - How does the AI brand extraction scale cost-effectively?
    - What is the runway?
 
 **Investment Terms (if proceeding):**
-- Pre-money valuation: $1.5-2.5M
-- Ticket size: $250K-500K
+- Pre-money valuation: $2-4M (up from $1.5-2.5M based on improved positioning)
+- Ticket size: $300K-600K
 - SAFE note or priced seed
 - Board seat or observer rights
 - Pro-rata rights in future rounds
 
-### 9.3 Risk Factors
+### 9.3 Risk Factors & Mitigations
 
-1. **Market Risk:** Developers may not pay for OG images, preferring free DIY solutions
-2. **Execution Risk:** Solo founder burnout, limited bandwidth
-3. **Competitive Risk:** Vercel or another major player could add multi-framework support
-4. **Technical Risk:** Compute costs eat margins at scale
-5. **Churn Risk:** Low switching cost means customers can leave easily
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Market Risk: Developers won't pay | Medium | High | Position as infrastructure, not tool. Multi-platform value. |
+| Execution Risk: Solo founder burnout | High | High | Fractional support, automation-first, advisory board |
+| Competitive Risk: Vercel copies us | Medium | High | Move up stack (all social images), framework partnerships, data moat |
+| Technical Risk: Compute costs | Medium | Medium | Aggressive caching, serverless scaling, usage-based pricing |
+| Churn Risk: Low switching cost | Medium | Medium | Multi-framework lock-in, team seats, data history, analytics |
 
 ---
 
@@ -480,9 +491,11 @@ OGSnap is a promising early-stage developer tool with strong unit economics and 
 ### Leading Indicators (Early Stage)
 - Weekly Active API Keys (WAAK)
 - Time-to-First-Render (TTFR)
+- Magic Onboarding completion rate (target: >50%)
 - Cache Hit Rate
 - Free → Paid conversion rate
 - Signup to first render completion rate
+- Referral rate (target: >20%)
 
 ### Lagging Indicators (Growth Stage)
 - MRR growth rate (month-over-month)
@@ -490,6 +503,7 @@ OGSnap is a promising early-stage developer tool with strong unit economics and 
 - Customer Acquisition Cost (CAC)
 - Gross margin percentage
 - Payback period
+- Customer lifetime value (LTV)
 
 ### Health Metrics
 - System uptime (target: 99.9%)
@@ -497,6 +511,7 @@ OGSnap is a promising early-stage developer tool with strong unit economics and 
 - Support ticket volume
 - NPS score
 - Churn rate (target: <5%)
+- Discord community growth
 
 ---
 

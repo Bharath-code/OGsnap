@@ -10,6 +10,8 @@ The MVP is NOT a demo. It is the smallest version of the product that delivers r
 
 **The MVP does exactly one thing perfectly:** Takes a URL's metadata and returns a beautiful branded OG image via API.
 
+**Key Differentiator:** Magic Onboarding — user pastes URL, OGSnap auto-extracts their brand and generates sample images in 10 seconds. This creates the "wow factor" for Product Hunt.
+
 ---
 
 ## What's In The MVP
@@ -30,6 +32,21 @@ Response: image/png (1200x630)
 ```
 
 That's the entire API surface at launch. One endpoint.
+
+### ✅ Magic Onboarding (WOW Factor)
+```
+User action: Pastes their website URL (e.g., "https://my-saas.com")
+
+OGSnap automatically:
+1. Crawls their homepage with Playwright
+2. Extracts logo from navbar
+3. Reads primary/secondary colors from CSS
+4. Identifies font family from stylesheet
+5. Generates 5 sample OG images in 10 seconds
+6. Shows them in a beautiful preview grid
+
+Result: User sees "WTF, this is magic!" — immediate viral potential
+```
 
 ### ✅ Next.js SDK (`@ogsnap/next`)
 ```typescript
@@ -135,11 +152,15 @@ export const { GET } = OGEndpoint({ apiKey: import.meta.env.OGSNAP_API_KEY })
 - [ ] `@ogsnap/astro` published to npm
 - [ ] Dashboard: signup, API key display, usage counter
 - [ ] Brand kit: logo + color + font
+- [ ] **Magic Onboarding: URL → auto-generated images in 10 seconds**
+- [ ] Multi-platform output: OG + Twitter + LinkedIn + Slack + Discord
 - [ ] DodoPayments billing working end-to-end (test mode → live mode)
 - [ ] Convex caching working (cache hit < 50ms)
 - [ ] Watermark on free tier
-- [ ] Homepage with live demo
+- [ ] Homepage with live demo (includes Magic Onboarding demo)
 - [ ] README with copy-paste quickstart
 - [ ] UptimeRobot monitoring set up
 - [ ] Privacy policy + Terms of service (use a generator)
+- [ ] Discord server created with #showcase channel
 - [ ] Show HN post drafted and ready
+- [ ] "Built with OGSnap" badge assets ready

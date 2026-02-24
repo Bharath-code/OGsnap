@@ -194,8 +194,16 @@ ogsnap/
 │   ├── 03-TECH-STACK-ARCHITECTURE.md
 │   ├── 04-FOLDER-STRUCTURE.md
 │   ├── 05-EXECUTION-PLAN.md
-│   ├── 06-DESIGN-SYSTEM.md
-│   └── 07-BRAND.md
+│   ├── 06-DESIGN-SYSTEM.md           # + UX principles, animations, a11y
+│   ├── 07-BRAND.md
+│   ├── 08-STARTUP-METRICS.md
+│   ├── 09-AI-AGENT-STRATEGY.md
+│   ├── 10-VC-DUE-DILIGENCE.md
+│   ├── 11-MOAT-DEFENSIBILITY-STRATEGY.md
+│   ├── 12-UX-FLOW.md                # User journeys, psychology, interactions
+│   ├── 13-WIREFRAMES.md             # Detailed wireframes for all screens
+│   ├── 14-LANDING-PAGE-UX.md        # Landing page UX specification
+│   └── 15-DASHBOARD-UX.md           # Dashboard UX specification
 │
 ├── scripts/
 │   ├── seed.ts                       # Seed DB with test data

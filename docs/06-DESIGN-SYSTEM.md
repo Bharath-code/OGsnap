@@ -380,3 +380,379 @@ module.exports = {
   }
 }
 ```
+
+---
+
+## Part 8: Psychology-Based UX Principles
+
+### The OGSnap UX Philosophy
+
+Design decisions at OGSnap are driven by behavioral psychology principles that maximize conversion and retention:
+
+#### 1. Friction Reduction Principle
+
+Every unnecessary step costs users. Remove everything between "I want this" and "I have this."
+
+| Friction | OGSnap Solution |
+|----------|------------------|
+| Password creation | Social login (Google, GitHub) |
+| Credit card to try | 100 free renders, no card required |
+| Reading docs | Auto-detect framework, 3-line install |
+| Finding API key | Display immediately on signup |
+| First render | One-click copy, auto-detect metadata |
+
+#### 2. Instant Gratification Principle
+
+Users should feel rewarded within seconds of each action.
+
+| Action | Reward |
+|--------|--------|
+| Signup | API key displayed immediately |
+| First render | Confetti celebration animation |
+| Copy code | "Copied!" feedback |
+| Hit 100 renders | Badge unlock notification |
+| Refer friend | Confetti + "You've unlocked..." |
+
+#### 3. Endowed Progress Effect
+
+Showing progress increases completion rates. Every flow should show progress.
+
+```
+Onboarding: Step 1/3 → Step 2/3 → Step 3/3
+Usage meter: ████░░░░ 847/1000 (85%)
+Loading: ○ → ◐ → ●
+```
+
+#### 4. Loss Aversion Principle
+
+People work harder to avoid losses than to gain equivalent benefits.
+
+| Scenario | OGSnap Approach |
+|----------|-----------------|
+| Approaching limit | "Only 153 renders remaining" (urgency) |
+| Watermark | "Your images will show watermark" (loss) |
+| Canceling | "You'll lose Pro features" (loss) |
+| Expiring trial | "3 days left of Pro trial" (scarcity) |
+
+#### 5. Social Proof Principle
+
+Show that others are using and succeeding with OGSnap.
+
+| Social Proof | Implementation |
+|--------------|----------------|
+| Usage | "2,400+ renders this week" |
+| Popularity | "Used by 500+ developers" |
+| Quality | "4.9/5 rating" |
+| Trust | "Trusted by teams at..." |
+
+#### 6. Cognitive Ease Principle
+
+Make every screen feel familiar and effortless.
+
+| Cognitive Ease | Implementation |
+|----------------|----------------|
+| Consistent patterns | Same card layouts across dashboard |
+| Recognizable icons | Lucide icons throughout |
+| Clear hierarchy | Size-based visual hierarchy |
+| Scannable content | Bullet points, short paragraphs |
+
+---
+
+## Part 9: Animation Specifications
+
+### Animation Philosophy
+
+Animations should feel:
+- **Purposeful**: Every animation has a reason
+- **Subtle**: Support content, don't distract
+- **Consistent**: Same timing, same easing
+
+### Timing Specifications
+
+| Animation | Duration | Easing | Use Case |
+|-----------|----------|--------|----------|
+| Micro-interactions | 150ms | ease-out | Hover states, button clicks |
+| Feedback | 200ms | ease-in-out | Form validation, copy confirmation |
+| Page elements | 300ms | ease-out | Cards appearing, modals opening |
+| Page transitions | 400ms | ease-in-out | Route changes |
+| Celebrations | 1500ms | ease-out | Confetti, milestone achievements |
+
+### Easing Curves
+
+```css
+/* Standard ease - most transitions */
+transition: all 200ms ease;
+
+/* Smooth ease - modal open, page transitions */
+transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+/* Bounce ease - buttons, celebrations */
+transition: all 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+/* Fast out - loading states */
+transition: all 150ms ease-out;
+
+/* Slow in - fade in elements */
+transition: all 400ms ease-in;
+```
+
+### Key Animations
+
+#### Button Hover
+```css
+button {
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+button:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+button:active {
+  transform: scale(0.98);
+}
+```
+
+#### Card Appear
+```css
+.card {
+  opacity: 0;
+  transform: translateY(8px);
+  animation: cardAppear 300ms ease-out forwards;
+}
+@keyframes cardAppear {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+```
+
+#### Modal Open
+```css
+.modal-backdrop {
+  animation: fadeIn 200ms ease-out forwards;
+}
+.modal-content {
+  opacity: 0;
+  transform: scale(0.95);
+  animation: modalAppear 250ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes modalAppear {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+```
+
+#### Usage Meter Fill
+```css
+.usage-meter-fill {
+  animation: meterFill 800ms ease-out forwards;
+}
+@keyframes meterFill {
+  from {
+    width: 0%;
+  }
+}
+```
+
+#### Copy Success
+```css
+.copy-icon {
+  transition: all 200ms ease;
+}
+.copy-icon.copied {
+  color: #10B981;
+}
+.copy-icon.copied svg {
+  animation: iconPop 200ms ease;
+}
+@keyframes iconPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+```
+
+#### Confetti Celebration
+```javascript
+// Use canvas-confetti library
+confetti({
+  particleCount: 100,
+  spread: 70,
+  origin: { y: 0.6 },
+  colors: ['#6366F1', '#10B981', '#FAFAFA']
+});
+```
+
+---
+
+## Part 10: Accessibility (A11y) Guidelines
+
+### WCAG 2.1 AA Compliance Requirements
+
+#### Color Contrast
+- Normal text: minimum 4.5:1 contrast ratio
+- Large text (18px+ or 14px+ bold): minimum 3:1
+- UI components: minimum 3:1
+
+```css
+/* Verify contrast */
+--text-primary on --bg-base: #FAFAFA on #0A0A0B = 19.4:1 ✓
+--text-secondary on --bg-base: #A1A1AA on #0A0A0B = 9.1:1 ✓
+--brand-primary on --bg-base: #6366F1 on #0A0A0B = 7.2:1 ✓
+```
+
+#### Keyboard Navigation
+- All interactive elements focusable
+- Logical tab order
+- Visible focus indicators
+
+```css
+:focus-visible {
+  outline: 2px solid #6366F1;
+  outline-offset: 2px;
+}
+```
+
+#### Screen Reader Support
+- Semantic HTML (header, nav, main, footer)
+- ARIA labels for icons and buttons
+- Alt text for images
+
+```html
+<!-- Good examples -->
+<button aria-label="Copy API key">
+  <CopyIcon />
+</button>
+
+<img alt="OG image preview for blog post" />
+
+<input aria-label="Website URL" />
+```
+
+#### Touch Targets
+- Minimum 44x44px on mobile
+- Adequate spacing between targets
+
+```css
+@media (max-width: 640px) {
+  button, .btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+```
+
+#### Reduced Motion
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+---
+
+## Part 11: Responsive Design
+
+### Breakpoints
+
+```css
+/* Mobile first - base styles */
+:root {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+}
+
+/* Mobile: < 640px */
+@media (max-width: 639px) {
+  /* Single column, bottom navigation */
+}
+
+/* Tablet: 640px - 1024px */
+@media (min-width: 640px) and (max-width: 1023px) {
+  /* Two columns, collapsible sidebar */
+}
+
+/* Desktop: > 1024px */
+@media (min-width: 1024px) {
+  /* Full sidebar, three column grids */
+}
+```
+
+### Mobile Adaptations
+
+| Element | Desktop | Mobile |
+|---------|---------|--------|
+| Navigation | Sidebar (240px) | Bottom tab bar |
+| Header | Full width | Compact, hamburger |
+| Cards | 3-column grid | Single column |
+| Code blocks | Full width | Horizontal scroll |
+| Buttons | Standard size | Full width |
+| Forms | Standard | Full width, larger inputs |
+
+---
+
+## Part 12: Error Handling UX
+
+### Error Message Guidelines
+
+| Rule | Example |
+|------|---------|
+| Be specific | "Invalid API key. Keys start with og_live_" |
+| Be helpful | "Check your API key and try again" |
+| Be human | "Oops! Something went wrong" |
+| Provide action | "Click here to generate a new key" |
+
+### Error States
+
+```css
+/* Input error state */
+.input-error {
+  border-color: #EF4444;
+}
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+/* Error message */
+.error-message {
+  color: #EF4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+```
+
+### Toast Notifications
+
+```css
+.toast {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  background: #111113;
+  border: 1px solid #2A2A2E;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  animation: slideUp 200ms ease-out;
+}
+
+.toast-success { border-left: 3px solid #10B981; }
+.toast-error { border-left: 3px solid #EF4444; }
+.toast-warning { border-left: 3px solid #F59E0B; }
+```
+
+---
+
+*This design system should be used alongside wireframes (13-WIREFRAMES.md) and UX flows (12-UX-FLOW.md) for complete implementation.*

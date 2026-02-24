@@ -8,8 +8,9 @@
 ## Guiding Principle
 
 Ship ugly. Ship fast. Get feedback. Fix what matters. 
-
 Every day you spend perfecting something before launch is a day you don't know if anyone cares. The market is the only validator that matters.
+
+**The Moat Focus:** Every feature we build must increase switching costs or create network effects. Pure feature development without defensibility = wasted time.
 
 ---
 
@@ -25,14 +26,16 @@ Every day you spend perfecting something before launch is a day you don't know i
 | Playwright browser renderer (deploy to Vercel/Railway as microservice) | 3h | ☐ |
 | First HTML template (card layout) | 2h | ☐ |
 | Core render Convex Action (`api/render:generateImage`) | 2h | ☐ |
+| Multi-platform output support (OG + Twitter + LinkedIn + Slack + Discord) | 3h | ☐ |
+| Basic usage tracking | 2h | ☐ |
 
 **End of Week 1 milestone:** Calling the Convex Action returns a PNG image. That's it. That's the milestone.
 
 ---
 
-## Week 2 — Auth + Brand Kit (15 hours)
+## Week 2 — Auth + Brand Kit + Magic Onboarding (15 hours)
 
-**Goal:** Real users can sign up and get an API key.
+**Goal:** Real users can sign up and get an API key. Plus the "wow factor" feature.
 
 | Task | Hours | Done? |
 |------|-------|-------|
@@ -44,8 +47,9 @@ Every day you spend perfecting something before launch is a day you don't know i
 | Brand kit applied to renderer | 2h | ☐ |
 | Watermark injection (Sharp) for free tier | 2h | ☐ |
 | Usage counter increment + limit check (Convex Mutation) | 1h | ☐ |
+| **Magic Onboarding: AI brand extraction from URL** | 3h | ☐ |
 
-**End of Week 2 milestone:** Sign up via Clerk → get API key → trigger Convex HTTP Endpoint → render image with brand colors. Watermark appears if no paid plan.
+**End of Week 2 milestone:** Sign up via Clerk → get API key → trigger Convex HTTP Endpoint → render image with brand colors. Watermark appears if no paid plan. **Bonus: User pastes URL, gets auto-generated images in 10 seconds.**
 
 ---
 
@@ -137,12 +141,15 @@ Every day you spend perfecting something before launch is a day you don't know i
 - Write first SEO blog post: "OG images in Astro — complete guide"
 - Post in SvelteKit GitHub discussion thread
 - Email JavaScript Weekly curator
+- **Launch referral program**
+- **Create Discord community (target: 100 members)**
 
 **Week 9-10:**
 - Ship `@ogsnap/tanstack` SDK
 - Write second SEO blog post: "Vercel OG vs OGSnap — which should you use"
 - Product Hunt launch preparation
 - Add analytics dashboard (v1.1)
+- **Reach out to framework maintainers for official partnerships**
 
 **Month 2 target:** 40 paying customers, $800 MRR
 
@@ -150,10 +157,14 @@ Every day you spend perfecting something before launch is a day you don't know i
 
 ## Month 3 — Compounding
 
-- Product Hunt launch
+- Product Hunt launch (with Magic Onboarding as killer feature)
 - Add 5 templates (v1.1)
+- **Launch template marketplace beta**
+- **Announce first framework partnerships (Astro, Svelte)**
 - Start building in public on Twitter (weekly MRR updates)
 - Reach out to 3 developer YouTubers for tutorial collaboration
+- **Launch "Built with OGSnap" program**
+- **Ship Enterprise tier (white-label, SLA, unlimited)**
 - Target: 100+ paying customers, $2,000+ MRR
 
 ---
@@ -178,3 +189,24 @@ Every day you spend perfecting something before launch is a day you don't know i
 If after 3 months you have fewer than 20 paying customers, the product has a problem. Not a distribution problem — a product problem. At that point: interview 10 free users about why they didn't upgrade, and either fix the conversion problem or pivot the product. Don't just keep building features hoping something sticks.
 
 The signal to keep going: any stranger pays you money without you asking them personally. That's the moment the business is real.
+
+---
+
+## Moat Building Timeline (Beyond Revenue)
+
+### Month 4-6: Integration Moat
+- Support 10+ frameworks (add Vue, Nuxt, Solid, Qwik)
+- Official framework partnerships announced
+- "OGSnap Certified" partner program launched
+
+### Month 7-9: Community Moat
+- Discord community: 500+ members
+- Template marketplace live with premium templates
+- "Built with OGSnap" badges on 100+ customer sites
+- First OGSnap virtual event
+
+### Month 10-12: Platform Moat
+- Open-source OGSnap Engine (core rendering)
+- Create OGSnap Standard (open spec for social images)
+- Annual "State of Social Images" report published
+- Series A preparation

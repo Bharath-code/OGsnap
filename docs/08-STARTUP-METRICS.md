@@ -6,30 +6,31 @@
 
 ## 1. Unit Economics & Cost Structure (CFO View)
 
-Building a SaaS business around headless Chromium requires strict margin discipline. Compute is our primary variable cost. 
+Building a SaaS business around headless Chromium requires strict margin discipline. Compute is our primary variable cost.
 
 ### Infrastructure Costs (Monthly Scale)
 
-| Service | Tier / Plan | Cost at Launch (0 users) | Cost at $5K MRR (100k renders) |
-|---------|-------------|----------------------------|--------------------------------|
-| **Convex (DB/Cache)** | Free → Pay as you go | $0 | ~$15 |
-| **Vercel (Dashboard)** | Hobby/Pro | $0 | $20 |
-| **Railway (Renderer)**| Developer | $5 (1 instance) | ~$40 (Auto-scaled pool) |
-| **Cloudflare R2** | Free (10GB) | $0 | $0 |
-| **Clerk (Auth)** | Free (10k MAU) | $0 | $0 |
-| **Resend (Email)**| Free (3k/mo) | $0 | $20 |
-| **Total Server Cost** | | **$5/mo** | **~$95/mo** |
+| Service | Tier / Plan | Cost at Launch (0 users) | Cost at $25K MRR (500k renders) | Cost at $100K MRR (2M renders) |
+|---------|-------------|----------------------------|-----------------------------------|--------------------------------|
+| **Convex (DB/Cache)** | Free → Pay as you go | $0 | ~$50 | ~$150 |
+| **Vercel (Dashboard)** | Hobby/Pro | $0 | $20 | $40 |
+| **Railway (Renderer)**| Developer | $5 (1 instance) | ~$150 (auto-scaled) | ~$500 (large pool) |
+| **Cloudflare R2** | Free (10GB) | $0 | $0 | $50 |
+| **Clerk (Auth)** | Free (10k MAU) | $0 | $0 | $0 |
+| **Resend (Email)**| Free (3k/mo) | $0 | $20 | $50 |
+| **AI (Brand Extraction)** | Pay per use | $0 | ~$100 | ~$400 |
+| **Total Server Cost** | | **$5/mo** | **~$340/mo** | **~$1,190/mo** |
 
 ### Gross Margin Analysis
 
 *   **Average Revenue Per User (ARPU):** ~$15 
     *(Assuming mostly Hobby $9/mo and some Pro $29/mo accounts)*
-*   **Average Cost Per User (COGS):** ~$0.40
+*   **Average Cost Per User (COGS):** ~$0.40 → ~$0.08 at scale (via caching)
     *(Based on Railway compute spikes + DodoPayments processing fees)*
-*   **Target Gross Margin:** **97%**
+*   **Target Gross Margin:** **97%** → **98%** at scale
     *(Standard software margins are 80-90%. Because we heavily utilize Edge caching and Convex free tiers, our margins are exceptionally high).*
 
-**CFO Verdict:** The business model is highly profitable once it crosses the breakeven threshold of just 2 paying Hobby users ($18/mo). Every dollar earned after $95/mo drops virtually straight to the bottom line.
+**CFO Verdict:** The business model is highly profitable once it crosses the breakeven threshold of just 2 paying Hobby users ($18/mo). Every dollar earned after ~$340/mo drops virtually straight to the bottom line.
 
 ---
 
@@ -44,6 +45,7 @@ Building a SaaS business around headless Chromium requires strict margin discipl
 1.  **Cache Hit Rate:** Target >90%. (CTO Metric: This dictates our profit margins. Every cache hit is pure profit; every cache miss costs compute).
 2.  **Time-to-First-Render (TTFR):** Target <10 minutes. The time from a user hitting the landing page to seeing their first branded OG image in their own codebase.
 3.  **Net Revenue Retention (NRR):** Target >110%. (Can we naturally upgrade $9 users to $29 users as their traffic grows without acquiring new users?).
+4.  **Magic Onboarding Conversion:** Target >50% of signups complete onboarding in <2 minutes.
 
 ---
 
@@ -65,15 +67,25 @@ For a developer tool aimed at solo founders/agencies, PMF isn't about massive us
 *   **Metric:** If we survey active users and ask, *"How would you feel if OGSnap disappeared tomorrow?"*, over 40% answer **"Very Disappointed."**
 *   **Signal:** We have successfully eliminated the pain of managing their own Puppeteer/CSS pipelines.
 
+### 4. The "Wow" (Virality)
+*   **Metric:** >20% of new users come from referrals
+*   **Signal:** Magic Onboarding is so impressive that users naturally share it
+
 ---
 
-## 4. The 12-Month Roadmap to $10k MRR
+## 4. The 12-Month Roadmap to $50K MRR
 
 | Phase | Goal | Focus | Financial Target |
 |-------|------|-------|------------------|
-| **Months 1-2** | Survival | Ship MVP. Get 1st dollar from strangers. Fix critical bugs. | $100 MRR |
-| **Months 3-4** | Distribution | Ship Astro, Svelte, Remix SDKs. Write SEO playbooks. | $1K MRR |
-| **Months 5-8** | Agency Wedge | Launch "Pro" features: Team seats, custom domains. | $4K MRR |
-| **Months 9-12**| Scale | Sponsorships on high-converting dev newsletters (e.g., Bytes). | $10K MRR |
+| **Months 1-2** | Survival | Ship MVP with Magic Onboarding. Get 1st dollar from strangers. Fix critical bugs. | $100 MRR → $800 MRR |
+| **Months 3-4** | Distribution | Ship Astro, Svelte, Remix SDKs. Framework partnerships. Referral program. | $2K MRR |
+| **Months 5-8** | Ecosystem | Template marketplace. Enterprise tier. "Built with OGSnap" program. | $10K MRR |
+| **Months 9-12**| Platform | Open core. Data network effects. 10+ framework partnerships. | $50K MRR |
 
 **Summary:** OGSnap is a high-margin, low-churn "set it and forget it" utility. The execution risk is low because the technology (Playwright + Convex) is proven. The distribution risk is medium-to-high because developers hate paying for things they think they can build, until they realize maintaining it costs 10x more than $9/month.
+
+**Moat Strategy:** Every phase builds defensibility:
+- Month 1-2: Integration depth (multi-framework)
+- Month 3-4: Community (Discord, referrals)
+- Month 5-8: Data (analytics, AI optimization)
+- Month 9-12: Platform (open core, standards)
