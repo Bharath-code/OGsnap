@@ -116,7 +116,7 @@ export default defineSchema({
     userId: v.id("users"),
     stripeCustomerId: v.optional(v.string()),
     stripeSubscriptionId: v.optional(v.string()),
-    plan: v.string(), // free | hobby | starter | pro
+    plan: v.string(), // free | hobby | pro | scale
     status: v.string(),
     currentPeriodEnd: v.optional(v.number()),
     renderLimit: v.number(),

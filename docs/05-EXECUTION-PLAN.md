@@ -145,7 +145,7 @@ Every day you spend perfecting something before launch is a day you don't know i
 - **Create Discord community (target: 100 members)**
 
 **Week 9-10:**
-- Ship `@ogsnap/tanstack` SDK
+- Ship `@ogsnap/nuxt` SDK (if demand)
 - Write second SEO blog post: "Vercel OG vs OGSnap — which should you use"
 - Product Hunt launch preparation
 - Add analytics dashboard (v1.1)

@@ -43,7 +43,7 @@ The result: millions of JavaScript developers either skip OG images entirely, sp
 - Managing 3-10 web products or client sites
 - Needs brand consistency across multiple projects
 - Wants analytics to show clients their content is being shared
-- Budget: $49-99/month is a business expense, not a personal decision
+- Budget: $9-99/month is a business expense, not a personal decision
 - **Pain point:** Managing multiple OG image solutions for different frameworks
 
 **Tertiary — Content Creators / Technical Bloggers**
@@ -70,7 +70,7 @@ The result: millions of JavaScript developers either skip OG images entirely, sp
 
 ### 4.2 Magic Onboarding (v1.0 - Key Differentiator)
 - User pastes their website URL
-- OGSnap crawls and extracts: logo, primary/secondary colors, font family
+- OGSnap uses Firecrawl to crawl and extracts: logo, primary/secondary colors, font family
 - Auto-generates 5 sample OG images in 10 seconds
 - No manual brand kit setup required
 - **This is the "wow factor" that drives viral adoption**
@@ -83,7 +83,6 @@ Ship on day 1:
 Ship in week 3-4:
 - `@ogsnap/svelte` — SvelteKit hooks
 - `@ogsnap/remix` — Remix resource routes
-- `@ogsnap/tanstack` — TanStack Start server functions
 
 **Moat strategy:** Expand to 10+ frameworks by Month 4 (Vue, Nuxt, Solid, Qwik, etc.)
 
