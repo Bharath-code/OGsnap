@@ -84,7 +84,7 @@ They see: "WTF, this is magic!"
 ```
 Click "Get Started"
          ↓
-Sign up with email (or Google/GitHub)
+Sign up/login with Clerk (Google/GitHub and/or email magic link)
          ↓
 Get API key instantly
          ↓

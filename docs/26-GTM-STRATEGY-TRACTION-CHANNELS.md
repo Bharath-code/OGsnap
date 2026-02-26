@@ -427,6 +427,8 @@ OGSnap extracts your brand and generates perfect social images automatically.
 
 ### Social Proof Section
 
+**Execution note:** Treat names/quotes below as placeholder copy. Replace with verifiable customer quotes before publishing.
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   Loved by 2,000+ Developers               │

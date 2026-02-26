@@ -17,7 +17,7 @@
 | Cache | **Convex DB** | Edge-cached queries natively replace Redis |
 | Auth | **Clerk** | Drops right into Convex, vastly simpler than rolling custom JWT auth |
 | File Storage | **Cloudflare R2** | Free egress, S3-compatible API. Store brand logos and rendered images here. |
-| Billing | **Razorpay / DodoPayments** | Stripe alternative for India context. Webhooks sync directly to Convex. |
+| Billing | **DodoPayments** | India-friendly subscriptions with webhook sync to Convex. |
 
 ### Frontend (Dashboard)
 | Layer | Choice | Why |
@@ -114,8 +114,8 @@ export default defineSchema({
 
   subscriptions: defineTable({
     userId: v.id("users"),
-    stripeCustomerId: v.optional(v.string()),
-    stripeSubscriptionId: v.optional(v.string()),
+    paymentCustomerId: v.optional(v.string()), // DodoPayments customer id
+    paymentSubscriptionId: v.optional(v.string()), // DodoPayments subscription id
     plan: v.string(), // free | hobby | pro | scale
     status: v.string(),
     currentPeriodEnd: v.optional(v.number()),
@@ -229,5 +229,5 @@ og_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxx   (test mode, renders not counted)
 - [ ] API keys hashed with Node `crypto` or WebCrypto before storage
 - [ ] XSS prevention: All user inputs sanitized before HTML template injection
 - [ ] CORS restricted to known origins
-- [ ] Stripe/Payment webhook signature verification (managed via Convex HTTP actions)
+- [ ] DodoPayments webhook signature verification (managed via Convex HTTP actions)
 - [ ] R2 bucket private — images served via signed URLs or CDN only

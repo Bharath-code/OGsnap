@@ -1,0 +1,18 @@
+{
+  "name": "@ogsnap/next",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@ogsnap/core": "workspace:*"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "echo 'lint:next-sdk not configured'",
+    "test": "echo 'test:next-sdk not configured'",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}

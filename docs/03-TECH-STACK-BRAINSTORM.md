@@ -1,4 +1,7 @@
 # OGSnap — Tech Stack Brainstorm (CTO Review)
+**Status:** Archived (Pre-Consolidation Alternatives)  
+**Superseded By:** `00-V1-DOC-CONSOLIDATION.md` and `03-TECH-STACK-ARCHITECTURE.md`
+
 **Date:** February 2026  
 **Reviewer:** Veteran CTO Perspective  
 **Context:** Solo developer, India-based, 10-20hrs/week available

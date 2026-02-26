@@ -1,0 +1,35 @@
+{
+  "mcpServers": {
+    "convex": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "convex@latest",
+        "mcp",
+        "start",
+        "--project-dir",
+        "/Users/bharath/Desktop/on-going-projects/og-image-tool",
+        "--env-file",
+        "/Users/bharath/Desktop/on-going-projects/og-image-tool/.env.mcp"
+      ]
+    },
+    "firecrawl": {
+      "command": "bash",
+      "args": [
+        "-lc",
+        "set -a; [ -f /Users/bharath/Desktop/on-going-projects/og-image-tool/.env.mcp ] && source /Users/bharath/Desktop/on-going-projects/og-image-tool/.env.mcp; set +a; npx -y mcp-remote \"https://mcp.firecrawl.dev/${FIRECRAWL_API_KEY}/v2/mcp\""
+      ]
+    },
+    "dodopayments": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.dodopayments.com/sse"
+      ]
+    },
+    "cloudflare-api": {
+      "url": "https://mcp.cloudflare.com/mcp"
+    }
+  }
+}

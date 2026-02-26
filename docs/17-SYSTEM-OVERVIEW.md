@@ -263,7 +263,7 @@
 │  └─────────────────┘         ├─────────────────┤              │        │
 │                             │ id              │              │        │
 │                             │ userId     (FK) │              │        │
-│                             │ stripePaymentId │              │        │
+│                             │ paymentTxnId    │              │        │
 │                             │ amount         │              │        │
 │                             │ currency       │              │        │
 │                             │ status         │              │        │
@@ -665,7 +665,7 @@
 │                                                                                 │
 │  REVENUE:       Subscription ($0-$99/mo), 97% gross margin                   │
 │                                                                                 │
-│  TRACTION:     Pre-launch (projected 500 customers, $25K MRR by Month 12)    │
+│  TRACTION:     Pre-launch (projected 500 customers, $7.5K MRR by Month 12)    │
 │                                                                                 │
 │  ASK:           $300K-600K for 12-18 months runway                          │
 │                                                                                 │

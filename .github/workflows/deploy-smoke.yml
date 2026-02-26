@@ -1,0 +1,29 @@
+name: Deploy Smoke
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm smoke:deploy
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          OGSNAP_SMOKE_API_KEY: ${{ secrets.OGSNAP_SMOKE_API_KEY }}
+          INTERNAL_SERVICE_SECRET: ${{ secrets.INTERNAL_SERVICE_SECRET }}
+          OGSNAP_SMOKE_CLERK_ID: ${{ secrets.OGSNAP_SMOKE_CLERK_ID }}
+          OGSNAP_SMOKE_EMAIL: ${{ secrets.OGSNAP_SMOKE_EMAIL }}
+          SMOKE_RENDER_URL: ${{ secrets.SMOKE_RENDER_URL }}
+          SMOKE_ONBOARDING_URL: ${{ secrets.SMOKE_ONBOARDING_URL }}
+          SMOKE_CONVEX_BASE_URL: ${{ secrets.SMOKE_CONVEX_BASE_URL }}
+          SMOKE_ALLOW_DATA_URL: ${{ secrets.SMOKE_ALLOW_DATA_URL }}

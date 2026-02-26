@@ -38,7 +38,7 @@ That's the entire API surface at launch. One endpoint.
 User action: Pastes their website URL (e.g., "https://my-saas.com")
 
 OGSnap automatically:
-1. Crawls their homepage with Playwright
+1. Crawls their homepage with Firecrawl
 2. Extracts logo from navbar
 3. Reads primary/secondary colors from CSS
 4. Identifies font family from stylesheet
@@ -75,7 +75,7 @@ export const { GET } = OGEndpoint({ apiKey: import.meta.env.OGSNAP_API_KEY })
 - One layout template only at MVP (clean card layout)
 
 ### ✅ Dashboard (Minimal)
-- Sign up with email + password (no OAuth at MVP — reduces complexity)
+- Sign up/login via Clerk (OAuth and/or email magic link)
 - API key displayed on dashboard
 - Usage counter (renders this month / limit)
 - Last 20 renders as a simple table (URL, timestamp, cached yes/no)
@@ -93,7 +93,7 @@ export const { GET } = OGEndpoint({ apiKey: import.meta.env.OGSNAP_API_KEY })
 
 ### ✅ Caching
 - Cache every render by SHA256 hash of (api_key + url + title + description)
-- Store in Redis with 24hr TTL
+- Store cache metadata in Convex + serve images through Cloudflare CDN (24hr default TTL)
 - Return cached image in <50ms with `X-Cache: HIT` header
 
 ### ✅ Watermark
@@ -106,7 +106,6 @@ export const { GET } = OGEndpoint({ apiKey: import.meta.env.OGSNAP_API_KEY })
 
 | Feature | Why Cut |
 |---------|---------|
-| OAuth (Google/GitHub login) | Adds 2 days, not needed for validation |
 | Analytics dashboard | Build after first 20 customers confirm they want it |
 | Multiple templates | One great template beats five mediocre ones |
 | SvelteKit/Remix/TanStack SDKs | Ship after Next.js SDK is validated |
@@ -123,7 +122,7 @@ export const { GET } = OGEndpoint({ apiKey: import.meta.env.OGSNAP_API_KEY })
 
 1. Developer finds OGSnap (HN post, npm search, blog post)
 2. Lands on homepage — sees live demo with their own URL in <5 seconds
-3. Clicks "Get API Key" → email + password signup (30 seconds)
+3. Clicks "Get API Key" → Clerk signup/login (30 seconds)
 4. Dashboard shows API key immediately
 5. Copies npm install command for their framework
 6. Pastes 3 lines into their codebase

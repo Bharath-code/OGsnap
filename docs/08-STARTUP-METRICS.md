@@ -73,14 +73,14 @@ For a developer tool aimed at solo founders/agencies, PMF isn't about massive us
 
 ---
 
-## 4. The 12-Month Roadmap to $50K MRR
+## 4. The 12-Month Roadmap (Base Case + Stretch)
 
-| Phase | Goal | Focus | Financial Target |
-|-------|------|-------|------------------|
-| **Months 1-2** | Survival | Ship MVP with Magic Onboarding. Get 1st dollar from strangers. Fix critical bugs. | $100 MRR → $800 MRR |
-| **Months 3-4** | Distribution | Ship Astro, Svelte, Remix SDKs. Framework partnerships. Referral program. | $2K MRR |
-| **Months 5-8** | Ecosystem | Template marketplace. Enterprise tier. "Built with OGSnap" program. | $10K MRR |
-| **Months 9-12**| Platform | Open core. Data network effects. 10+ framework partnerships. | $50K MRR |
+| Phase | Goal | Focus | Base-Case Target | Stretch Target |
+|-------|------|-------|------------------|----------------|
+| **Months 1-2** | Survival | Ship MVP with Magic Onboarding. Get 1st dollar from strangers. Fix critical bugs. | $100 MRR -> $800 MRR | Same |
+| **Months 3-4** | Distribution | Ship Astro, Svelte, Remix SDKs. Framework partnerships. Referral program. | $2K MRR | $3K MRR |
+| **Months 5-8** | Ecosystem | Templates, retention loops, stronger onboarding conversion. | $5K MRR | $10K MRR |
+| **Months 9-12**| Platform | Open core and data moat work only after proven retention. | $7.5K MRR | $50K MRR |
 
 **Summary:** OGSnap is a high-margin, low-churn "set it and forget it" utility. The execution risk is low because the technology (Playwright + Convex) is proven. The distribution risk is medium-to-high because developers hate paying for things they think they can build, until they realize maintaining it costs 10x more than $9/month.
 

@@ -116,7 +116,7 @@ Each SDK: 3-line install, zero config required, TypeScript-first, auto-reads pag
 - Usage meter (renders used / limit, resets monthly)
 - Recent renders gallery (last 50 images with URL, timestamp, cache status)
 - Brand kit editor
-- Billing management (Stripe Customer Portal)
+- Billing management (DodoPayments Customer Portal)
 - Team seats management (Pro tier)
 
 ### 4.7 Caching Layer
@@ -205,7 +205,7 @@ Each SDK: 3-line install, zero config required, TypeScript-first, auto-reads pag
 | npm installs/week | 100 | 500 | 2,000 | 10,000 |
 | Free signups | 50 | 300 | 1,000 | 5,000 |
 | Paying customers | 5 | 40 | 150 | 500+ |
-| MRR | $100 | $800 | $3,000 | $25,000 |
+| MRR | $100 | $800 | $3,000 | $7,500 |
 | Churn rate | <10% | <5% | <3% | <2% |
 | API uptime | 99.5% | 99.9% | 99.9% | 99.99% |
 | Cache hit rate | 80% | 90% | 95% | 97% |

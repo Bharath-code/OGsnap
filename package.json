@@ -1,0 +1,25 @@
+{
+  "name": "ogsnap",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.3",
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:web": "pnpm --filter @ogsnap/web dev",
+    "dev:renderer": "pnpm --filter @ogsnap/renderer dev",
+    "dev:convex": "pnpm --filter @ogsnap/convex dev",
+    "preflight:local": "node scripts/preflight.mjs --target=local",
+    "preflight:prod": "node scripts/preflight.mjs --target=production",
+    "smoke:deploy": "node scripts/smoke-deploy.mjs",
+    "convex:codegen": "pnpm --filter @ogsnap/convex exec convex codegen",
+    "convex:codegen:check": "node scripts/check-convex-generated.mjs",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}

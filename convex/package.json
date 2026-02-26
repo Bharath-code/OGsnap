@@ -1,0 +1,21 @@
+{
+  "name": "@ogsnap/convex",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "convex dev",
+    "codegen": "convex codegen",
+    "deploy": "convex deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo 'lint:convex not configured'",
+    "test": "echo 'test:convex not configured'"
+  },
+  "dependencies": {
+    "convex": "^1.17.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}

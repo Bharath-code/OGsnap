@@ -424,7 +424,7 @@ The architecture is sound for MVP. The stack choices minimize operational burden
 | **Product** | 10/10 | Magic Onboarding creates viral wow factor. Multi-platform output (7 outputs per 1 integration). AI optimization roadmap. |
 | **Business Model** | 10/10 | 97-98% margins, Enterprise tier ($499/mo), usage-based overage, template marketplace revenue share. |
 | **Team** | 8/10 | Strong skills, fractional support hired, advisory board formed, community building. |
-| **Traction** | 7/10 | With moat strategy: aggressive targets (500 customers, $25K MRR by Month 12) with clear path to prove. |
+| **Traction** | 7/10 | Base case: 500 customers and $7.5K MRR by Month 12, with a stretch path beyond that. |
 | **Moat** | 9/10 | Integration + Data + Community + Platform layers. Framework partnerships. Template marketplace network effects. |
 | **AI Strategy** | 10/10 | Magic Onboarding (MVP), Layout Agent (internal), Smart Optimization (moat). Phased for maximum impact. |
 

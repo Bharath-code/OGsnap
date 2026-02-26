@@ -50,7 +50,7 @@
 │                                  ▼                                        │
 │   ┌────────────────────────────────────────────────────────────────┐    │
 │   │ 1. Validate API key                                             │    │
-│   │ 2. Check cache (Redis)                                         │    │
+│   │ 2. Check cache (Convex metadata + Cloudflare CDN)              │    │
 │   │ 3. If MISS → Queue render job                                    │    │
 │   │ 4. Return image URL                                              │    │
 │   └──────────────────────────────┬─────────────────────────────────┘    │
