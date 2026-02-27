@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { ConvexClerkProvider } from "@/components/providers/convex-clerk-provider";
+import { Reveal } from "@/components/ui/reveal";
 import { syncUserToConvex } from "@/lib/user-sync";
 
 const navItems = [
@@ -29,15 +31,13 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="grid" style={{ gap: 16 }}>
-      <nav className="card" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        {navItems.map((item) => (
-          <Link key={item.href} href={item.href} style={{ opacity: 0.9 }}>
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      {children}
-    </div>
+    <ConvexClerkProvider>
+      <div className="space-y-4">
+        <Reveal>
+          <DashboardNav items={navItems} />
+        </Reveal>
+        <Reveal delay={70}>{children}</Reveal>
+      </div>
+    </ConvexClerkProvider>
   );
 }

@@ -1,21 +1,24 @@
 import { SignUp } from "@clerk/nextjs";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SignupPage() {
   if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
     return (
-      <section className="card">
-        <h2 style={{ marginTop: 0 }}>Sign Up</h2>
-        <p style={{ marginBottom: 0 }}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Sign Up</CardTitle>
+          <CardDescription>
           Clerk is not configured. Set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`.
-        </p>
-      </section>
+          </CardDescription>
+        </CardHeader>
+      </Card>
     );
   }
 
   return (
-    <section className="card">
-      <h2 style={{ marginTop: 0 }}>Sign Up</h2>
+    <Card className="p-6">
+      <h2 className="mb-4 font-display text-2xl">Sign Up</h2>
       <SignUp path="/signup" routing="path" signInUrl="/login" />
-    </section>
+    </Card>
   );
 }

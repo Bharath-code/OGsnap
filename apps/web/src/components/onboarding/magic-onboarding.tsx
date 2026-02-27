@@ -1,6 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 interface DemoResponse {
   imageUrl: string;
@@ -39,30 +44,37 @@ export function MagicOnboarding() {
   }
 
   return (
-    <section className="card grid" style={{ gap: 12 }}>
-      <h3 style={{ margin: 0 }}>Magic Onboarding Demo</h3>
-      <p style={{ margin: 0, opacity: 0.85 }}>
-        Paste a URL and run the first render through the v1 API flow.
-      </p>
-      <input className="input" value={url} onChange={(event) => setUrl(event.target.value)} />
-      <button className="button" type="button" onClick={runDemo} disabled={loading}>
-        {loading ? "Rendering..." : "Generate Demo Image"}
-      </button>
+    <Card>
+      <CardHeader>
+        <Badge className="w-fit">Try It Live</Badge>
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <Sparkles className="h-4 w-4 text-primary" />
+          Magic Onboarding Demo
+        </CardTitle>
+        <CardDescription>Paste a URL and run the first render through the v1 API flow.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Input value={url} onChange={(event) => setUrl(event.target.value)} />
+        <Button type="button" onClick={runDemo} disabled={loading}>
+          {loading ? "Rendering..." : "Generate Demo Image"}
+        </Button>
 
-      {error ? <p style={{ color: "#fda4af", margin: 0 }}>{error}</p> : null}
+        {error ? <p className="text-sm text-red-500">{error}</p> : null}
 
-      {result ? (
-        <div className="grid" style={{ gap: 8 }}>
-          <p style={{ margin: 0 }}>
-            cache: <strong>{result.cacheHit ? "HIT" : "MISS"}</strong> | render: <strong>{result.renderTimeMs}ms</strong>
-          </p>
-          <img
-            src={result.imageUrl}
-            alt="OG render preview"
-            style={{ width: "100%", borderRadius: 12, border: "1px solid rgba(148,163,184,0.3)" }}
-          />
-        </div>
-      ) : null}
-    </section>
+        {result ? (
+          <div className="space-y-3">
+            <div className="text-sm text-muted-foreground">
+              cache: <strong className="text-foreground">{result.cacheHit ? "HIT" : "MISS"}</strong> | render:{" "}
+              <strong className="text-foreground">{result.renderTimeMs}ms</strong>
+            </div>
+            <img
+              src={result.imageUrl}
+              alt="OG render preview"
+              className="w-full rounded-lg border border-border/70 object-cover"
+            />
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
   );
 }

@@ -4,6 +4,7 @@ import { dodoWebhook } from "./billing/webhooks";
 import { bootstrapDemo } from "./dev/http";
 import { magicOnboarding } from "./onboarding/http";
 import { syncUserFromIdentity } from "./users/http";
+import { getDashboardData } from "./dashboard/http";
 
 const http = httpRouter();
 
@@ -41,6 +42,12 @@ http.route({
   path: "/v1/internal/sync-user",
   method: "POST",
   handler: syncUserFromIdentity,
+});
+
+http.route({
+  path: "/v1/internal/dashboard",
+  method: "POST",
+  handler: getDashboardData,
 });
 
 export default http;

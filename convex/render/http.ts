@@ -62,6 +62,11 @@ export const renderImage = httpAction(async (ctx, request) => {
 
   const cached = await ctx.runQuery(api.render.queries.getCachedRender, { cacheKey });
   if (cached?.imageUrl) {
+    await ctx.runMutation(api.usage.mutations.incrementMonthlyUsage, {
+      userId: apiKey.userId,
+      by: 1,
+    });
+
     await ctx.runMutation(api.apiKeys.mutations.touchLastUsed, {
       apiKeyId: apiKey._id,
     });

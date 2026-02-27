@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { createCustomerPortalSession } from "@/lib/dodo";
 
 export async function POST(request: NextRequest) {
+  const authState = await auth();
+  if (!authState.userId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   const body = (await request.json()) as {
     customerId?: string;
   };

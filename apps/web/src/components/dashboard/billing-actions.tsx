@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowRight, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export function BillingActions() {
   const [email, setEmail] = useState("");
@@ -48,25 +52,34 @@ export function BillingActions() {
   }
 
   return (
-    <div className="grid" style={{ gap: 10 }}>
-      <label className="grid" style={{ gap: 6 }}>
-        <span>Email for checkout</span>
-        <input className="input" value={email} onChange={(event) => setEmail(event.target.value)} />
+    <CardContent className="space-y-4">
+      <label className="grid gap-2 text-sm">
+        <span className="font-medium text-foreground">Email for checkout</span>
+        <Input value={email} onChange={(event) => setEmail(event.target.value)} />
       </label>
 
-      <div className="grid two">
-        <button className="button" type="button" onClick={() => startCheckout("hobby")}>Start Hobby ($9)</button>
-        <button className="button" type="button" onClick={() => startCheckout("pro")}>Start Pro ($29)</button>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <Button type="button" onClick={() => startCheckout("hobby")}>
+          Start Hobby ($9)
+          <ArrowRight className="h-4 w-4" />
+        </Button>
+        <Button type="button" onClick={() => startCheckout("pro")} variant="secondary">
+          Start Pro ($29)
+          <ArrowRight className="h-4 w-4" />
+        </Button>
       </div>
 
-      <label className="grid" style={{ gap: 6 }}>
-        <span>Customer ID for portal</span>
-        <input className="input" value={customerId} onChange={(event) => setCustomerId(event.target.value)} />
+      <label className="grid gap-2 text-sm">
+        <span className="font-medium text-foreground">Customer ID for portal</span>
+        <Input value={customerId} onChange={(event) => setCustomerId(event.target.value)} />
       </label>
 
-      <button className="button" type="button" onClick={openPortal}>Open Customer Portal</button>
+      <Button type="button" onClick={openPortal} variant="outline">
+        Open Customer Portal
+        <ExternalLink className="h-4 w-4" />
+      </Button>
 
-      {message ? <p style={{ margin: 0, opacity: 0.85 }}>{message}</p> : null}
-    </div>
+      {message ? <p className="text-sm text-muted-foreground">{message}</p> : null}
+    </CardContent>
   );
 }

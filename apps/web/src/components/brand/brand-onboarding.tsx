@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { PaintBucket } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 interface OnboardingBrand {
   title?: string;
@@ -55,62 +59,68 @@ export function BrandOnboarding() {
   }
 
   return (
-    <section className="card grid" style={{ gap: 12 }}>
-      <h3 style={{ margin: 0 }}>Magic Onboarding</h3>
-      <p style={{ margin: 0, opacity: 0.85 }}>
-        Paste your site URL. We extract branding with Firecrawl and persist your default brand kit.
-      </p>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <PaintBucket className="h-4 w-4 text-primary" />
+          Magic Onboarding
+        </CardTitle>
+        <CardDescription>
+          Paste your site URL. We extract branding with Firecrawl and persist your default brand kit.
+        </CardDescription>
+      </CardHeader>
 
-      <input
-        className="input"
-        placeholder="https://your-site.com"
-        value={url}
-        onChange={(event) => setUrl(event.target.value)}
-      />
-
-      <button className="button" type="button" disabled={loading || !url} onClick={handleRun}>
-        {loading ? "Extracting..." : "Extract And Save Brand"}
-      </button>
-
-      {error ? <p style={{ margin: 0, color: "#fca5a5" }}>{error}</p> : null}
-
-      {result?.brand ? (
-        <div className="grid two">
-          <div className="card" style={{ padding: 14 }}>
-            <p style={{ margin: 0 }}>
-              <strong>Primary</strong>: {result.brand.primaryColor ?? "n/a"}
-            </p>
-            <p style={{ margin: "8px 0 0 0" }}>
-              <strong>Background</strong>: {result.brand.backgroundColor ?? "n/a"}
-            </p>
-            <p style={{ margin: "8px 0 0 0" }}>
-              <strong>Font</strong>: {result.brand.fontFamily ?? "n/a"}
-            </p>
-          </div>
-
-          <div className="card" style={{ padding: 14 }}>
-            {result.brand.logoUrl ? (
-              <img
-                src={result.brand.logoUrl}
-                alt="Extracted logo"
-                style={{ maxWidth: "100%", maxHeight: 80, objectFit: "contain" }}
-              />
-            ) : (
-              <p style={{ margin: 0 }}>No logo detected</p>
-            )}
-          </div>
-        </div>
-      ) : null}
-
-      {result?.previewImageUrl ? (
-        <img
-          src={result.previewImageUrl}
-          alt="Generated OG preview"
-          style={{ width: "100%", borderRadius: 10, border: "1px solid rgba(148, 163, 184, 0.3)" }}
+      <CardContent className="space-y-4">
+        <Input
+          placeholder="https://your-site.com"
+          value={url}
+          onChange={(event) => setUrl(event.target.value)}
         />
-      ) : null}
 
-      {result?.previewWarning ? <p style={{ margin: 0, opacity: 0.8 }}>{result.previewWarning}</p> : null}
-    </section>
+        <Button type="button" disabled={loading || !url} onClick={handleRun}>
+          {loading ? "Extracting..." : "Extract And Save Brand"}
+        </Button>
+
+        {error ? <p className="text-sm text-red-500">{error}</p> : null}
+
+        {result?.brand ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-lg border border-border/70 bg-muted/40 p-4 text-sm">
+              <p>
+                <strong>Primary:</strong> {result.brand.primaryColor ?? "n/a"}
+              </p>
+              <p>
+                <strong>Background:</strong> {result.brand.backgroundColor ?? "n/a"}
+              </p>
+              <p>
+                <strong>Font:</strong> {result.brand.fontFamily ?? "n/a"}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-border/70 bg-muted/40 p-4">
+              {result.brand.logoUrl ? (
+                <img
+                  src={result.brand.logoUrl}
+                  alt="Extracted logo"
+                  className="max-h-20 w-full object-contain"
+                />
+              ) : (
+                <p className="text-sm text-muted-foreground">No logo detected</p>
+              )}
+            </div>
+          </div>
+        ) : null}
+
+        {result?.previewImageUrl ? (
+          <img
+            src={result.previewImageUrl}
+            alt="Generated OG preview"
+            className="w-full rounded-lg border border-border/70"
+          />
+        ) : null}
+
+        {result?.previewWarning ? <p className="text-sm text-muted-foreground">{result.previewWarning}</p> : null}
+      </CardContent>
+    </Card>
   );
 }
