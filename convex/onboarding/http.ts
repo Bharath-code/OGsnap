@@ -13,6 +13,14 @@ function optionalString(value: unknown): string | undefined {
   return normalized.length > 0 ? normalized : undefined;
 }
 
+const PREVIEW_TITLES = [
+  { title: "Welcome to Our Site", description: "Discover what we have to offer" },
+  { title: "New Features Released", description: "Check out the latest updates" },
+  { title: "How It Works", description: "Learn about our process" },
+  { title: "Get Started Today", description: "Join thousands of users" },
+  { title: "Our Mission", description: "Building the future together" },
+];
+
 export const magicOnboarding = httpAction(async (ctx, request) => {
   const secret = process.env.INTERNAL_SERVICE_SECRET;
   if (!secret) {
@@ -70,20 +78,26 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
     fontFamily: brand.fontFamily ?? "Inter, system-ui, sans-serif",
   });
 
-  let previewImageUrl: string | undefined;
-  let previewWarning: string | undefined;
+  const previews: Array<{ title: string; description: string; imageUrl: string }> = [];
+  const warnings: string[] = [];
 
-  try {
-    const preview = await ctx.runAction(api.render.actions.generateImage, {
-      userId,
-      plan: subscription?.plan ?? "free",
-      url,
-      title: brand.title ?? "Your Brand Preview",
-      description: "Magic onboarding generated this preview.",
-    });
-    previewImageUrl = preview.imageUrl;
-  } catch (error) {
-    previewWarning = error instanceof Error ? error.message : "Preview generation failed";
+  for (let i = 0; i < PREVIEW_TITLES.length; i++) {
+    try {
+      const preview = await ctx.runAction(api.render.actions.generateImage, {
+        userId,
+        plan: subscription?.plan ?? "free",
+        url,
+        title: PREVIEW_TITLES[i].title,
+        description: PREVIEW_TITLES[i].description,
+      });
+      previews.push({
+        title: PREVIEW_TITLES[i].title,
+        description: PREVIEW_TITLES[i].description,
+        imageUrl: preview.imageUrl,
+      });
+    } catch (error) {
+      warnings.push(`Preview ${i + 1} failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
   }
 
   return new Response(
@@ -92,8 +106,9 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
       userId,
       brandKitId,
       brand,
-      previewImageUrl,
-      previewWarning,
+      previews,
+      previewCount: previews.length,
+      warnings: warnings.length > 0 ? warnings : undefined,
     }),
     {
       status: 200,

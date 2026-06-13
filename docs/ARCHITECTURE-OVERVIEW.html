@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGSnap - Architecture Overview</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #1a1a2e; margin-bottom: 10px; font-size: 2.5em; }
+        h2 { color: #16213e; margin: 30px 0 15px; padding-bottom: 10px; border-bottom: 2px solid #0f3460; }
+        h3 { color: #0f3460; margin: 20px 0 10px; }
+        h4 { color: #533483; margin: 15px 0 8px; }
+        p { margin-bottom: 15px; }
+        code { 
+            background: #1a1a2e; 
+            color: #e94560; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        pre { 
+            background: #1a1a2e; 
+            color: #eee; 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .flow { 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            gap: 10px; 
+            margin: 20px 0;
+        }
+        .flow-step { 
+            background: linear-gradient(135deg, #0f3460, #533483); 
+            color: white; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            text-align: center;
+            min-width: 120px;
+        }
+        .flow-arrow { color: #e94560; font-size: 1.5em; }
+        .component { 
+            background: #f0f4f8; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border-left: 4px solid #0f3460;
+        }
+        .tech-stack { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .tech-item { 
+            background: white; 
+            padding: 15px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .tech-name { font-weight: bold; color: #0f3460; }
+        .tech-why { font-size: 0.85em; color: #666; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #0f3460; color: white; }
+        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
+        .diagram { 
+            background: #0f3460; 
+            color: #7fdbda; 
+            padding: 20px; 
+            border-radius: 12px; 
+            font-family: 'Monaco', monospace;
+            font-size: 0.85em;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        ul { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🏗️ OGSnap Architecture Overview</h1>
+    <p><em>System architecture and data flow diagrams for OGSnap v1.0</em></p>
+
+    <div class="section">
+        <h2>1. High-Level Architecture</h2>
+        
+        <h3>System Overview Diagram</h3>
+        <div class="diagram">┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                              OGSnap System Architecture                              │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+
+                         ┌─────────────────────┐
+                         │   Developer Website  │
+                         │  (Next.js/Astro/     │
+                         │   SvelteKit/Remix)   │
+                         └──────────┬────────────┘
+                                    │
+         ┌──────────────────────────┼──────────────────────────┐
+         │                          │                          │
+         ▼                          ▼                          ▼
+┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
+│  @ogsnap/next   │      │  @ogsnap/astro  │      │   Direct API    │
+│  SDK Package    │      │  SDK Package    │      │   (REST)        │
+└────────┬────────┘      └────────┬────────┘      └────────┬────────┘
+         │                        │                        │
+         └────────────────────────┼────────────────────────┘
+                                   │
+                                   ▼
+                         ┌─────────────────────┐
+                         │  Cloudflare CDN    │
+                         │  (Edge Network)    │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │  Next.js Web App   │
+                         │  (Vercel)          │
+                         └──────────┬──────────┘
+                                    │
+                                    │ HTTPS
+                                    ▼
+                         ┌─────────────────────┐
+                         │  Convex Backend    │
+                         │  (API + Database)  │
+                         └──────────┬──────────┘
+                                    │
+              ┌─────────────────────┼─────────────────────┐
+              │                     │                     │
+              ▼                     ▼                     ▼
+    ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+    │  Clerk Auth     │  │  Firecrawl     │  │  DodoPayments  │
+    │  (Auth)         │  │  (Brand)       │  │  (Billing)     │
+    └─────────────────┘  └─────────────────┘  └─────────────────┘
+              │                     │                     │
+              └─────────────────────┼─────────────────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │  Playwright        │
+                         │  Renderer          │
+                         │  (Microservice)    │
+                         └─────────────────────┘</div>
+
+        <h3>Tech Stack</h3>
+        <div class="tech-stack">
+            <div class="tech-item">
+                <div class="tech-name">Frontend: Next.js 15</div>
+                <div class="tech-why">Landing page + Dashboard with App Router</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Backend: Convex</div>
+                <div class="tech-why">API + Database + Actions (serverless)</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Renderer: Playwright</div>
+                <div class="tech-why">HTML → PNG conversion</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Storage: Cloudflare R2</div>
+                <div class="tech-why">Free egress, S3-compatible</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Auth: Clerk</div>
+                <div class="tech-why">User authentication</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Billing: DodoPayments</div>
+                <div class="tech-why">India-friendly subscriptions</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">Brand: Firecrawl</div>
+                <div class="tech-why">URL → brand data extraction</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-name">CDN: Cloudflare</div>
+                <div class="tech-why">Image delivery & caching</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. User Sign Up Flow</h2>
+        
+        <div class="flow">
+            <div class="flow-step">1. User visits<br>/signup</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">2. Clerk<br>Auth Page</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">3. Sign up<br>complete</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">4. Convex<br>creates user</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">5. Redirect to<br>/dashboard</div>
+        </div>
+
+        <h4>What happens in Convex:</h4>
+        <ul>
+            <li>Insert into <code>users</code> table</li>
+            <li>Insert into <code>subscriptions</code> (free plan)</li>
+            <li>Create empty <code>brandKits</code> entry</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>3. Magic Onboarding Flow</h2>
+        
+        <div class="flow">
+            <div class="flow-step">Enter<br>URL</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Firecrawl<br>scrape</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Extract<br>logo/colors</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Save<br>brand kit</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Generate 5<br>previews</div>
+        </div>
+
+        <h4>Brand Extraction Process:</h4>
+        <ol>
+            <li>Fetch HTML from user's URL via Firecrawl</li>
+            <li>Extract <code>og:image</code> or favicon for logo</li>
+            <li>Extract theme colors from <code>meta theme-color</code> or CSS</li>
+            <li>Extract font-family from stylesheet</li>
+            <li>Save to brandKits table</li>
+            <li>Generate 5 sample OG images with different titles</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>4. API Render Flow</h2>
+        
+        <div class="flow">
+            <div class="flow-step">Developer<br>calls API</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Convex<br>validates key</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Check<br>cache?</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">HIT: return<br>URL</div>
+        </div>
+
+        <h4>Cache MISS Flow:</h4>
+        <div class="flow">
+            <div class="flow-step">Get brand<br>kit</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Build HTML<br>template</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Playwright<br>render</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Upload<br>to R2</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Record<br>usage</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Return<br>URL</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>5. Billing Upgrade Flow</h2>
+        
+        <div class="flow">
+            <div class="flow-step">User clicks<br>"Upgrade"</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Convex<br>creates<br>checkout</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Redirect<br>to Dodo</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">User pays</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Webhook<br>updates DB</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">Done!</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>6. Database Schema</h2>
+        
+        <table>
+            <tr>
+                <th>Table</th>
+                <th>Purpose</th>
+                <th>Key Fields</th>
+            </tr>
+            <tr>
+                <td><code>users</code></td>
+                <td>User accounts</td>
+                <td>clerkId, email, name</td>
+            </tr>
+            <tr>
+                <td><code>subscriptions</code></td>
+                <td>Plan info</td>
+                <td>plan, status, renderLimit</td>
+            </tr>
+            <tr>
+                <td><code>apiKeys</code></td>
+                <td>API keys</td>
+                <td>keyHash, keyPrefix, revokedAt</td>
+            </tr>
+            <tr>
+                <td><code>brandKits</code></td>
+                <td>Brand settings</td>
+                <td>logoUrl, primaryColor, fontFamily</td>
+            </tr>
+            <tr>
+                <td><code>renderLogs</code></td>
+                <td>Render history</td>
+                <td>originalUrl, imageUrl, cacheHit</td>
+            </tr>
+            <tr>
+                <td><code>usageCounters</code></td>
+                <td>Usage tracking</td>
+                <td>month, rendersUsed</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>7. Environment Variables</h2>
+        
+        <h4>apps/web/.env.local</h4>
+        <pre>NEXT_PUBLIC_CONVEX_URL=<span class="highlight">From Convex dashboard</span>
+CLERK_SECRET_KEY=<span class="highlight">From Clerk</span>
+INTERNAL_SERVICE_SECRET=<span class="highlight">Shared with Convex</span>
+FIRECRAWL_API_KEY=<span class="highlight">From Firecrawl</span>
+DODO_API_KEY=<span class="highlight">From DodoPayments</span>
+RENDERER_SERVICE_URL=<span class="highlight">Renderer deployment URL</span></pre>
+    </div>
+
+    <div class="section">
+        <h2>8. Quick Start</h2>
+        
+        <pre># 1. Install dependencies
+pnpm install
+
+# 2. Set up environment variables
+cp apps/web/.env.local.example apps/web/.env.local
+# Fill in your API keys
+
+# 3. Start development
+pnpm dev:convex     # Terminal 1 - Backend
+pnpm dev:renderer   # Terminal 2 - Renderer
+pnpm dev:web       # Terminal 3 - Frontend
+
+# 4. Open browser
+open http://localhost:3000</pre>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #666;">
+        <p>OGSnap v1.0 | Generated: March 2026</p>
+    </footer>
+</body>
+</html>

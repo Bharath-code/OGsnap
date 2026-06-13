@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OGSnap - User Flow Screen by Screen</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6; 
+            color: #333; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        h1 { color: #1a1a2e; margin-bottom: 10px; font-size: 2.2em; }
+        h2 { color: #16213e; margin: 35px 0 15px; padding-bottom: 8px; border-bottom: 2px solid #0f3460; }
+        h3 { color: #0f3460; margin: 20px 0 12px; font-size: 1.3em; }
+        h4 { color: #533483; margin: 12px 0 8px; }
+        p { margin-bottom: 12px; }
+        code { 
+            background: #e8e8e8; 
+            color: #c7254e; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+        }
+        pre { 
+            background: #282c34; 
+            color: #abb2bf; 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto;
+            margin: 12px 0;
+            font-size: 0.85em;
+        }
+        .section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .screen { 
+            background: #fff; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin: 15px 0;
+        }
+        .screen-title { 
+            background: #0f3460; 
+            color: white; 
+            padding: 8px 15px; 
+            border-radius: 6px 6px 0 0; 
+            margin: -20px -20px 15px;
+            font-weight: 600;
+        }
+        .action { 
+            background: #e3f2fd; 
+            padding: 8px 12px; 
+            border-radius: 6px; 
+            margin: 8px 0;
+            border-left: 3px solid #2196f3;
+        }
+        .nav-flow { 
+            display: flex; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            gap: 8px; 
+            margin: 15px 0;
+        }
+        .nav-step { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            padding: 10px 16px; 
+            border-radius: 6px; 
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        .nav-arrow { color: #e94560; font-weight: bold; font-size: 1.2em; }
+        .component { 
+            background: #f5f5f5; 
+            padding: 12px; 
+            margin: 8px 0; 
+            border-radius: 6px; 
+            border-left: 3px solid #0f3460;
+        }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #0f3460; color: white; font-size: 0.9em; }
+        ul, ol { margin-left: 20px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        .highlight { 
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            padding: 3px 10px; 
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+        .box {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 12px 0;
+        }
+        .journey-node {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>👤 OGSnap User Flow: Screen by Screen</h1>
+    <p>A complete walkthrough of every screen and interaction a user experiences.</p>
+
+    <div class="section">
+        <h2>1. Landing Page (Unauthenticated)</h2>
+        
+        <div class="screen">
+            <div class="screen-title">Screen 1.1: Landing Page — /</div>
+            
+            <div class="box">
+                <h4>Hero Section</h4>
+                <p>✨ OG images in 3 lines. Every modern JS framework.</p>
+                <p><strong>The SaaS pipeline for Open Graph images that actually scales.</strong></p>
+                <div style="margin: 15px 0;">
+                    <span class="highlight">Start Free</span>
+                    <span style="margin: 0 10px; color: #999;">or</span>
+                    <span class="highlight" style="background: #6c757d;">Open Dashboard</span>
+                </div>
+            </div>
+
+            <div class="box">
+                <h4>Features Grid</h4>
+                <ul>
+                    <li>🎨 Brand-Aware Output — Extract colors, logos...</li>
+                    <li>⚡ Framework Native APIs — Drop into route handlers...</li>
+                    <li>🛡️ Usage And Billing Gates — Manage API keys...</li>
+                    <li>☁️ Storage You Can Trust — R2-backed storage...</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <h4>Pricing</h4>
+                <table>
+                    <tr><th>Plan</th><th>Price</th><th>Renders</th></tr>
+                    <tr><td>Free</td><td>$0</td><td>100/mo (watermarked)</td></tr>
+                    <tr><td>Hobby</td><td>$9/mo</td><td>1,000/mo</td></tr>
+                    <tr><td>Pro</td><td>$29/mo</td><td>5,000/mo</td></tr>
+                </table>
+            </div>
+
+            <div class="action"><strong>User Action:</strong> Click "Start Free" → Navigate to /signup</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Sign Up Flow</h2>
+        
+        <div class="nav-flow">
+            <div class="nav-step">1. Landing</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">2. /signup</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">3. Clerk Auth</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">4. /dashboard</div>
+        </div>
+
+        <div class="screen">
+            <div class="screen-title">Screen 2.1: Sign Up — /signup</div>
+            
+            <div class="box">
+                <h4>Authentication Options</h4>
+                <ul>
+                    <li>🔵 Continue with <strong>Google</strong></li>
+                    <li>⚫ Continue with <strong>GitHub</strong></li>
+                    <li>📧 Continue with <strong>Email</strong> (magic link)</li>
+                </ul>
+            </div>
+
+            <div class="action"><strong>System Action:</strong> Clerk → Webhook → Convex creates user + subscription</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3. Dashboard Home</h2>
+        
+        <div class="screen">
+            <div class="screen-title">Screen 3.1: Dashboard — /dashboard</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 15px 0;">
+                <div class="component">
+                    <h4>🔑 API Keys</h4>
+                    <p>Issue and manage live keys</p>
+                </div>
+                <div class="component">
+                    <h4>🎨 Brand Kit</h4>
+                    <p>Set default visual language</p>
+                </div>
+                <div class="component">
+                    <h4>📊 Recent Renders</h4>
+                    <p>Monitor usage and cache</p>
+                </div>
+                <div class="component">
+                    <h4>💳 Billing</h4>
+                    <p>Checkout and portal actions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>4. API Keys Management</h2>
+        
+        <div class="screen">
+            <div class="screen-title">Screen 4.1: API Keys — /dashboard/keys</div>
+            
+            <div class="box">
+                <h4>Actions</h4>
+                <ul>
+                    <li><strong>[+ Create New Key]</strong> → Modal to name key → Generate</li>
+                    <li><strong>[Copy]</strong> → Copy key to clipboard</li>
+                    <li><strong>[Revoke]</strong> → Disable key</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <h4>Quick Start Code</h4>
+<pre>npm install @ogsnap/next
+
+// app/blog/[slug]/opengraph-image.ts
+import { generateOG } from '@ogsnap/next';
+
+export const { GET } = generateOG({
+  apiKey: process.env.OGSNAP_API_KEY,
+});</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>5. Brand Kit (Magic Onboarding)</h2>
+        
+        <div class="nav-flow">
+            <div class="nav-step">Enter URL</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">Firecrawl Extract</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">Save Brand Kit</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">Generate 5 Previews</div>
+        </div>
+
+        <div class="screen">
+            <div class="screen-title">Screen 5.1: Brand Kit — /dashboard/brand</div>
+            
+            <div class="box">
+                <h4>Magic Onboarding</h4>
+                <div style="margin: 10px 0;">
+                    <input type="text" placeholder="https://your-site.com" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+                </div>
+                <button style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                    Extract Brand & Generate Previews
+                </button>
+            </div>
+
+            <div class="box">
+                <h4>Extracted Brand (After)</h4>
+                <ul>
+                    <li>Primary: <span style="color: #3B82F6;">#3B82F6</span></li>
+                    <li>Background: <span style="color: #0F172A;">#0F172A</span></li>
+                    <li>Font: Inter</li>
+                    <li>Logo: [detected image]</li>
+                </ul>
+            </div>
+
+            <div class="box">
+                <h4>Generated Previews (5)</h4>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="background: #f0f0f0; padding: 10px; border-radius: 6px; text-align: center; width: 120px;">
+                        <div style="background: white; height: 60px; border-radius: 4px; margin-bottom: 5px;"></div>
+                        <small>Welcome</small>
+                    </div>
+                    <div style="background: #f0f0f0; padding: 10px; border-radius: 6px; text-align: center; width: 120px;">
+                        <div style="background: white; height: 60px; border-radius: 4px; margin-bottom: 5px;"></div>
+                        <small>New Features</small>
+                    </div>
+                    <div style="background: #f0f0f0; padding: 10px; border-radius: 6px; text-align: center; width: 120px;">
+                        <div style="background: white; height: 60px; border-radius: 4px; margin-bottom: 5px;"></div>
+                        <small>How It Works</small>
+                    </div>
+                    <div style="background: #f0f0f0; padding: 10px; border-radius: 6px; text-align: center; width: 120px;">
+                        <div style="background: white; height: 60px; border-radius: 4px; margin-bottom: 5px;"></div>
+                        <small>Get Started</small>
+                    </div>
+                    <div style="background: #f0f0f0; padding: 10px; border-radius: 6px; text-align: center; width: 120px;">
+                        <div style="background: white; height: 60px; border-radius: 4px; margin-bottom: 5px;"></div>
+                        <small>Our Mission</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>6. Recent Renders</h2>
+        
+        <div class="screen">
+            <div class="screen-title">Screen 6.1: Renders — /dashboard/renders</div>
+            
+            <div class="box">
+                <h4>Usage Meter</h4>
+                <div style="background: #e9ecef; border-radius: 10px; padding: 3px; margin: 10px 0;">
+                    <div style="background: linear-gradient(90deg, #667eea, #764ba2); width: 47%; padding: 8px; border-radius: 8px; color: white; font-size: 0.85em;">
+                        47 / 100 renders (47%)
+                    </div>
+                </div>
+            </div>
+
+            <div class="box">
+                <h4>Render History Table</h4>
+                <table>
+                    <tr><th>URL</th><th>Rendered</th><th>Cache</th><th>Time</th></tr>
+                    <tr><td>/blog/launch</td><td>Feb 18, 2pm</td><td>MISS</td><td>1.2s</td></tr>
+                    <tr><td>/blog/feature</td><td>Feb 18, 1pm</td><td>HIT</td><td>45ms</td></tr>
+                    <tr><td>/pricing</td><td>Feb 17, 5pm</td><td>HIT</td><td>38ms</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>7. Billing</h2>
+        
+        <div class="screen">
+            <div class="screen-title">Screen 7.1: Billing — /dashboard/billing</div>
+            
+            <div class="box">
+                <h4>Current Plan</h4>
+                <p><strong>Free Plan</strong> — 100 renders/month</p>
+                <p>Current usage: 47/100</p>
+                <button style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin-top: 10px;">
+                    [Upgrade]
+                </button>
+            </div>
+
+            <div class="box">
+                <h4>Available Plans</h4>
+                <table>
+                    <tr><th>Plan</th><th>Price</th><th>Renders</th><th></th></tr>
+                    <tr><td>Hobby</td><td>$9/mo</td><td>1,000</td><td>[Select]</td></tr>
+                    <tr><td>Pro</td><td>$29/mo</td><td>5,000</td><td>[Select]</td></tr>
+                    <tr><td>Scale</td><td>$99/mo</td><td>25,000</td><td>[Select]</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>8. Developer API Usage</h2>
+        
+        <div class="nav-flow">
+            <div class="nav-step">Install SDK</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">Add to Route</div>
+            <span class="nav-arrow">→</span>
+            <div class="nav-step">Done!</div>
+        </div>
+
+        <div class="screen">
+            <div class="screen-title">Step 8.1: Integration</div>
+            
+<pre># 1. Install
+npm install @ogsnap/next
+
+# 2. Add to Next.js route
+// app/blog/[slug]/opengraph-image.ts
+import { generateOG } from '@ogsnap/next';
+
+export const { GET } = generateOG({
+  apiKey: process.env.OGSNAP_API_KEY!,
+});
+
+# 3. That's it!
+# When Twitter fetches /blog/my-post, it returns OG image</pre>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>9. Complete Journey Map</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 10px; margin: 20px 0;">
+            <div class="journey-node">🏠 Landing Page (/)</div>
+            <div style="text-align: center; color: #999;">↓</div>
+            <div class="journey-node">📝 Sign Up (/signup) → Clerk → Convex</div>
+            <div style="text-align: center; color: #999;">↓</div>
+            <div class="journey-node">📊 Dashboard (/dashboard)</div>
+            <div style="display: flex; gap: 20px; justify-content: center; margin: 10px 0;">
+                <div style="text-align: center;">
+                    <div style="color: #999;">↓</div>
+                    <div class="journey-node">🔑 API Keys</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: #999;">↓</div>
+                    <div class="journey-node">🎨 Brand Kit</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="color: #999;">↓</div>
+                    <div class="journey-node">💳 Billing</div>
+                </div>
+            </div>
+            <div style="text-align: center; color: #999;">↓</div>
+            <div class="journey-node">🚀 Production — OG Images Working!</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Screen Summary</h2>
+        
+        <table>
+            <tr><th>#</th><th>Screen</th><th>URL</th><th>Key Actions</th></tr>
+            <tr><td>1</td><td>Landing</td><td>/</td><td>Sign up CTA</td></tr>
+            <tr><td>2</td><td>Sign Up</td><td>/signup</td><td>Clerk auth</td></tr>
+            <tr><td>3</td><td>Dashboard</td><td>/dashboard</td><td>Navigation</td></tr>
+            <tr><td>4</td><td>API Keys</td><td>/dashboard/keys</td><td>Create, copy, revoke</td></tr>
+            <tr><td>5</td><td>Brand Kit</td><td>/dashboard/brand</td><td>Magic onboarding</td></tr>
+            <tr><td>6</td><td>Renders</td><td>/dashboard/renders</td><td>View history</td></tr>
+            <tr><td>7</td><td>Billing</td><td>/dashboard/billing</td><td>Upgrade plan</td></tr>
+        </table>
+    </div>
+
+    <footer style="text-align: center; padding: 20px; color: #666;">
+        <p>OGSnap v1.0 | Generated: March 2026</p>
+    </footer>
+</body>
+</html>
