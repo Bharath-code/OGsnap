@@ -155,13 +155,13 @@ export function BrandOnboarding() {
         </Button>
 
         {status ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
-            <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
+          <div role="status" aria-live="polite" className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
+            <span className="h-2 w-2 rounded-full bg-primary animate-ping" aria-hidden="true" />
             <span>{status}</span>
           </div>
         ) : null}
 
-        {error ? <p className="text-sm text-red-500">{error}</p> : null}
+        {error ? <p role="alert" className="text-sm text-red-500">{error}</p> : null}
 
         {result?.brand ? (
           <div className="grid gap-4 md:grid-cols-2">

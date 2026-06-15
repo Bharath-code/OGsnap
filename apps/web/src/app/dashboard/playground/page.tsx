@@ -189,48 +189,50 @@ export default function PlaygroundPage() {
 
               {/* Toggles */}
               <div className="pt-2 space-y-3">
-                <label className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-background/40 hover:bg-background/60 transition cursor-pointer">
-                  <div className="space-y-0.5 pr-2">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-background/40 hover:bg-background/60 transition">
+                  <label htmlFor="multi-size-checkbox" className="space-y-0.5 pr-2 cursor-pointer flex-1">
                     <span className="text-sm font-medium flex items-center gap-1.5">
-                      <Layers className="h-3.5 w-3.5 text-primary" />
+                      <Layers className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                       Multi-Platform Sizes
                     </span>
                     <span className="text-xs text-muted-foreground block leading-tight">
                       Render 7 social crop dimensions in parallel
                     </span>
-                  </div>
+                  </label>
                   <input
+                    id="multi-size-checkbox"
                     type="checkbox"
                     checked={multi}
                     onChange={(e) => setMulti(e.target.checked)}
                     disabled={loading}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
                   />
-                </label>
+                </div>
 
-                <label className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-background/40 hover:bg-background/60 transition cursor-pointer">
-                  <div className="space-y-0.5 pr-2">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-background/40 hover:bg-background/60 transition">
+                  <label htmlFor="ai-copy-checkbox" className="space-y-0.5 pr-2 cursor-pointer flex-1">
                     <span className="text-sm font-medium flex items-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                      <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
                       AI Copy Polish
                     </span>
                     <span className="text-xs text-muted-foreground block leading-tight">
                       Generate optimized Alt text, tweets, and posts
                     </span>
-                  </div>
+                  </label>
                   <input
+                    id="ai-copy-checkbox"
                     type="checkbox"
                     checked={polish}
                     onChange={(e) => setPolish(e.target.checked)}
                     disabled={loading}
                     className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
                   />
-                </label>
+                </div>
               </div>
 
               {isFreePlan && (
-                <div className="flex gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 text-xs">
-                  <Info className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
+                <div role="alert" className="flex gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 text-xs">
+                  <Info className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" aria-hidden="true" />
                   <div>
                     <strong>Free Tier Notice:</strong> Renders are processed using the low-latency <strong>Satori Engine</strong> and will include an OGSnap watermark. Upgrade to remove.
                   </div>
@@ -238,8 +240,8 @@ export default function PlaygroundPage() {
               )}
 
               {error && (
-                <div className="flex gap-2 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-800 text-xs">
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" />
+                <div role="alert" className="flex gap-2 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-800 text-xs">
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" aria-hidden="true" />
                   <div className="break-all">{error}</div>
                 </div>
               )}
@@ -318,10 +320,15 @@ export default function PlaygroundPage() {
                   <div className="p-4 bg-muted/30">
                     <div className="flex flex-col gap-4">
                       {/* Image Viewer Container */}
-                      <div className="relative overflow-hidden rounded-lg border border-border/80 bg-[linear-gradient(45deg,#ccc_25%,transparent_25%),linear-gradient(-45deg,#ccc_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#ccc_75%),linear-gradient(-45deg,transparent_75%,#ccc_75%)] bg-[size:16px_16px] bg-[position:0_0,0_8px,8px_-8px,8px_0] bg-white flex items-center justify-center p-4">
+                      <div
+                        id="image-preview-panel"
+                        role="tabpanel"
+                        aria-label="Social Image Preview"
+                        className="relative overflow-hidden rounded-lg border border-border/80 bg-[linear-gradient(45deg,#ccc_25%,transparent_25%),linear-gradient(-45deg,#ccc_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#ccc_75%),linear-gradient(-45deg,transparent_75%,#ccc_75%)] bg-[size:16px_16px] bg-[position:0_0,0_8px,8px_-8px,8px_0] bg-white flex items-center justify-center p-4"
+                      >
                         <img
                           src={activeImageUrl}
-                          alt="Rendered social card"
+                          alt={`Rendered preview of size ${SIZE_LABELS[selectedSize]?.label || selectedSize}`}
                           className="max-h-[380px] w-auto max-w-full rounded-md shadow-lg object-contain transition-all duration-300"
                         />
                       </div>
@@ -329,15 +336,18 @@ export default function PlaygroundPage() {
                       {/* Selector Tabs for Sizes */}
                       {multi && multiResult && (
                         <div className="space-y-2.5">
-                          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
+                          <span id="size-selector-label" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
                             Target Social Sizes ({Object.keys(multiResult.images).length})
-                          </label>
-                          <div className="flex flex-wrap gap-2">
+                          </span>
+                          <div className="flex flex-wrap gap-2" role="tablist" aria-labelledby="size-selector-label">
                             {(Object.keys(multiResult.images) as SizeKey[]).map((key) => {
                               const active = selectedSize === key;
                               return (
                                 <button
                                   key={key}
+                                  role="tab"
+                                  aria-selected={active}
+                                  aria-controls="image-preview-panel"
                                   onClick={() => setSelectedSize(key)}
                                   className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition flex items-center gap-1.5 ${
                                     active
