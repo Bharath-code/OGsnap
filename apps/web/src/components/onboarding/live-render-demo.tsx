@@ -13,7 +13,7 @@ interface DemoResponse {
   renderTimeMs: number;
 }
 
-export function MagicOnboarding() {
+export function LiveRenderDemo() {
   const [url, setUrl] = useState("https://example.com/blog/my-post");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,9 +49,11 @@ export function MagicOnboarding() {
         <Badge className="w-fit">Try It Live</Badge>
         <CardTitle className="flex items-center gap-2 text-xl">
           <Sparkles className="h-4 w-4 text-primary" />
-          Magic Onboarding Demo
+          Live Render Demo
         </CardTitle>
-        <CardDescription>Paste a URL and run the first render through the v1 API flow.</CardDescription>
+        <CardDescription>
+          Renders a basic OG image in 3 lines. For brand-matched previews, sign up and use Magic Onboarding.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Input value={url} onChange={(event) => setUrl(event.target.value)} />

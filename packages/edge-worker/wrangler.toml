@@ -1,0 +1,10 @@
+name = "ogsnap-edge-cache"
+main = "index.ts"
+compatibility_date = "2026-06-15"
+
+[vars]
+CONVEX_URL = "https://your-convex-app.convex.site"
+
+[[kv_namespaces]]
+binding = "OGSNAP_CACHE"
+id = "YOUR_KV_NAMESPACE_ID"

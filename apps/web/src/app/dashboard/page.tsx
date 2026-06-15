@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AreaChart, KeyRound, Palette, ReceiptText } from "lucide-react";
+import { AreaChart, KeyRound, Palette, ReceiptText, Sparkles } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -7,6 +7,7 @@ const sections = [
   { href: "/dashboard/keys", label: "API Keys", icon: KeyRound, blurb: "Issue and manage live keys" },
   { href: "/dashboard/brand", label: "Brand Kit", icon: Palette, blurb: "Set default visual language" },
   { href: "/dashboard/renders", label: "Recent Renders", icon: AreaChart, blurb: "Monitor usage and cache" },
+  { href: "/dashboard/playground", label: "Playground", icon: Sparkles, blurb: "Test multi-platform renders & AI copy" },
   { href: "/dashboard/billing", label: "Billing", icon: ReceiptText, blurb: "Checkout and portal actions" },
 ];
 

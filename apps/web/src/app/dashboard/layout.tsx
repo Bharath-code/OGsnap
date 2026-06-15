@@ -11,6 +11,7 @@ const navItems = [
   { href: "/dashboard/brand", label: "Brand Kit" },
   { href: "/dashboard/renders", label: "Renders" },
   { href: "/dashboard/billing", label: "Billing" },
+  { href: "/dashboard/playground", label: "Playground" },
 ];
 
 export default async function DashboardLayout({

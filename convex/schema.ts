@@ -49,6 +49,7 @@ export default defineSchema({
     backgroundColor: v.string(),
     fontFamily: v.string(),
     isDefault: v.boolean(),
+    brandExtractionMethod: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),

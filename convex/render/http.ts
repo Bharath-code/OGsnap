@@ -10,6 +10,8 @@ interface RenderBody {
   template?: string;
   width?: number;
   height?: number;
+  multi?: boolean;
+  polish?: boolean;
 }
 
 export const renderImage = httpAction(async (ctx, request) => {
@@ -50,7 +52,7 @@ export const renderImage = httpAction(async (ctx, request) => {
     );
   }
 
-  const cacheKey = buildRenderCacheKey({
+  const cacheKey = await buildRenderCacheKey({
     apiKeyId: String(apiKey._id),
     url: body.url,
     title: body.title,
@@ -59,6 +61,47 @@ export const renderImage = httpAction(async (ctx, request) => {
     width: body.width,
     height: body.height,
   });
+
+  if (body.multi) {
+    const renderResult = (await ctx.runAction(api.render.actions.generateImage, {
+      userId: apiKey.userId,
+      plan: seededSubscription?.plan ?? "free",
+      url: body.url,
+      title: body.title,
+      description: body.description,
+      multi: true,
+      polish: body.polish,
+    })) as any;
+
+    await ctx.runMutation(api.apiKeys.mutations.touchLastUsed, {
+      apiKeyId: apiKey._id,
+    });
+
+    await ctx.runMutation(api.render.mutations.recordRender, {
+      userId: apiKey.userId,
+      apiKeyId: apiKey._id,
+      cacheKey,
+      originalUrl: body.url,
+      title: body.title,
+      description: body.description,
+      imageUrl: renderResult.images.og,
+      cacheHit: false,
+      renderTimeMs: renderResult.renderTimeMs,
+    });
+
+    return json(
+      {
+        images: renderResult.images,
+        metadata: renderResult.metadata,
+        cacheHit: false,
+        renderTimeMs: renderResult.renderTimeMs,
+      },
+      200,
+      {
+        "X-Cache": "MISS",
+      },
+    );
+  }
 
   const cached = await ctx.runQuery(api.render.queries.getCachedRender, { cacheKey });
   if (cached?.imageUrl) {
@@ -84,7 +127,7 @@ export const renderImage = httpAction(async (ctx, request) => {
     );
   }
 
-  const renderResult = await ctx.runAction(api.render.actions.generateImage, {
+  const renderResult = (await ctx.runAction(api.render.actions.generateImage, {
     userId: apiKey.userId,
     plan: seededSubscription?.plan ?? "free",
     url: body.url,
@@ -92,7 +135,8 @@ export const renderImage = httpAction(async (ctx, request) => {
     description: body.description,
     width: body.width,
     height: body.height,
-  });
+    polish: body.polish,
+  })) as any;
 
   await ctx.runMutation(api.apiKeys.mutations.touchLastUsed, {
     apiKeyId: apiKey._id,
@@ -113,6 +157,7 @@ export const renderImage = httpAction(async (ctx, request) => {
   return json(
     {
       imageUrl: renderResult.imageUrl,
+      metadata: renderResult.metadata,
       cacheHit: false,
       renderTimeMs: renderResult.renderTimeMs,
     },

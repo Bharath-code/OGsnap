@@ -16,7 +16,7 @@ import {
   Sparkles,
   Wand2,
 } from "lucide-react";
-import { MagicOnboarding } from "@/components/onboarding/magic-onboarding";
+import { LiveRenderDemo } from "@/components/onboarding/live-render-demo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -313,33 +313,7 @@ export default function HomePage() {
           </Reveal>
 
           <Reveal delay={180}>
-            <Card className="overflow-hidden border-foreground/10 bg-[#152338] text-white">
-              <CardContent className="space-y-4 p-0">
-                <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-                  <div className="flex items-center gap-2 text-sm text-white/80">
-                    <Wand2 className="h-4 w-4 text-[#7dd3fc]" />
-                    Live Render Preview
-                  </div>
-                  <Badge className="bg-white/10 text-white">Route-ready</Badge>
-                </div>
-                <div className="space-y-4 px-5 pb-5">
-                  <div className="rounded-lg border border-white/15 bg-white/5 p-4 font-mono text-xs text-white/90">
-                    <div>{`POST /api/demo-render`}</div>
-                    <div className="mt-2 text-[#7dd3fc]">{`{ "url": "https://example.com/post" }`}</div>
-                  </div>
-                  <div className="rounded-lg border border-white/10 bg-[linear-gradient(140deg,#132034_0%,#273a56_48%,#0e1a2d_100%)] p-5">
-                    <div className="mb-3 text-xs uppercase tracking-[0.18em] text-white/55">Generated OG</div>
-                    <div className="rounded-md border border-white/10 bg-white/95 p-4 text-[#13203a]">
-                      <div className="mb-2 text-xs uppercase tracking-wide text-[#3c4f71]">OGSnap</div>
-                      <div className="font-display text-2xl leading-tight">
-                        Stop maintaining custom OG workers for every app.
-                      </div>
-                      <div className="mt-3 text-xs text-[#516289]">ogsnap.dev</div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <LiveRenderDemo />
           </Reveal>
         </div>
       </section>
@@ -409,7 +383,33 @@ export default function HomePage() {
           </div>
         </Reveal>
         <Reveal delay={160}>
-          <MagicOnboarding />
+          <Card className="overflow-hidden border-foreground/10 bg-[#152338] text-white">
+            <CardContent className="space-y-4 p-0">
+              <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Wand2 className="h-4 w-4 text-[#7dd3fc]" />
+                  Live Render Preview
+                </div>
+                <Badge className="bg-white/10 text-white">Route-ready</Badge>
+              </div>
+              <div className="space-y-4 px-5 pb-5">
+                <div className="rounded-lg border border-white/15 bg-white/5 p-4 font-mono text-xs text-white/90">
+                  <div>{`POST /api/demo-render`}</div>
+                  <div className="mt-2 text-[#7dd3fc]">{`{ "url": "https://example.com/post" }`}</div>
+                </div>
+                <div className="rounded-lg border border-white/10 bg-[linear-gradient(140deg,#132034_0%,#273a56_48%,#0e1a2d_100%)] p-5">
+                  <div className="mb-3 text-xs uppercase tracking-[0.18em] text-white/55">Generated OG</div>
+                  <div className="rounded-md border border-white/10 bg-white/95 p-4 text-[#13203a]">
+                    <div className="mb-2 text-xs uppercase tracking-wide text-[#3c4f71]">OGSnap</div>
+                    <div className="font-display text-2xl leading-tight">
+                      Stop maintaining custom OG workers for every app.
+                    </div>
+                    <div className="mt-3 text-xs text-[#516289]">ogsnap.dev</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </Reveal>
       </section>
 

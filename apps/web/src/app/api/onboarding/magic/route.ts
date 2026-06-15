@@ -51,11 +51,12 @@ export async function POST(request: Request) {
     }),
   });
 
-  const text = await response.text();
-  return new Response(text, {
+  return new Response(response.body, {
     status: response.status,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
     },
   });
 }

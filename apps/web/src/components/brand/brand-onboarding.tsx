@@ -33,12 +33,15 @@ interface OnboardingResponse {
 export function BrandOnboarding() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const [result, setResult] = useState<OnboardingResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function handleRun() {
     setLoading(true);
     setError(null);
+    setStatus("Connecting...");
+    setResult(null);
 
     try {
       const response = await fetch("/api/onboarding/magic", {
@@ -49,18 +52,79 @@ export function BrandOnboarding() {
         body: JSON.stringify({ url }),
       });
 
-      const payload = (await response.json()) as OnboardingResponse;
-
-      if (!response.ok || !payload.success) {
-        setError(payload.error ?? "Onboarding failed");
-        setResult(null);
-        return;
+      if (!response.ok) {
+        throw new Error(`Onboarding failed: ${response.statusText}`);
       }
 
-      setResult(payload);
+      const reader = response.body?.getReader();
+      if (!reader) {
+        throw new Error("Response body is not readable");
+      }
+
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      setResult({ success: true, previews: [], warnings: [] });
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const parts = buffer.split("\n\n");
+        buffer = parts.pop() || "";
+
+        for (const part of parts) {
+          if (!part.trim()) continue;
+
+          let event = "message";
+          let data = "";
+
+          const lines = part.split("\n");
+          for (const line of lines) {
+            if (line.startsWith("event:")) {
+              event = line.replace("event:", "").trim();
+            } else if (line.startsWith("data:")) {
+              data = line.replace("data:", "").trim();
+            }
+          }
+
+          if (!data) continue;
+          const parsedData = JSON.parse(data);
+
+          if (event === "status") {
+            setStatus(parsedData.message);
+          } else if (event === "brand") {
+            setResult((prev) => ({
+              ...prev!,
+              brand: parsedData.brand,
+            }));
+          } else if (event === "preview") {
+            setResult((prev) => {
+              const currentPreviews = prev?.previews || [];
+              return {
+                ...prev!,
+                previews: [...currentPreviews, parsedData],
+              };
+            });
+          } else if (event === "warning") {
+            setResult((prev) => {
+              const currentWarnings = prev?.warnings || [];
+              return {
+                ...prev!,
+                warnings: [...currentWarnings, parsedData.message],
+              };
+            });
+          } else if (event === "error") {
+            setError(parsedData.message);
+          }
+        }
+      }
+
+      setStatus(null);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Onboarding request failed");
-      setResult(null);
+      setStatus(null);
     } finally {
       setLoading(false);
     }
@@ -89,6 +153,13 @@ export function BrandOnboarding() {
         <Button type="button" disabled={loading || !url} onClick={handleRun}>
           {loading ? "Extracting brand & generating previews..." : "Extract Brand & Generate Previews"}
         </Button>
+
+        {status ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
+            <span className="h-2 w-2 rounded-full bg-primary animate-ping" />
+            <span>{status}</span>
+          </div>
+        ) : null}
 
         {error ? <p className="text-sm text-red-500">{error}</p> : null}
 

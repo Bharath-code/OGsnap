@@ -8,15 +8,14 @@ export interface RenderCacheInput {
   height?: number;
 }
 
-function stableHash(input: string): string {
-  let hash = 5381;
-  for (let index = 0; index < input.length; index += 1) {
-    hash = (hash * 33) ^ input.charCodeAt(index);
-  }
-  return (hash >>> 0).toString(16).padStart(8, "0");
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const bytes = new Uint8Array(hashBuffer);
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-export function buildRenderCacheKey(input: RenderCacheInput): string {
+export async function buildRenderCacheKey(input: RenderCacheInput): Promise<string> {
   const digestInput = JSON.stringify({
     apiKeyId: input.apiKeyId,
     url: input.url,
@@ -26,7 +25,8 @@ export function buildRenderCacheKey(input: RenderCacheInput): string {
     width: input.width ?? 1200,
     height: input.height ?? 630,
   });
-  return stableHash(digestInput);
+  const hash = await sha256Hex(digestInput);
+  return hash.slice(0, 16);
 }
 
 export function monthBucket(timestamp: number): string {

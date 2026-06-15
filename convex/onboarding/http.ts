@@ -21,6 +21,12 @@ const PREVIEW_TITLES = [
   { title: "Our Mission", description: "Building the future together" },
 ];
 
+function sendSSE(controller: ReadableStreamDefaultController, event: string, data: unknown) {
+  const encoder = new TextEncoder();
+  const msg = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  controller.enqueue(encoder.encode(msg));
+}
+
 export const magicOnboarding = httpAction(async (ctx, request) => {
   const secret = process.env.INTERNAL_SERVICE_SECRET;
   if (!secret) {
@@ -46,73 +52,81 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
 
   const userId = userIdRaw as Id<"users">;
 
-  const subscription = await ctx.runMutation(api.render.mutations.seedDefaultSubscriptionIfMissing, {
-    userId,
-  });
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        const subscription = await ctx.runMutation(api.render.mutations.seedDefaultSubscriptionIfMissing, {
+          userId,
+        });
 
-  const extracted = await ctx.runAction(api.brand.actions.extractFromUrl, {
-    url,
-  });
+        sendSSE(controller, "status", { message: "Extracting brand guidelines..." });
+        const extracted = await ctx.runAction(api.brand.actions.extractFromUrl, {
+          url,
+        });
 
-  if (!extracted.success) {
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: extracted.error ?? "Failed to extract brand",
-      }),
-      {
-        status: 422,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
+        if (!extracted.success) {
+          sendSSE(controller, "error", { message: extracted.error ?? "Failed to extract brand" });
+          controller.close();
+          return;
+        }
 
-  const brand = extracted.result;
+        const brand = extracted.result;
 
-  const brandKitId = await ctx.runMutation(api.brand.mutations.upsertDefaultBrandKit, {
-    userId,
-    name: "Auto Imported",
-    logoUrl: brand.logoUrl,
-    primaryColor: brand.primaryColor ?? "#3B82F6",
-    backgroundColor: brand.backgroundColor ?? "#0F172A",
-    fontFamily: brand.fontFamily ?? "Inter, system-ui, sans-serif",
-  });
+        const brandKitId = await ctx.runMutation(api.brand.mutations.upsertDefaultBrandKit, {
+          userId,
+          name: "Auto Imported",
+          logoUrl: brand.logoUrl,
+          primaryColor: brand.primaryColor ?? "#3B82F6",
+          backgroundColor: brand.backgroundColor ?? "#0F172A",
+          fontFamily: brand.fontFamily ?? "Inter, system-ui, sans-serif",
+        });
 
-  const previews: Array<{ title: string; description: string; imageUrl: string }> = [];
-  const warnings: string[] = [];
+        sendSSE(controller, "brand", {
+          brandKitId,
+          brand,
+        });
 
-  for (let i = 0; i < PREVIEW_TITLES.length; i++) {
-    try {
-      const preview = await ctx.runAction(api.render.actions.generateImage, {
-        userId,
-        plan: subscription?.plan ?? "free",
-        url,
-        title: PREVIEW_TITLES[i].title,
-        description: PREVIEW_TITLES[i].description,
-      });
-      previews.push({
-        title: PREVIEW_TITLES[i].title,
-        description: PREVIEW_TITLES[i].description,
-        imageUrl: preview.imageUrl,
-      });
-    } catch (error) {
-      warnings.push(`Preview ${i + 1} failed: ${error instanceof Error ? error.message : "Unknown error"}`);
-    }
-  }
+        sendSSE(controller, "status", { message: "Generating previews..." });
 
-  return new Response(
-    JSON.stringify({
-      success: true,
-      userId,
-      brandKitId,
-      brand,
-      previews,
-      previewCount: previews.length,
-      warnings: warnings.length > 0 ? warnings : undefined,
-    }),
-    {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+        const renderPromises = PREVIEW_TITLES.map(async (item, index) => {
+          try {
+            const preview = await ctx.runAction(api.render.actions.generateImage, {
+              userId,
+              plan: subscription?.plan ?? "free",
+              url,
+              title: item.title,
+              description: item.description,
+            });
+            
+            sendSSE(controller, "preview", {
+              index,
+              title: item.title,
+              description: item.description,
+              imageUrl: preview.imageUrl,
+            });
+          } catch (error) {
+            sendSSE(controller, "warning", {
+              index,
+              message: error instanceof Error ? error.message : "Unknown error",
+            });
+          }
+        });
+
+        await Promise.allSettled(renderPromises);
+        sendSSE(controller, "done", { success: true });
+        controller.close();
+      } catch (err) {
+        sendSSE(controller, "error", { message: err instanceof Error ? err.message : "Internal error" });
+        controller.close();
+      }
     },
-  );
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection": "keep-alive",
+    },
+  });
 });

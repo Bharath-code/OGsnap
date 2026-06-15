@@ -39,6 +39,14 @@ export const getKeysPanelByClerkId = query({
     apiKeyLimit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated");
+    }
+    if (identity.subject !== args.clerkId) {
+      throw new Error("Unauthorized");
+    }
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk", (q) => q.eq("clerkId", args.clerkId))
@@ -84,6 +92,14 @@ export const getRendersPanelByClerkId = query({
     renderLimit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthenticated");
+    }
+    if (identity.subject !== args.clerkId) {
+      throw new Error("Unauthorized");
+    }
+
     const user = await ctx.db
       .query("users")
       .withIndex("by_clerk", (q) => q.eq("clerkId", args.clerkId))

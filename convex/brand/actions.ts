@@ -2,6 +2,7 @@
 
 import { action } from "../_generated/server";
 import { v } from "convex/values";
+import { extractBrandFromScreenshot } from "../lib/llm";
 
 function extractHexColor(input: string): string | null {
   const match = input.match(/#([0-9a-fA-F]{3}){1,2}\b/);
@@ -147,6 +148,7 @@ export const extractFromUrl = action({
     let html = "";
     let title = "Your Website";
     let description = "";
+    let screenshotUrl: string | undefined = undefined;
 
     try {
       const response = await fetch("https://api.firecrawl.dev/v1/scrape", {
@@ -157,7 +159,7 @@ export const extractFromUrl = action({
         },
         body: JSON.stringify({
           url: args.url,
-          formats: ["html", "metadata"],
+          formats: ["html", "metadata", "screenshot"],
         }),
       });
 
@@ -176,12 +178,14 @@ export const extractFromUrl = action({
             description?: string;
           };
           html?: string;
+          screenshot?: string;
         };
       };
 
       html = payload.data?.html ?? "";
       title = payload.data?.metadata?.title ?? "Your Website";
       description = payload.data?.metadata?.description ?? "";
+      screenshotUrl = payload.data?.screenshot;
     } catch (err) {
       return {
         success: false,
@@ -196,20 +200,50 @@ export const extractFromUrl = action({
       };
     }
 
-    const logoUrl = extractLogoUrl(html, args.url);
-    const primaryColor = extractPrimaryColor(html);
-    const backgroundColor = extractBackgroundColor(html);
-    const fontFamily = extractFontFamily(html);
+    let brandKit: {
+      logoUrl?: string;
+      primaryColor: string;
+      backgroundColor: string;
+      fontFamily: string;
+      accentColor?: string;
+    } | null = null;
+    let brandExtractionMethod: "vision" | "regex-fallback" = "regex-fallback";
+
+    if (screenshotUrl) {
+      brandKit = await extractBrandFromScreenshot(screenshotUrl);
+      if (brandKit) {
+        brandExtractionMethod = "vision";
+      } else {
+        console.warn("Vision-based brand kit extraction failed; falling back to regex.");
+      }
+    } else {
+      console.warn("No screenshot received from Firecrawl; falling back to regex.");
+    }
+
+    if (!brandKit) {
+      const logoUrl = extractLogoUrl(html, args.url);
+      const primaryColor = extractPrimaryColor(html);
+      const backgroundColor = extractBackgroundColor(html);
+      const fontFamily = extractFontFamily(html);
+      brandKit = {
+        logoUrl: logoUrl ?? undefined,
+        primaryColor,
+        backgroundColor,
+        fontFamily,
+      };
+    }
 
     return {
       success: true,
       result: {
         title: title.slice(0, 100),
         description: description.slice(0, 200),
-        logoUrl: logoUrl ?? undefined,
-        primaryColor,
-        backgroundColor,
-        fontFamily,
+        logoUrl: brandKit.logoUrl,
+        primaryColor: brandKit.primaryColor,
+        backgroundColor: brandKit.backgroundColor,
+        fontFamily: brandKit.fontFamily,
+        accentColor: brandKit.accentColor,
+        brandExtractionMethod,
       },
     };
   },

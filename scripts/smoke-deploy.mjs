@@ -70,6 +70,58 @@ async function smokeRender() {
   );
 }
 
+async function smokeRenderMultiAndPolish() {
+  console.log("Starting multi-size & AI polish render smoke test...");
+  const { response, text, json } = await fetchJson(`${apiBase}/v1/render`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      url: renderUrl,
+      title: "OGSnap Smoke Multi-Render",
+      description: "Testing multi size and AI polish rendering",
+      multi: true,
+      polish: true,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Multi-render smoke failed (${response.status}): ${text}`);
+  }
+
+  if (!json || typeof json.images !== "object" || json.images === null) {
+    throw new Error(`Multi-render smoke returned invalid payload (missing images): ${text}`);
+  }
+
+  const expectedSizes = ["og", "twitter", "linkedin", "slack", "discord", "square", "story"];
+  for (const size of expectedSizes) {
+    if (typeof json.images[size] !== "string" || json.images[size].length === 0) {
+      throw new Error(`Multi-render smoke payload missing size ${size}: ${text}`);
+    }
+  }
+
+  const hasLlmKey = Boolean(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY);
+  if (hasLlmKey) {
+    if (!json.metadata || typeof json.metadata.altText !== "string" || json.metadata.altText.length === 0) {
+      throw new Error(`Multi-render smoke payload missing or invalid AI altText: ${text}`);
+    }
+    if (typeof json.metadata.twitterCopy !== "string" || json.metadata.twitterCopy.length === 0) {
+      throw new Error(`Multi-render smoke payload missing or invalid AI twitterCopy: ${text}`);
+    }
+    if (typeof json.metadata.linkedinCopy !== "string" || json.metadata.linkedinCopy.length === 0) {
+      throw new Error(`Multi-render smoke payload missing or invalid AI linkedinCopy: ${text}`);
+    }
+  } else {
+    console.log("[info] Skipping AI metadata assertion as LLM API keys are not set in environment");
+  }
+
+  console.log(
+    `[ok] multi-size + AI polish render smoke passed in ${elapsedMs()}ms (7 sizes verified)`
+  );
+}
+
 async function smokeInternalSyncAndOnboarding() {
   if (!internalSecret) {
     console.log("[skip] internal sync/onboarding smoke (INTERNAL_SERVICE_SECRET not set)");
@@ -136,6 +188,7 @@ async function smokeInternalSyncAndOnboarding() {
 
 try {
   await smokeRender();
+  await smokeRenderMultiAndPolish();
   await smokeInternalSyncAndOnboarding();
   console.log(`Smoke suite passed in ${elapsedMs()}ms`);
 } catch (error) {
