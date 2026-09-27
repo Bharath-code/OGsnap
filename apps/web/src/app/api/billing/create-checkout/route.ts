@@ -17,17 +17,21 @@ export async function POST(request: NextRequest) {
 
   const body = (await request.json()) as {
     plan?: "hobby" | "pro" | "scale";
+    siteId?: string;
     email?: string;
   };
 
-  if (!body.plan) {
-    return new Response("plan is required", { status: 400 });
+  if (!body.plan && !body.siteId) {
+    return new Response("plan or siteId is required", { status: 400 });
+  }
+  if (body.siteId !== undefined && !/^[a-z0-9]{10,64}$/.test(body.siteId)) {
+    return new Response("Invalid siteId", { status: 400 });
   }
 
-  const envKey = PLAN_TO_PRICE_ENV[body.plan];
-  const priceId = process.env[envKey];
-  if (!priceId) {
-    return new Response(`${envKey} is missing`, { status: 500 });
+  const envKey = body.siteId ? "DODO_SITE_PRODUCT_ID" : PLAN_TO_PRICE_ENV[body.plan!];
+  const productId = envKey ? process.env[envKey] : undefined;
+  if (!envKey || !productId) {
+    return new Response(`${envKey ?? "Product id"} is missing`, { status: 500 });
   }
 
   const webBase = process.env.WEB_BASE_URL ?? "http://localhost:3000";
@@ -45,10 +49,11 @@ export async function POST(request: NextRequest) {
 
     const checkout = await createCheckoutSession({
       customerEmail,
-      priceId,
-      successUrl: `${webBase}/dashboard/billing?checkout=success`,
-      cancelUrl: `${webBase}/dashboard/billing?checkout=cancelled`,
-      metadata: { userId: convexUserId, plan: body.plan },
+      productId,
+      successUrl: `${webBase}/dashboard/${body.siteId ? "sites" : "billing"}?checkout=success`,
+      cancelUrl: `${webBase}/dashboard/${body.siteId ? "sites" : "billing"}?checkout=cancelled`,
+      // ownership is enforced when the webhook applies the status (setStatusFromBilling)
+      metadata: body.siteId ? { userId: convexUserId, siteId: body.siteId } : { userId: convexUserId, plan: body.plan! },
     });
 
     return Response.json(checkout);

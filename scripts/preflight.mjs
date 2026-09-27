@@ -31,6 +31,7 @@ const requiredByTarget = {
       "DODO_HOBBY_PRICE_ID",
       "DODO_PRO_PRICE_ID",
       "DODO_SCALE_PRICE_ID",
+      "DODO_SITE_PRODUCT_ID",
       "WEB_BASE_URL",
     ],
     convex: [

@@ -33,26 +33,34 @@ export function safeEqualString(a: string, b: string): boolean {
   return result === 0;
 }
 
-export async function hmacSha256Hex(secret: string, payload: string): Promise<string> {
-  const keyData = new TextEncoder().encode(secret);
-  const payloadData = new TextEncoder().encode(payload);
+const base64ToBytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+const bytesToBase64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes));
+
+// Standard Webhooks (https://www.standardwebhooks.com), which Dodo Payments uses
+export async function verifyStandardWebhook(
+  rawBody: string,
+  headers: { id: string | null; timestamp: string | null; signature: string | null },
+  secret: string,
+  nowSeconds = Math.floor(Date.now() / 1000),
+): Promise<boolean> {
+  const { id, timestamp, signature } = headers;
+  if (!id || !timestamp || !signature) return false;
+
+  const sentAt = Number(timestamp);
+  if (!Number.isFinite(sentAt) || Math.abs(nowSeconds - sentAt) > 300) return false;
+
   const key = await crypto.subtle.importKey(
     "raw",
-    keyData,
+    base64ToBytes(secret.replace(/^whsec_/, "")),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
   );
-  const signature = await crypto.subtle.sign("HMAC", key, payloadData);
-  return bytesToHex(new Uint8Array(signature));
-}
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${timestamp}.${rawBody}`));
+  const expected = bytesToBase64(new Uint8Array(mac));
 
-export async function verifyDodoSignature(
-  rawBody: string,
-  signature: string | null,
-  secret: string,
-): Promise<boolean> {
-  if (!signature) return false;
-  const expected = await hmacSha256Hex(secret, rawBody);
-  return safeEqualString(expected, signature);
+  return signature.split(" ").some((part) => {
+    const [version, value] = part.split(",");
+    return version === "v1" && value !== undefined && safeEqualString(value, expected);
+  });
 }

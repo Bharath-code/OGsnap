@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PLAN_PRICES } from "@/lib/pricing";
 import { type DashboardSite, siteImageUrl, useCreateSite, useSites } from "@/lib/dashboard-live";
 
 const snippetFor = (siteId: string) => {
@@ -20,7 +21,27 @@ const snippetFor = (siteId: string) => {
 
 function SiteCard({ site }: { site: DashboardSite }) {
   const [copied, setCopied] = useState(false);
+  const [activating, setActivating] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
   const snippet = snippetFor(site.id);
+
+  async function activate() {
+    setActivating(true);
+    setBillingError(null);
+    try {
+      const response = await fetch("/api/billing/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ siteId: site.id }),
+      });
+      if (!response.ok) throw new Error(await response.text());
+      const { checkoutUrl } = (await response.json()) as { checkoutUrl: string };
+      window.location.assign(checkoutUrl);
+    } catch (error) {
+      setBillingError(error instanceof Error ? error.message : "Could not start checkout");
+      setActivating(false);
+    }
+  }
 
   async function copy() {
     await navigator.clipboard.writeText(snippet);
@@ -58,8 +79,22 @@ function SiteCard({ site }: { site: DashboardSite }) {
             {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
             {copied ? "Copied" : "Copy snippet"}
           </Button>
-          {site.status === "trial" ? (
-            <p className="text-xs text-muted-foreground">Trial previews carry a small watermark until the site is active.</p>
+          {site.status !== "active" ? (
+            <div className="space-y-1 pt-2">
+              <Button type="button" size="sm" onClick={activate} disabled={activating}>
+                {activating ? "Opening checkout..." : `Activate for $${PLAN_PRICES.site}/month`}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                {site.status === "trial"
+                  ? "Trial previews carry a small watermark until the site is active."
+                  : "This site is canceled, so shares show a neutral image."}
+              </p>
+              {billingError ? (
+                <p role="alert" className="text-xs text-red-600">
+                  {billingError}
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </CardContent>

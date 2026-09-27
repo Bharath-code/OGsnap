@@ -1,8 +1,10 @@
-const DODO_API_BASE = "https://api.dodopayments.com/v1";
+// DODO_ENVIRONMENT=live_mode for real charges; anything else hits test mode
+const dodoApiBase = () =>
+  process.env.DODO_ENVIRONMENT === "live_mode" ? "https://live.dodopayments.com" : "https://test.dodopayments.com";
 
 interface CreateCheckoutInput {
   customerEmail: string;
-  priceId: string;
+  productId: string;
   successUrl: string;
   cancelUrl: string;
   metadata?: Record<string, string>;
@@ -20,7 +22,7 @@ async function dodoRequest<T>(options: DodoRequestOptions): Promise<T> {
     throw new Error("DODO_API_KEY is not configured");
   }
 
-  const response = await fetch(`${DODO_API_BASE}${options.path}`, {
+  const response = await fetch(`${dodoApiBase()}${options.path}`, {
     method: options.method,
     headers: {
       Authorization: `Bearer ${apiKey}`,
@@ -37,19 +39,19 @@ async function dodoRequest<T>(options: DodoRequestOptions): Promise<T> {
 }
 
 export async function createCheckoutSession(input: CreateCheckoutInput): Promise<{ checkoutUrl: string }> {
-  const payload = await dodoRequest<{ url: string }>({
+  const payload = await dodoRequest<{ checkout_url: string }>({
     method: "POST",
-    path: "/checkout/sessions",
+    path: "/checkouts",
     body: {
-      customer_email: input.customerEmail,
-      price_id: input.priceId,
-      success_url: input.successUrl,
+      product_cart: [{ product_id: input.productId, quantity: 1 }],
+      customer: { email: input.customerEmail },
+      return_url: input.successUrl,
       cancel_url: input.cancelUrl,
       metadata: input.metadata,
     },
   });
 
-  return { checkoutUrl: payload.url };
+  return { checkoutUrl: payload.checkout_url };
 }
 
 export async function createCustomerPortalSession(customerId: string): Promise<{ portalUrl: string }> {

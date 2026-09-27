@@ -1,4 +1,4 @@
-import { mutation } from "../_generated/server";
+import { internalMutation } from "../_generated/server";
 import { v } from "convex/values";
 
 const PLAN_LIMITS: Record<string, number> = {
@@ -8,7 +8,7 @@ const PLAN_LIMITS: Record<string, number> = {
   scale: 25000,
 };
 
-export const upsertSubscriptionByPaymentId = mutation({
+export const upsertSubscriptionByPaymentId = internalMutation({
   args: {
     paymentSubscriptionId: v.string(),
     paymentCustomerId: v.optional(v.string()),
@@ -53,7 +53,7 @@ export const upsertSubscriptionByPaymentId = mutation({
   },
 });
 
-export const recordWebhookEvent = mutation({
+export const recordWebhookEvent = internalMutation({
   args: {
     provider: v.string(),
     eventId: v.string(),
@@ -66,9 +66,9 @@ export const recordWebhookEvent = mutation({
       .withIndex("by_provider_and_event", (q) => q.eq("provider", args.provider).eq("eventId", args.eventId))
       .first();
 
-    if (existing) return existing._id;
+    if (existing) return { webhookEventId: existing._id, alreadyProcessed: existing.processed };
 
-    return await ctx.db.insert("webhookEvents", {
+    const webhookEventId = await ctx.db.insert("webhookEvents", {
       provider: args.provider,
       eventId: args.eventId,
       eventType: args.eventType,
@@ -76,10 +76,11 @@ export const recordWebhookEvent = mutation({
       receivedAt: Date.now(),
       processed: false,
     });
+    return { webhookEventId, alreadyProcessed: false };
   },
 });
 
-export const markWebhookProcessed = mutation({
+export const markWebhookProcessed = internalMutation({
   args: {
     webhookEventId: v.id("webhookEvents"),
   },

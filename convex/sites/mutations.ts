@@ -84,3 +84,22 @@ export const recordRender = internalMutation({
     });
   },
 });
+
+export const setStatusFromBilling = internalMutation({
+  args: {
+    siteId: v.string(),
+    ownerId: v.string(),
+    status: v.union(v.literal("trial"), v.literal("active"), v.literal("canceled")),
+  },
+  handler: async (ctx, args) => {
+    const siteId = ctx.db.normalizeId("sites", args.siteId);
+    const site = siteId ? await ctx.db.get(siteId) : null;
+    // only the site's owner can change it; a checkout for someone else's site is ignored
+    if (!siteId || !site || site.userId !== args.ownerId || site.status === args.status) return false;
+
+    await ctx.db.patch(siteId, { status: args.status });
+    // re-render so active sites lose the watermark; canceled sites fall back via the image route
+    if (args.status === "active") await ctx.scheduler.runAfter(0, internal.sites.actions.render, { siteId });
+    return true;
+  },
+});
