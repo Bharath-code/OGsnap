@@ -1,8 +1,8 @@
-import { internalMutation, mutation } from "../_generated/server";
+import { internalMutation } from "../_generated/server";
 import { v } from "convex/values";
 import { monthBucket } from "../lib/cache";
 
-export const recordRender = mutation({
+export const recordRender = internalMutation({
   args: {
     userId: v.id("users"),
     apiKeyId: v.id("apiKeys"),

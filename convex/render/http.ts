@@ -77,7 +77,7 @@ export const renderImage = httpAction(async (ctx, request) => {
       apiKeyId: apiKey._id,
     });
 
-    await ctx.runMutation(api.render.mutations.recordRender, {
+    await ctx.runMutation(internal.render.mutations.recordRender, {
       userId: apiKey.userId,
       apiKeyId: apiKey._id,
       cacheKey,
@@ -142,7 +142,7 @@ export const renderImage = httpAction(async (ctx, request) => {
     apiKeyId: apiKey._id,
   });
 
-  await ctx.runMutation(api.render.mutations.recordRender, {
+  await ctx.runMutation(internal.render.mutations.recordRender, {
     userId: apiKey.userId,
     apiKeyId: apiKey._id,
     cacheKey,
