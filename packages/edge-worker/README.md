@@ -1,6 +1,22 @@
 # @ogsnap/edge-cache
 
-High-performance Cloudflare Worker that intercepts `/v1/render` API calls to perform sub-50ms cache lookups using Cloudflare KV.
+Cloudflare Worker with two modes:
+
+- **Render cache** (default): intercepts `/v1/render` API calls for KV cache lookups.
+- **Proxy** (`SITE_ID` set): sits in front of a customer site and gives every page its own preview image.
+
+## Proxy mode (per-page previews)
+
+For HTML responses, `og:image` and `twitter:image` are replaced (or inserted, plus `twitter:card` if missing) with
+`{CONVEX_URL}/v1/site/{SITE_ID}/og.png?path={pathname}`. Stale `og:image:*` tags are removed. Everything else (JS, CSS, images, non-200s) passes through untouched.
+
+- The page title comes from the page's `og:title` or `<title>`, fetched by OGSnap itself, never from the request. SPAs that reuse the homepage title on every route get a title derived from the path.
+- The first visit to a new path queues its render. Until the render is ready, crawlers get the site-wide image.
+- Up to 200 distinct paths per site.
+
+Setup: set `SITE_ID` (and `ORIGIN` only if the domain is not proxied through its own Cloudflare zone), then either add a route such as `example.com/*`, or attach the worker as a custom domain.
+
+Measured with `wrangler dev` against a local origin (20 requests, 71 KB page): HTML p50 went from 2.6 ms direct to 6–8 ms through the worker, so about 5 ms of added overhead.
 
 ## Deployment Instructions
 

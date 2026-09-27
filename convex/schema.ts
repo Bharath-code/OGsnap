@@ -90,6 +90,17 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_and_domain", ["userId", "domain"]),
 
+  sitePages: defineTable({
+    siteId: v.id("sites"),
+    path: v.string(),
+    title: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    watermarked: v.optional(v.boolean()),
+    renderError: v.optional(v.string()),
+    requestedAt: v.number(),
+    renderedAt: v.optional(v.number()),
+  }).index("by_site_and_path", ["siteId", "path"]),
+
   leads: defineTable({
     email: v.string(),
     url: v.string(),

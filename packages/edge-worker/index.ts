@@ -1,10 +1,71 @@
+declare const HTMLRewriter: any;
+
 interface Env {
   OGSNAP_CACHE: any;
   CONVEX_URL: string;
+  // proxy mode: set SITE_ID to put this worker in front of a customer site
+  SITE_ID?: string;
+  // only when the worker is not a route on the site's own zone, e.g. my-app.lovable.app
+  ORIGIN?: string;
+}
+
+interface ExecutionContext {
+  waitUntil(promise: Promise<unknown>): void;
+}
+
+// ponytail: per-isolate memory, so each isolate pings a path at most once per window; use KV if Convex load matters
+const WARM_MS = 10 * 60 * 1000;
+const warmedAt = new Map<string, number>();
+
+async function proxy(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  const url = new URL(request.url);
+  const upstream = env.ORIGIN ? new URL(url.pathname + url.search, env.ORIGIN) : url;
+  const response = await fetch(new Request(upstream, request));
+
+  if (request.method !== "GET" || !response.ok || !response.headers.get("content-type")?.includes("text/html")) {
+    return response;
+  }
+
+  const image = `${env.CONVEX_URL}/v1/site/${env.SITE_ID}/og.png?path=${encodeURIComponent(url.pathname)}`;
+
+  // start the page render on the first human visit, so it is ready before the link is shared
+  if (Date.now() - (warmedAt.get(url.pathname) ?? 0) > WARM_MS) {
+    warmedAt.set(url.pathname, Date.now());
+    ctx.waitUntil(fetch(image, { redirect: "manual" }).catch(() => undefined));
+  }
+
+  const seen = new Set<string>();
+  const replace = (key: string) => ({
+    element(el: any) {
+      seen.add(key);
+      el.setAttribute("content", image);
+    },
+  });
+
+  return new HTMLRewriter()
+    .on('meta[property="og:image"], meta[name="og:image"]', replace("og"))
+    .on('meta[name="twitter:image"], meta[property="twitter:image"]', replace("twitter"))
+    .on('meta[property^="og:image:"], meta[name^="twitter:image:"]', { element: (el: any) => el.remove() })
+    .on('meta[name="twitter:card"], meta[property="twitter:card"]', { element: () => seen.add("card") })
+    .on("head", {
+      element(el: any) {
+        el.onEndTag((end: any) => {
+          const tags = [
+            seen.has("og") ? "" : `<meta property="og:image" content="${image}">`,
+            seen.has("twitter") ? "" : `<meta name="twitter:image" content="${image}">`,
+            seen.has("card") ? "" : `<meta name="twitter:card" content="summary_large_image">`,
+          ].join("");
+          if (tags) end.before(tags, { html: true });
+        });
+      },
+    })
+    .transform(response);
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    if (env.SITE_ID) return proxy(request, env, ctx);
+
     const urlObj = new URL(request.url);
     
     // Only intercept POST /v1/render requests

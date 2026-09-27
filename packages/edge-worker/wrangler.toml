@@ -4,6 +4,9 @@ compatibility_date = "2026-06-15"
 
 [vars]
 CONVEX_URL = "https://your-convex-app.convex.site"
+# Proxy mode (per-page previews): uncomment to put this worker in front of one customer site
+# SITE_ID = "the site id from the dashboard"
+# ORIGIN = "https://my-app.lovable.app"  # only if the worker is not a route on the site's own zone
 
 [[kv_namespaces]]
 binding = "OGSNAP_CACHE"

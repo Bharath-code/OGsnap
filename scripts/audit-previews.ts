@@ -2,6 +2,7 @@
 //        node scripts/audit-previews.ts --self-test
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
+import { parseMeta } from "../convex/lib/meta.ts";
 
 type Verdict = "missing" | "broken" | "generic" | "ok" | "unknown";
 
@@ -11,21 +12,6 @@ const TIMEOUT_MS = 10_000;
 
 // ponytail: hand-kept list of known platform stock images; extend as outreach finds more
 const PLATFORM_DEFAULTS = [/lovable\.dev\/opengraph-image/i, /gptengineer/i];
-
-const decode = (s: string) =>
-  s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-
-export function parseMeta(html: string): Map<string, string> {
-  const meta = new Map<string, string>();
-  for (const [tag] of html.matchAll(/<meta\b[^>]*>/gi)) {
-    const attrs = Object.fromEntries(
-      [...tag.matchAll(/([a-zA-Z:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)].map((m) => [m[1].toLowerCase(), m[2] ?? m[3]]),
-    );
-    const key = (attrs.property ?? attrs.name)?.toLowerCase();
-    if (key && attrs.content !== undefined && !meta.has(key)) meta.set(key, decode(attrs.content));
-  }
-  return meta;
-}
 
 export function guessPlatform(html: string, host: string, headers: Headers): string {
   const gen = parseMeta(html).get("generator")?.toLowerCase() ?? "";
