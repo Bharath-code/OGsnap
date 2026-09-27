@@ -1,10 +1,9 @@
-import { internalMutation, mutation } from "../_generated/server";
+import { internalMutation, mutation, type MutationCtx } from "../_generated/server";
 import type { Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { createApiKey } from "../lib/security";
 
-// ponytail: ctx is any until real Convex codegen replaces the _generated stubs; then use MutationCtx
-async function insertKey(ctx: any, userId: Id<"users">, name: string) {
+async function insertKey(ctx: MutationCtx, userId: Id<"users">, name: string) {
   const generated = await createApiKey();
   await ctx.db.insert("apiKeys", {
     userId,

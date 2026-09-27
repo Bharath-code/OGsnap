@@ -1,21 +1,20 @@
 #!/usr/bin/env node
 
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
 const generatedFiles = [
-  join(root, "convex", "_generated", "api.ts"),
-  join(root, "convex", "_generated", "server.ts"),
-  join(root, "convex", "_generated", "dataModel.ts"),
+  join(root, "convex", "_generated", "api.d.ts"),
+  join(root, "convex", "_generated", "server.d.ts"),
+  join(root, "convex", "_generated", "dataModel.d.ts"),
 ];
 
 const marker = "Temporary scaffold stubs";
 const failed = [];
 
 for (const file of generatedFiles) {
-  const content = readFileSync(file, "utf8");
-  if (content.includes(marker)) {
+  if (!existsSync(file) || readFileSync(file, "utf8").includes(marker)) {
     failed.push(file);
   }
 }
