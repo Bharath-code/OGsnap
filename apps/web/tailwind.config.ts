@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
+  darkMode: "media",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -35,6 +35,21 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        fog: {
+          DEFAULT: "hsl(var(--fog))",
+          deep: "hsl(var(--fog-deep))",
+        },
+        flash: {
+          DEFAULT: "hsl(var(--flash))",
+          foreground: "hsl(var(--flash-foreground))",
+        },
+        terminal: {
+          DEFAULT: "hsl(var(--terminal))",
+          foreground: "hsl(var(--terminal-foreground))",
+        },
+        ok: "hsl(var(--ok))",
+        warn: "hsl(var(--warn))",
+        bad: "hsl(var(--bad))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -43,16 +58,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "Georgia", "serif"],
-      },
-      keyframes: {
-        shimmer: {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
-        },
-      },
-      animation: {
-        shimmer: "shimmer 2s linear infinite",
+        display: ["var(--font-display)", "Arial Narrow", "Helvetica Neue", "Arial", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
       },
     },
   },

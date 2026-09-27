@@ -1,5 +1,5 @@
 import { httpAction } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 
 interface DashboardBody {
@@ -42,7 +42,7 @@ export const getDashboardData = httpAction(async (ctx, request) => {
     return new Response("clerkId is required", { status: 400 });
   }
 
-  const user = await ctx.runQuery(api.users.queries.getByClerkId, { clerkId });
+  const user = await ctx.runQuery(internal.users.queries.getByClerkId, { clerkId });
   if (!user) {
     return new Response("User not found for clerkId", { status: 404 });
   }
@@ -52,9 +52,9 @@ export const getDashboardData = httpAction(async (ctx, request) => {
   const renderLimit = Math.min(optionalPositiveInt(body.renderLimit) ?? 25, 100);
 
   const [keys, renders, usage] = await Promise.all([
-    ctx.runQuery(api.apiKeys.queries.listByUser, { userId }),
-    ctx.runQuery(api.render.queries.listRecentByUser, { userId, limit: renderLimit }),
-    ctx.runQuery(api.usage.queries.getUsageForCurrentMonth, { userId }),
+    ctx.runQuery(internal.apiKeys.queries.listByUser, { userId }),
+    ctx.runQuery(internal.render.queries.listRecentByUser, { userId, limit: renderLimit }),
+    ctx.runQuery(internal.usage.queries.getUsageForCurrentMonth, { userId }),
   ]);
 
   const visibleKeys = keys

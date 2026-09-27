@@ -99,10 +99,7 @@ export default function DashboardKeysPage(): React.ReactElement {
     setCopied(false);
 
     try {
-      const created = await createApiKey({
-        userId: payload.user.id,
-        name,
-      });
+      const created = await createApiKey({ name });
       setNewRawKey(created.rawKey);
       setKeyName("");
     } catch (error) {
@@ -159,7 +156,7 @@ export default function DashboardKeysPage(): React.ReactElement {
                 </div>
               </div>
             ) : null}
-            {createError ? <p className="text-sm text-red-500">{createError}</p> : null}
+            {createError ? <p className="text-sm text-bad">{createError}</p> : null}
           </CardHeader>
         </Card>
       </Reveal>

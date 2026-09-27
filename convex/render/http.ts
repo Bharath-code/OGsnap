@@ -33,11 +33,11 @@ export const renderImage = httpAction(async (ctx, request) => {
     return json({ error: "url is required" }, 400);
   }
 
-  const seededSubscription = await ctx.runMutation(api.render.mutations.seedDefaultSubscriptionIfMissing, {
+  const seededSubscription = await ctx.runMutation(internal.render.mutations.seedDefaultSubscriptionIfMissing, {
     userId: apiKey.userId,
   });
 
-  const usage = await ctx.runQuery(api.usage.queries.getUsageForCurrentMonth, {
+  const usage = await ctx.runQuery(internal.usage.queries.getUsageForCurrentMonth, {
     userId: apiKey.userId,
   });
 
@@ -77,7 +77,7 @@ export const renderImage = httpAction(async (ctx, request) => {
       apiKeyId: apiKey._id,
     });
 
-    await ctx.runMutation(api.render.mutations.recordRender, {
+    await ctx.runMutation(internal.render.mutations.recordRender, {
       userId: apiKey.userId,
       apiKeyId: apiKey._id,
       cacheKey,
@@ -142,7 +142,7 @@ export const renderImage = httpAction(async (ctx, request) => {
     apiKeyId: apiKey._id,
   });
 
-  await ctx.runMutation(api.render.mutations.recordRender, {
+  await ctx.runMutation(internal.render.mutations.recordRender, {
     userId: apiKey.userId,
     apiKeyId: apiKey._id,
     cacheKey,

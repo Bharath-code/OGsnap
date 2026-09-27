@@ -14,7 +14,7 @@ export const getCachedRender = query({
   },
 });
 
-export const listRecentByUser = query({
+export const listRecentByUser = internalQuery({
   args: {
     userId: v.id("users"),
     limit: v.optional(v.number()),

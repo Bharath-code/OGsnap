@@ -1,18 +1,30 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { FormEvent, ReactNode, useEffect, useState } from "react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { Develop } from "@/components/ui/develop";
 import { Input } from "@/components/ui/input";
+import { UrlComposer } from "@/components/ui/url-composer";
+import { demoBrands } from "@/components/preview/brands";
+import { BlankCard, OgCard } from "@/components/preview/og-card";
 
 type Phase = "idle" | "loading" | "done" | "error";
 type LeadPhase = "idle" | "saving" | "saved" | "error";
 
+const demo = demoBrands[0];
+
 const normalizeUrl = (value: string) => {
   const trimmed = value.trim();
   return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+};
+
+const hostOf = (value: string) => {
+  try {
+    return new URL(normalizeUrl(value)).hostname.replace(/^www\./, "");
+  } catch {
+    return value.trim();
+  }
 };
 
 async function streamPreview(
@@ -46,44 +58,64 @@ async function streamPreview(
   }
 }
 
-function PreviewFrame({ label, src, highlight }: { label: string; src: string | null; highlight?: boolean }) {
+function Bubble({ children }: { children: ReactNode }) {
   return (
-    <figure className="space-y-2">
-      <figcaption className={highlight ? "text-sm font-semibold text-primary" : "text-sm text-muted-foreground"}>
-        {label}
-      </figcaption>
-      {src ? (
-        <img
-          src={src}
-          alt={`${label} link preview image`}
-          className="aspect-[1.91/1] w-full rounded-lg border border-border/70 object-cover"
-        />
-      ) : (
-        <div className="flex aspect-[1.91/1] w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 text-sm text-muted-foreground">
-          No preview image
-        </div>
-      )}
-    </figure>
+    <p className="pop-in max-w-[82%] self-start rounded-[18px] rounded-bl-md bg-background px-3.5 py-2.5 text-[15px] leading-snug">
+      {children}
+    </p>
   );
 }
 
-export function LiveRenderDemo() {
+export function LiveRenderDemo({ children }: { children: ReactNode }) {
   const [url, setUrl] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [status, setStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [before, setBefore] = useState<string | null>(null);
   const [after, setAfter] = useState<string | null>(null);
+  const [developed, setDeveloped] = useState(false);
+  const [replied, setReplied] = useState(false);
+  const [cycle, setCycle] = useState(0);
+  const [host, setHost] = useState("");
   const [email, setEmail] = useState("");
   const [leadPhase, setLeadPhase] = useState<LeadPhase>("idle");
   const [leadError, setLeadError] = useState<string | null>(null);
+  const isDemo = phase === "idle";
+
+  // Idle: loop the sample conversation so the hero shows the product before anyone types.
+  useEffect(() => {
+    if (!isDemo) return;
+    setDeveloped(false);
+    setReplied(false);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDeveloped(true);
+      setReplied(true);
+      return;
+    }
+    const timers = [
+      setTimeout(() => setDeveloped(true), 1400),
+      setTimeout(() => setReplied(true), 3400),
+      setTimeout(() => setCycle((c) => c + 1), 10000),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [isDemo, cycle]);
+
+  useEffect(() => {
+    if (isDemo || !developed) return;
+    const timer = setTimeout(() => setReplied(true), 1800);
+    return () => clearTimeout(timer);
+  }, [isDemo, developed]);
 
   async function runPreview(event: FormEvent) {
     event.preventDefault();
     setPhase("loading");
+    setHost(hostOf(url));
+    setCycle((c) => c + 1);
     setError(null);
     setBefore(null);
     setAfter(null);
+    setDeveloped(false);
+    setReplied(false);
     setStatus("Reading your site...");
     try {
       await streamPreview(normalizeUrl(url), { status: setStatus, before: setBefore, after: setAfter });
@@ -112,62 +144,49 @@ export function LiveRenderDemo() {
     }
   }
 
-  return (
-    <Card id="preview" className="scroll-mt-24">
-      <CardHeader>
-        <Badge className="w-fit">Free check, no signup</Badge>
-        <h2 className="flex items-center gap-2 font-display text-xl tracking-tight">
-          <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-          See your site&apos;s link preview
-        </h2>
-        <CardDescription>Paste your address. We&apos;ll show today&apos;s preview next to a branded one.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        <form onSubmit={runPreview} className="flex flex-col gap-2 sm:flex-row">
-          <label htmlFor="site-url" className="sr-only">
-            Your website address
-          </label>
-          <Input
-            id="site-url"
-            type="text"
-            inputMode="url"
-            autoComplete="url"
-            placeholder="yoursite.com"
-            required
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-          />
-          <Button type="submit" disabled={phase === "loading" || !url.trim()}>
-            {phase === "loading" ? "Building..." : "Show my preview"}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Button>
-        </form>
+  const domain = isDemo ? demo.domain : host;
+  const blankLabel = phase === "error" ? "Couldn't open this site" : phase === "loading" && !after ? status : "No og:image";
 
-        <p role="status" aria-live="polite" className="text-sm text-muted-foreground">
-          {phase === "loading" ? status : ""}
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        {children}
+
+        <UrlComposer
+          formId="preview"
+          id="site-url"
+          label="Your website address"
+          value={url}
+          onChange={setUrl}
+          onSubmit={runPreview}
+          busy={phase === "loading"}
+          className="mt-8 scroll-mt-28"
+        >
+          {phase === "loading" ? "Developing..." : "Develop my link"}
+        </UrlComposer>
+        <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-muted-foreground">
+          <span>Free check, no signup</span>
+          <span>Lovable, Framer, Webflow or any site</span>
+        </p>
+
+        <p role="status" aria-live="polite" className="sr-only">
+          {phase === "loading" ? status : phase === "done" ? "Your branded preview is ready." : ""}
         </p>
         {error ? (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="mt-4 text-sm text-bad">
             {error}
           </p>
         ) : null}
 
-        {after ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <PreviewFrame label="Today" src={before} />
-            <PreviewFrame label="With OGSnap" src={after} highlight />
-          </div>
-        ) : null}
-
         {phase === "done" && after ? (
           leadPhase === "saved" ? (
-            <p role="status" className="flex items-center gap-2 text-sm text-foreground">
-              <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+            <p role="status" className="mt-6 flex items-center gap-2 text-sm">
+              <Check className="h-4 w-4" aria-hidden="true" />
               Thanks! Your install snippet will arrive by email within 24 hours.
             </p>
           ) : (
-            <form onSubmit={saveLead} className="space-y-2">
-              <label htmlFor="lead-email" className="text-sm font-medium text-foreground">
+            <form onSubmit={saveLead} className="mt-6 max-w-lg space-y-2">
+              <label htmlFor="lead-email" className="text-sm font-medium">
                 Want this live on your site? Get the install snippet.
               </label>
               <div className="flex flex-col gap-2 sm:flex-row">
@@ -185,14 +204,52 @@ export function LiveRenderDemo() {
                 </Button>
               </div>
               {leadError ? (
-                <p role="alert" className="text-sm text-red-600">
+                <p role="alert" className="text-sm text-bad">
                   {leadError}
                 </p>
               ) : null}
             </form>
           )
         ) : null}
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="flex min-h-[420px] flex-col justify-end gap-2.5 rounded-[28px] border border-border bg-card p-4 shadow-[0_24px_60px_-36px_rgba(18,20,19,0.45)]">
+        <p className="mb-auto border-b border-border pb-2.5 text-center text-xs font-semibold text-muted-foreground">
+          Maya · Messages
+        </p>
+        <Bubble>is this your new site??</Bubble>
+        <div key={cycle} className="pop-in w-[82%] self-end overflow-hidden rounded-[18px] rounded-br-md bg-background">
+          <Develop
+            developed={developed}
+            before={before ? <img src={before} alt={`Today's preview for ${domain}`} className="aspect-[1.91/1] w-full object-cover" /> : <BlankCard label={blankLabel} />}
+            after={
+              isDemo ? (
+                <OgCard brand={demo} />
+              ) : after ? (
+                <img
+                  src={after}
+                  alt={`Branded preview for ${domain}`}
+                  onLoad={() => setDeveloped(true)}
+                  className="aspect-[1.91/1] w-full object-cover"
+                />
+              ) : null
+            }
+          />
+          <div className="grid gap-0.5 px-3.5 pb-3 pt-2.5">
+            <b className="text-sm font-semibold">{isDemo ? demo.name : domain}</b>
+            <span className="font-mono text-xs text-muted-foreground">{domain}</span>
+          </div>
+        </div>
+        {replied ? (
+          <Bubble>ok that looks legit. who designed it?</Bubble>
+        ) : developed ? (
+          <span className="flex gap-1 self-start rounded-[18px] rounded-bl-md bg-background px-3.5 py-3.5" aria-hidden="true">
+            {[0, 150, 300].map((delay) => (
+              <i key={delay} className="h-[7px] w-[7px] animate-[typing_1s_infinite] rounded-full bg-fog-deep" style={{ animationDelay: `${delay}ms` }} />
+            ))}
+          </span>
+        ) : null}
+      </div>
+    </div>
   );
 }

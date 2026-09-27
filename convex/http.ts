@@ -1,6 +1,7 @@
 import { httpRouter } from "convex/server";
 import { renderCorsPreflight, renderImage } from "./render/http";
 import { dodoWebhook } from "./billing/webhooks";
+import { billingCustomer } from "./billing/http";
 import { bootstrapDemo } from "./dev/http";
 import { magicOnboarding } from "./onboarding/http";
 import { createLead } from "./leads/http";
@@ -50,6 +51,12 @@ http.route({
   path: "/v1/internal/dashboard",
   method: "POST",
   handler: getDashboardData,
+});
+
+http.route({
+  path: "/v1/internal/billing-customer",
+  method: "POST",
+  handler: billingCustomer,
 });
 
 http.route({

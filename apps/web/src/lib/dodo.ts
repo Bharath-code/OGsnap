@@ -54,14 +54,13 @@ export async function createCheckoutSession(input: CreateCheckoutInput): Promise
   return { checkoutUrl: payload.checkout_url };
 }
 
-export async function createCustomerPortalSession(customerId: string): Promise<{ portalUrl: string }> {
-  const payload = await dodoRequest<{ url: string }>({
+// https://docs.dodopayments.com/api-reference/customers/create-customer-portal-session
+export async function createCustomerPortalSession(customerId: string, returnUrl?: string): Promise<{ portalUrl: string }> {
+  const query = returnUrl ? `?return_url=${encodeURIComponent(returnUrl)}` : "";
+  const payload = await dodoRequest<{ link: string }>({
     method: "POST",
-    path: "/customers/portal/sessions",
-    body: {
-      customer_id: customerId,
-    },
+    path: `/customers/${encodeURIComponent(customerId)}/customer-portal/session${query}`,
   });
 
-  return { portalUrl: payload.url };
+  return { portalUrl: payload.link };
 }

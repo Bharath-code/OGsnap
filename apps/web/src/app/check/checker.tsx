@@ -2,11 +2,11 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CircleAlert, CircleCheck } from "lucide-react";
 import type { PreviewCheck, Verdict } from "@ogsnap/core/preview-audit";
+import { PlatformPreview, type Platform } from "@/components/preview/platform-preview";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { UrlComposer } from "@/components/ui/url-composer";
+import { cn } from "@/lib/utils";
 
 const normalizeUrl = (value: string) => {
   const trimmed = value.trim();
@@ -27,51 +27,7 @@ const VERDICTS: Record<Verdict, { title: string; body: (r: PreviewCheck) => stri
   unknown: { title: "We couldn't read this page", body: () => "Your site blocked our crawler. Social networks may be blocked too." },
 };
 
-function Thumb({ src, className = "" }: { src?: string; className?: string }) {
-  return src ? (
-    <img src={src} alt="" className={`aspect-[1.91/1] w-full object-cover ${className}`} />
-  ) : (
-    <div className={`flex aspect-[1.91/1] w-full items-center justify-center bg-muted text-xs text-muted-foreground ${className}`}>
-      No image
-    </div>
-  );
-}
-
-function Previews({ r }: { r: PreviewCheck }) {
-  const domain = new URL(r.url).hostname.replace(/^www\./, "");
-  const title = r.title ?? domain;
-  const image = r.verdict === "broken" ? undefined : r.image;
-  return (
-    <div className="grid gap-6 md:grid-cols-3">
-      <figure className="space-y-2">
-        <figcaption className="text-sm font-medium text-muted-foreground">X (Twitter)</figcaption>
-        <div className="relative overflow-hidden rounded-2xl border border-border">
-          <Thumb src={image} />
-          <span className="absolute bottom-2 left-2 rounded bg-black/70 px-1.5 py-0.5 text-xs text-white">{domain}</span>
-        </div>
-      </figure>
-      <figure className="space-y-2">
-        <figcaption className="text-sm font-medium text-muted-foreground">LinkedIn</figcaption>
-        <div className="overflow-hidden rounded-lg border border-border">
-          <Thumb src={image} />
-          <div className="space-y-1 bg-muted/40 p-3">
-            <p className="line-clamp-2 text-sm font-semibold text-foreground">{title}</p>
-            <p className="text-xs text-muted-foreground">{domain}</p>
-          </div>
-        </div>
-      </figure>
-      <figure className="space-y-2">
-        <figcaption className="text-sm font-medium text-muted-foreground">Slack</figcaption>
-        <div className="space-y-1 border-l-4 border-border pl-3">
-          <p className="text-sm font-bold text-foreground">{r.siteName ?? domain}</p>
-          <p className="text-sm font-semibold text-sky-600">{title}</p>
-          {r.description ? <p className="line-clamp-3 text-sm text-muted-foreground">{r.description}</p> : null}
-          <Thumb src={image} className="mt-2 max-w-[360px] rounded-md" />
-        </div>
-      </figure>
-    </div>
-  );
-}
+const SHOWN: Platform[] = ["X", "LinkedIn", "Slack"];
 
 export function Checker() {
   const [url, setUrl] = useState("");
@@ -101,68 +57,68 @@ export function Checker() {
 
   const verdict = result ? VERDICTS[result.verdict] : null;
   const good = result?.verdict === "ok";
+  const domain = result ? new URL(result.url).hostname.replace(/^www\./, "") : "";
 
   return (
-    <div className="space-y-8">
-      <form onSubmit={run} className="flex flex-col gap-2 sm:flex-row">
-        <label htmlFor="check-url" className="sr-only">
-          Page address
-        </label>
-        <Input
-          id="check-url"
-          type="text"
-          inputMode="url"
-          autoComplete="url"
-          placeholder="yoursite.com/any-page"
-          required
-          value={url}
-          onChange={(event) => setUrl(event.target.value)}
-        />
-        <Button type="submit" disabled={loading || !url.trim()}>
-          {loading ? "Checking..." : "Check preview"}
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </Button>
-      </form>
+    <div className="space-y-10">
+      <UrlComposer id="check-url" label="Page address" value={url} onChange={setUrl} onSubmit={run} busy={loading} placeholder="yoursite.com/any-page">
+        {loading ? "Checking..." : "Check preview"}
+      </UrlComposer>
 
       <p role="status" aria-live="polite" className="sr-only">
         {loading ? "Checking your link preview" : verdict ? verdict.title : ""}
       </p>
       {error ? (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-bad">
           {error}
         </p>
       ) : null}
 
+      {loading ? (
+        <div className="grid gap-6 md:grid-cols-3" aria-hidden="true">
+          {SHOWN.map((platform) => (
+            <div key={platform} className="fog-shimmer aspect-[1.91/1] rounded-lg" />
+          ))}
+        </div>
+      ) : null}
+
       {result && verdict ? (
         <>
-          <Card>
-            <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex gap-3">
-                {good ? (
-                  <CircleCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" aria-hidden="true" />
-                ) : (
-                  <CircleAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" aria-hidden="true" />
-                )}
-                <div>
-                  <h2 className="font-semibold text-foreground">{verdict.title}</h2>
-                  <p className="text-sm text-muted-foreground">{verdict.body(result)}</p>
-                  {result.width && result.height ? (
-                    <p className="text-xs text-muted-foreground">
-                      Image size {result.width}×{result.height}
-                      {result.width < 1200 ? " (1200×630 recommended)" : ""}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              <Button asChild variant={good ? "outline" : "default"}>
-                <Link href="/#preview">
-                  {good ? "Brand every page automatically" : "Fix it in 2 minutes"}
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-          <Previews r={result} />
+          <div
+            className={cn(
+              "pop-in flex flex-col gap-4 rounded-xl border border-border border-l-4 bg-card p-5 sm:flex-row sm:items-center sm:justify-between",
+              good ? "border-l-ok" : "border-l-bad",
+            )}
+          >
+            <div className="space-y-1">
+              <h2 className="wdth-80 font-display text-2xl font-extrabold">{verdict.title}</h2>
+              <p className="text-sm text-foreground/75">{verdict.body(result)}</p>
+              {result.width && result.height ? (
+                <p className="font-mono text-xs text-muted-foreground">
+                  {result.width} × {result.height}
+                  {result.width < 1200 ? " · 1200 × 630 recommended" : ""}
+                </p>
+              ) : null}
+            </div>
+            <Button asChild variant={good ? "outline" : "flash"}>
+              <Link href="/#preview">{good ? "Brand every page automatically" : "Fix it in 2 minutes"}</Link>
+            </Button>
+          </div>
+          <div className="grid gap-6 md:grid-cols-3">
+            {SHOWN.map((platform) => (
+              <figure key={platform} className="space-y-2">
+                <figcaption className="font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground">{platform}</figcaption>
+                <PlatformPreview
+                  platform={platform}
+                  image={result.verdict === "broken" ? undefined : result.image}
+                  domain={domain}
+                  title={result.title}
+                  siteName={result.siteName}
+                  description={result.description}
+                />
+              </figure>
+            ))}
+          </div>
         </>
       ) : null}
     </div>

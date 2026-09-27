@@ -1,0 +1,839 @@
+<title>OGSnap Darkroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap">
+<style>
+@property --r { syntax: '<percentage>'; inherits: false; initial-value: 0%; }
+@property --w { syntax: '<number>'; inherits: true; initial-value: 72; }
+
+:root {
+  --paper: #F2F3EF;
+  --print: #FFFFFF;
+  --ink: #121413;
+  --ink-2: #3A403C;
+  --muted: #5E6661;
+  --fog: #D3D7D2;
+  --fog-deep: #A3AAA5;
+  --line: #DCDFDA;
+  --flash: #FFD60A;
+  --flash-ink: #121413;
+  --ok: #1E8A5F;
+  --warn: #A86A12;
+  --bad: #C8412B;
+  --shadow: 0 1px 0 rgba(18,20,19,.04), 0 12px 32px -18px rgba(18,20,19,.35);
+  --ease-dev: cubic-bezier(.2,.7,0,1);
+  --ease-snap: cubic-bezier(.3,1.6,.5,1);
+  --display: "Archivo", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0E100F; --print: #171A18; --ink: #EEF0EC; --ink-2: #C4C9C4; --muted: #929A95;
+    --fog: #2A2F2C; --fog-deep: #4A524D; --line: #262B28;
+    --ok: #3DBE86; --warn: #E0A43A; --bad: #EF6A52;
+    --shadow: 0 1px 0 rgba(0,0,0,.4), 0 16px 40px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0E100F; --print: #171A18; --ink: #EEF0EC; --ink-2: #C4C9C4; --muted: #929A95;
+  --fog: #2A2F2C; --fog-deep: #4A524D; --line: #262B28;
+  --ok: #3DBE86; --warn: #E0A43A; --bad: #EF6A52;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 16px 40px -20px rgba(0,0,0,.8);
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 400 16px/1.6 var(--sans); padding-inline: 20px; padding-block: 0 80px; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin-inline: auto; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+.mono { font-family: var(--mono); }
+.edge { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 19px; line-height: 1.55; color: var(--ink-2); max-width: 62ch; }
+.body { color: var(--ink-2); max-width: 65ch; }
+
+/* ---------- top bar ---------- */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: color-mix(in oklab, var(--paper) 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); margin-inline: -20px; padding: 12px 20px; }
+.bar .wrap { display: flex; align-items: center; gap: 20px; }
+.brand { display: flex; align-items: center; gap: 10px; font: 800 20px/1 var(--display); font-variation-settings: "wdth" 80; letter-spacing: -.02em; background: none; border: 0; color: var(--ink); cursor: pointer; padding: 0; }
+.brand svg { width: 26px; height: 26px; }
+.bar nav { display: flex; gap: 18px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+.bar nav a { font: 500 13px/1 var(--sans); color: var(--muted); text-decoration: none; white-space: nowrap; padding-block: 6px; }
+.bar nav a:hover { color: var(--ink); }
+
+/* ---------- doc title ---------- */
+.title { padding-block: 64px 36px; display: grid; gap: 22px; }
+.title h1 { font: 850 clamp(64px, 13vw, 176px)/.86 var(--display); font-variation-settings: "wdth" 62; letter-spacing: -.03em; text-transform: uppercase; }
+.title h1 .roll { display: inline-block; animation: roll 7s ease-in-out infinite; }
+@keyframes roll { 0%,100% { font-variation-settings: "wdth" 62; } 50% { font-variation-settings: "wdth" 112; } }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+
+section.doc { padding-block: 72px 8px; border-top: 1px solid var(--line); margin-top: 56px; display: grid; gap: 28px; }
+.sec-head { display: grid; gap: 14px; }
+.sec-head h2 { font: 800 clamp(36px, 5.2vw, 64px)/.95 var(--display); font-variation-settings: "wdth" 70; letter-spacing: -.025em; max-width: 18ch; }
+h3.sub { font: 750 24px/1.1 var(--display); font-variation-settings: "wdth" 85; letter-spacing: -.01em; }
+.note { border-left: 2px solid var(--flash); padding: 2px 0 2px 14px; color: var(--ink-2); font-size: 15px; max-width: 70ch; }
+
+/* ---------- browser frame for prototypes ---------- */
+.frame { background: var(--print); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.frame-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+.dots { display: flex; gap: 6px; } .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--fog); display: block; }
+.frame-top .url { flex: 1; text-align: center; font: 500 12px/1 var(--mono); color: var(--muted); }
+.frame-body { padding: clamp(20px, 4vw, 48px); background: var(--paper); }
+
+/* ---------- OG card ---------- */
+.og { container-type: inline-size; aspect-ratio: 1.91 / 1; width: 100%; max-width: 100%; border-radius: 10px; overflow: hidden; position: relative; background: var(--b, #0A3A5C); color: var(--f, #F7F3EA); }
+.og .in { position: absolute; inset: 0; padding: 7cqi 7cqi 6cqi; display: flex; flex-direction: column; }
+.og .top { display: flex; align-items: center; gap: 2.4cqi; font: 600 3.6cqi/1 var(--sans); opacity: .92; }
+.og .logo { width: 7cqi; height: 7cqi; border-radius: 2cqi; display: grid; place-items: center; background: var(--a, #FF7A59); color: var(--b); font: 900 4.4cqi/1 var(--display); }
+.og .ttl { display: block; margin-top: auto; font: 800 8.6cqi/.98 var(--display); font-variation-settings: "wdth" 78; letter-spacing: -.02em; max-width: 15ch; }
+.og .shape { position: absolute; right: -8cqi; top: -10cqi; width: 46cqi; aspect-ratio: 1; border-radius: 50%; background: var(--a); opacity: .9; }
+.og .shape2 { position: absolute; right: 14cqi; top: 26cqi; width: 18cqi; aspect-ratio: 1; border: 1.4cqi solid var(--f); border-radius: 50%; opacity: .25; }
+.og .foot { margin-top: 3cqi; font: 500 3cqi/1 var(--mono); opacity: .7; }
+.og.blank { background: var(--fog); color: var(--fog-deep); display: grid; place-items: center; }
+.og.blank span { font: 500 3.4cqi/1 var(--mono); letter-spacing: .06em; }
+
+/* ---------- develop ---------- */
+.dev { display: grid; position: relative; border-radius: 10px; overflow: hidden; isolation: isolate; }
+.dev > * { grid-area: 1 / 1; }
+.dev .after { -webkit-mask: radial-gradient(circle at 12% 108%, #000 var(--r), transparent calc(var(--r) + 22%)); mask: radial-gradient(circle at 12% 108%, #000 var(--r), transparent calc(var(--r) + 22%)); }
+.dev.is-dev .after { animation: develop 1.25s var(--ease-dev) forwards; }
+.dev::after { content: ""; position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 2; }
+.dev.is-dev::after { animation: snap .55s ease-out 1s; }
+@keyframes develop {
+  0% { --r: 0%; filter: grayscale(1) blur(10px) contrast(.55) brightness(1.15); }
+  55% { filter: grayscale(.5) blur(3px) contrast(.85) brightness(1.05); }
+  100% { --r: 170%; filter: none; }
+}
+@keyframes snap { 0% { opacity: 0; } 8% { opacity: .8; } 100% { opacity: 0; } }
+
+/* ---------- buttons & inputs ---------- */
+.btn { font: 600 15px/1 var(--sans); border-radius: 999px; padding: 13px 20px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform .16s var(--ease-snap), background .16s; }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(1px) scale(.98); }
+.btn.flash { background: var(--flash); color: var(--flash-ink); border-color: var(--flash); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.sm { font-size: 13px; padding: 9px 14px; }
+
+/* ---------- landing hero prototype ---------- */
+.hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
+.hero h2 { font: 850 clamp(48px, 7.4vw, 104px)/.88 var(--display); font-variation-settings: "wdth" 66; letter-spacing: -.035em; }
+.greybox { background: linear-gradient(var(--flash), var(--flash)) left / 0% 100% no-repeat, var(--fog); padding: 0 .12em; border-radius: .08em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.greybox.go { animation: fill 1.1s var(--ease-dev) forwards; }
+@keyframes fill { to { background-size: 100% 100%, auto; } }
+.hero .lede { margin-top: 22px; font-size: 18px; }
+.composer { margin-top: 28px; display: flex; gap: 6px; background: var(--print); border: 1px solid var(--line); border-radius: 999px; padding: 6px; box-shadow: var(--shadow); max-width: 520px; }
+.composer label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.composer input { flex: 1; min-width: 0; border: 0; background: transparent; font: 500 16px/1 var(--mono); color: var(--ink); padding: 0 14px; outline: none; }
+.composer:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.fine { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px 18px; font: 500 12px/1.4 var(--mono); color: var(--muted); }
+
+.chat { background: var(--print); border: 1px solid var(--line); border-radius: 28px; padding: 18px; box-shadow: var(--shadow); display: grid; gap: 10px; min-height: 420px; align-content: end; }
+.chat-head { text-align: center; font: 600 12px/1 var(--sans); color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--line); margin-bottom: auto; }
+.msg { max-width: 82%; padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.35; animation: pop .35s var(--ease-snap) both; }
+.msg.them { background: var(--paper); justify-self: start; border-bottom-left-radius: 6px; }
+.msg.me { background: var(--ink); color: var(--paper); justify-self: end; border-bottom-right-radius: 6px; }
+.msg.link { padding: 0; width: 82%; background: var(--paper); overflow: hidden; }
+.msg.link .dev, .msg.link .og { border-radius: 0; }
+.msg.link .cap { padding: 10px 14px 12px; display: grid; gap: 2px; }
+.msg.link .cap b { font-size: 14px; font-weight: 600; }
+.msg.link .cap span { font: 500 12px/1.2 var(--mono); color: var(--muted); }
+.typing { display: flex; gap: 4px; padding: 14px; }
+.typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--fog-deep); animation: blink 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes blink { 50% { opacity: .25; } }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.96); } }
+
+/* ---------- diagnosis ---------- */
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.diag { display: grid; gap: 10px; align-content: start; padding-top: 16px; border-top: 2px solid var(--ink); }
+.diag h3 { font: 750 22px/1.1 var(--display); font-variation-settings: "wdth" 85; }
+.diag ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; display: grid; gap: 6px; }
+.diag code, .body code, td code { font: 500 .88em var(--mono); background: var(--fog); padding: 1px 5px; border-radius: 4px; color: var(--ink); }
+
+/* ---------- principles ---------- */
+.principles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.principles > div { background: var(--print); padding: 26px; display: grid; gap: 10px; align-content: start; }
+.principles h3 { font: 800 28px/1 var(--display); font-variation-settings: "wdth" 72; letter-spacing: -.02em; }
+.principles p { color: var(--ink-2); font-size: 15px; }
+
+/* ---------- system ---------- */
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.sw { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--print); }
+.sw .chip { height: 84px; }
+.sw .lab { padding: 10px 12px; display: grid; gap: 3px; }
+.sw b { font-size: 14px; } .sw span { font: 500 11px/1.3 var(--mono); color: var(--muted); }
+.type-row { display: grid; grid-template-columns: 180px 1fr; gap: 24px; padding-block: 22px; border-top: 1px solid var(--line); align-items: baseline; }
+.type-row .spec { display: grid; gap: 4px; }
+.t-display { font: 850 clamp(48px, 8vw, 96px)/.9 var(--display); font-variation-settings: "wdth" var(--w); letter-spacing: -.03em; transition: font-variation-settings .1s; }
+.t-h { font: 800 40px/1 var(--display); font-variation-settings: "wdth" 72; letter-spacing: -.02em; }
+.t-body { font: 400 18px/1.6 var(--sans); color: var(--ink-2); max-width: 60ch; }
+.t-mono { font: 500 13px/1.5 var(--mono); letter-spacing: .02em; }
+.slider { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.slider input { width: 220px; max-width: 100%; accent-color: var(--ink); }
+.prims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.prim { background: var(--print); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 14px; align-content: start; }
+.prim h4 { font: 750 18px/1.1 var(--display); font-variation-settings: "wdth" 85; }
+.prim p { font-size: 14px; color: var(--muted); }
+.ap-stage { display: grid; place-items: center; height: 150px; }
+.ap-stage svg { width: 120px; height: 120px; color: var(--ink); cursor: pointer; }
+.fogline { height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--fog) 0 40%, color-mix(in oklab, var(--fog) 50%, var(--print)) 50%, var(--fog) 60% 100%) 0 0 / 300% 100%; animation: shimmer 1.6s linear infinite; }
+@keyframes shimmer { to { background-position: -150% 0; } }
+
+/* ---------- grey wall ---------- */
+.wall { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.pf { background: var(--print); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 10px; align-content: start; }
+.pf .who { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.pf .av { width: 26px; height: 26px; border-radius: 50%; background: var(--fog); flex: none; }
+.pf .who b { font-weight: 600; } .pf .who span { color: var(--muted); }
+.pf .txt { font-size: 14px; color: var(--ink-2); }
+.pf .edge { margin-top: 2px; }
+.pf.slack { border-left: 4px solid var(--fog-deep); }
+.pf.bubble .dev { border-radius: 16px; }
+.wall-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.counter { font: 850 44px/1 var(--display); font-variation-settings: "wdth" 70; font-variant-numeric: tabular-nums; }
+
+/* ---------- how it works ---------- */
+.strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.step { background: var(--print); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: grid; grid-template-rows: 210px auto; }
+.step .stage { background: var(--paper); border-bottom: 1px solid var(--line); position: relative; overflow: hidden; display: grid; place-items: center; padding: 18px; }
+.step .txt { padding: 18px; display: grid; gap: 6px; }
+.step h4 { font: 800 22px/1.05 var(--display); font-variation-settings: "wdth" 80; }
+.step p { font-size: 14px; color: var(--ink-2); }
+.typer { font: 500 15px/1 var(--mono); background: var(--print); border: 1px solid var(--line); border-radius: 999px; padding: 12px 16px; width: 100%; display: flex; }
+.typer span { overflow: hidden; white-space: nowrap; width: 0; border-right: 2px solid var(--ink); animation: type 5s steps(13) infinite; }
+@keyframes type { 0%,10% { width: 0; } 45%,100% { width: 13ch; } }
+.site-mock { width: 100%; height: 100%; background: var(--print); border: 1px solid var(--line); border-radius: 8px; position: relative; padding: 12px; display: grid; gap: 8px; align-content: start; }
+.site-mock .nav { display: flex; justify-content: space-between; align-items: center; }
+.site-mock .lg { width: 22px; height: 22px; border-radius: 6px; background: #0A3A5C; }
+.site-mock .hl { height: 14px; width: 70%; border-radius: 3px; background: #0A3A5C; }
+.site-mock .hl2 { height: 8px; width: 50%; border-radius: 3px; background: var(--fog); }
+.site-mock .cta { height: 18px; width: 64px; border-radius: 9px; background: #FF7A59; }
+.site-mock .font { font: 600 10px/1 var(--mono); color: var(--muted); }
+.dropper { position: absolute; width: 28px; height: 28px; border: 2px solid var(--ink); border-radius: 50%; left: 16px; top: 14px; animation: sample 6s var(--ease-dev) infinite; box-shadow: 0 0 0 3px var(--print); }
+@keyframes sample { 0%,12% { left: 10px; top: 8px; } 30%,42% { left: 40%; top: 32px; } 60%,72% { left: 12px; top: 92px; } 88%,100% { left: 70%; top: 118px; } }
+.found { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 6px; }
+.found i { width: 22px; height: 22px; border-radius: 6px; display: block; border: 2px solid var(--print); box-shadow: 0 0 0 1px var(--line); animation: land 6s infinite both; }
+.found i:nth-child(1) { background: #0A3A5C; animation-delay: .4s; }
+.found i:nth-child(2) { background: #FF7A59; animation-delay: 1.6s; }
+.found i:nth-child(3) { background: #F7F3EA; animation-delay: 2.8s; }
+@keyframes land { 0%,6% { transform: scale(0); } 12%,92% { transform: scale(1); } 100% { transform: scale(0); } }
+.tags { font: 500 11.5px/1.7 var(--mono); background: var(--ink); color: var(--paper); border-radius: 10px; padding: 14px; width: 100%; overflow-x: auto; white-space: pre; }
+.tags .k { color: var(--flash); }
+
+/* ---------- per page tree ---------- */
+.tree { background: var(--print); border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow-x: auto; }
+.tree svg { width: 100%; min-width: 640px; height: auto; display: block; }
+.tree .wire { fill: none; stroke: var(--fog-deep); stroke-width: 1.5; stroke-dasharray: 400; stroke-dashoffset: 400; }
+.tree.drawn .wire { animation: draw 1.4s var(--ease-dev) forwards; }
+.tree.drawn .wire:nth-of-type(2) { animation-delay: .15s; } .tree.drawn .wire:nth-of-type(3) { animation-delay: .3s; } .tree.drawn .wire:nth-of-type(4) { animation-delay: .45s; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.tree .node { opacity: 0; transform: translateY(6px); transform-box: fill-box; }
+.tree.drawn .node { animation: pop .5s var(--ease-snap) forwards; }
+.tree text { font-family: var(--mono); }
+.tree .t-ink { fill: var(--ink); } .tree .t-muted { fill: var(--muted); }
+
+/* ---------- pricing prints ---------- */
+.prints { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; padding: 10px; }
+.print { background: var(--print); border: 1px solid var(--line); border-radius: 6px; padding: 14px 14px 22px; box-shadow: var(--shadow); display: grid; gap: 16px; transform: rotate(var(--rot, 0deg)); transition: transform .3s var(--ease-snap); }
+.print:hover { transform: rotate(0) translateY(-4px); }
+.print .img { aspect-ratio: 1.3; border-radius: 3px; display: grid; place-items: center; font: 850 64px/1 var(--display); font-variation-settings: "wdth" 66; letter-spacing: -.03em; }
+.print .img small { font: 500 13px/1 var(--mono); letter-spacing: 0; }
+.print h4 { font: 800 22px/1 var(--display); font-variation-settings: "wdth" 80; }
+.print ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.print li::before { content: "+ "; font-family: var(--mono); color: var(--muted); }
+
+/* ---------- FAQ ---------- */
+.faq { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 32px; }
+.faq details { border-top: 1px solid var(--line); padding-block: 16px; }
+.faq summary { font: 700 19px/1.2 var(--display); font-variation-settings: "wdth" 88; cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+.faq summary::after { content: "+"; font-family: var(--mono); color: var(--muted); }
+.faq details[open] summary::after { content: "–"; }
+.faq p { margin-top: 10px; color: var(--ink-2); font-size: 15px; }
+
+/* ---------- footer wordmark ---------- */
+.wordmark { font: 900 clamp(80px, 22vw, 300px)/.8 var(--display); font-variation-settings: "wdth" 62; letter-spacing: -.045em; text-transform: uppercase; display: flex; align-items: center; gap: .06em; overflow: hidden; }
+.wordmark svg { width: .8em; height: .8em; flex: none; }
+
+/* ---------- app ---------- */
+.ia { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: center; }
+.ia ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.ia li { background: var(--print); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.ia li s { color: var(--muted); }
+.ia li em { font: 500 11px/1.6 var(--mono); font-style: normal; color: var(--muted); }
+.ia .arrow { font: 800 40px/1 var(--display); color: var(--muted); }
+.app { display: grid; grid-template-columns: 200px 1fr; min-height: 560px; }
+.rail { border-right: 1px solid var(--line); padding: 16px 12px; display: grid; gap: 4px; align-content: start; background: var(--print); }
+.rail .brand { margin: 4px 8px 18px; font-size: 18px; }
+.rail a { display: flex; justify-content: space-between; padding: 9px 12px; border-radius: 8px; font-size: 14px; text-decoration: none; color: var(--ink-2); }
+.rail a.on { background: var(--paper); color: var(--ink); font-weight: 600; }
+.rail a span { font: 500 11px/1.6 var(--mono); color: var(--muted); }
+.rail .spacer { height: 18px; }
+.main { padding: 24px; background: var(--paper); display: grid; gap: 20px; align-content: start; min-width: 0; }
+.main-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: end; }
+.main-head h3 { font: 800 34px/1 var(--display); font-variation-settings: "wdth" 72; letter-spacing: -.02em; }
+.summary { display: flex; gap: 18px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.summary b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.rows { background: var(--print); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.row { display: grid; grid-template-columns: 132px 1fr auto auto; gap: 18px; align-items: center; padding: 12px 16px; border-top: 1px solid var(--line); cursor: pointer; transition: background .15s; }
+.row:first-child { border-top: 0; }
+.row:hover, .row.sel { background: var(--paper); }
+.row .dom { font-weight: 600; } .row .dom small { display: block; font: 500 12px/1.4 var(--mono); color: var(--muted); font-weight: 500; }
+.row time { font: 500 12px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.pill { font: 600 12px/1 var(--sans); padding: 6px 10px 6px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; border: 1px solid transparent; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.live { color: var(--ok); background: color-mix(in oklab, var(--ok) 12%, transparent); }
+.pill.wait { color: var(--warn); background: color-mix(in oklab, var(--warn) 14%, transparent); }
+.pill.broken { color: var(--bad); background: color-mix(in oklab, var(--bad) 12%, transparent); }
+.detail { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; }
+.panel { background: var(--print); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel h4 { font: 750 17px/1.1 var(--display); font-variation-settings: "wdth" 88; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.seg { display: flex; flex-wrap: wrap; gap: 2px; background: var(--paper); border: 1px solid var(--line); border-radius: 999px; padding: 3px; width: fit-content; max-width: 100%; }
+.seg button { font: 500 12.5px/1 var(--sans); border: 0; background: transparent; color: var(--muted); padding: 7px 12px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--print); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); font-weight: 600; }
+.platform-card { display: grid; gap: 8px; }
+.platform-card .chrome { font-size: 13px; color: var(--ink-2); }
+.platform-card .chrome b { color: var(--ink); }
+.log { font: 500 12px/1.75 var(--mono); background: var(--ink); color: var(--paper); border-radius: 10px; padding: 14px; min-height: 172px; overflow-x: auto; }
+.log div { white-space: pre; animation: pop .25s ease-out both; }
+.log .ok { color: #7EE2B0; } .log .bad { color: #FF9C88; } .log .dim { opacity: .55; }
+.pages { display: grid; gap: 6px; }
+.pages div { display: grid; grid-template-columns: 1fr auto; gap: 10px; font: 500 12.5px/1.4 var(--mono); padding: 8px 10px; border-radius: 8px; background: var(--paper); }
+.pages div span { font-family: var(--sans); font-size: 12px; color: var(--muted); }
+
+/* ---------- tables ---------- */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--print); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 640px; }
+th, td { text-align: left; padding: 12px 16px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+td:first-child { color: var(--muted); }
+td s { color: var(--muted); }
+
+.build { display: grid; gap: 0; counter-reset: b; }
+.build li { list-style: none; display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding-block: 18px; border-top: 1px solid var(--line); }
+.build li::before { counter-increment: b; content: counter(b, decimal-leading-zero); font: 850 34px/1 var(--display); font-variation-settings: "wdth" 66; color: var(--muted); }
+.build h4 { font: 750 19px/1.2 var(--display); font-variation-settings: "wdth" 88; }
+.build p { font-size: 14.5px; color: var(--ink-2); margin-top: 4px; }
+.build .files { font: 500 12px/1.6 var(--mono); color: var(--muted); margin-top: 6px; }
+
+@media (max-width: 900px) {
+  .hero, .detail, .grid3, .strip, .prims, .wall, .prints, .principles, .faq { grid-template-columns: 1fr; }
+  .app { grid-template-columns: 1fr; }
+  .rail { border-right: 0; border-bottom: 1px solid var(--line); grid-auto-flow: column; overflow-x: auto; }
+  .rail .brand, .rail .spacer { display: none; }
+  .ia { grid-template-columns: 1fr; } .ia .arrow { transform: rotate(90deg); justify-self: center; }
+  .row { grid-template-columns: 96px 1fr; } .row time { display: none; }
+  .type-row { grid-template-columns: 1fr; gap: 10px; }
+  .chat { min-height: 380px; }
+  .bar nav { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .dev.is-dev .after { animation: none; -webkit-mask: none; mask: none; }
+  .dev.is-dev::after { animation: none; }
+  .title h1 .roll { animation: none; }
+}
+</style>
+
+<header class="bar">
+  <div class="wrap">
+    <button class="brand" id="logo-btn" aria-label="OGSnap, click to snap the shutter"><svg class="aperture" viewBox="-50 -50 100 100" aria-hidden="true"></svg>OGSnap</button>
+    <nav aria-label="Sections">
+      <a href="#diagnosis">Diagnosis</a><a href="#concept">Concept</a><a href="#system">System</a><a href="#landing">Landing</a><a href="#app">App</a><a href="#voice">Voice</a><a href="#build">Build</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="title">
+    <p class="edge">Design direction v2 · OGSnap · 27 Sep 2026 · replaces docs/06 &amp; docs/07</p>
+    <h1><span class="roll">Darkroom</span></h1>
+    <p class="lede">Every shared link is a photograph of your site. Most never get developed, and people see a grey box. OGSnap is the darkroom. This spec rebuilds the landing page and the app around that one idea: a link going from grey to fully developed.</p>
+    <div class="meta"><span class="edge">Audience · Lovable, Framer &amp; Webflow founders, small agencies</span><span class="edge">Job · check a site, install in 2 min, pay $9</span></div>
+  </div>
+
+  <!-- HERO PROTOTYPE -->
+  <div class="frame" aria-label="Landing page hero prototype">
+    <div class="frame-top"><div class="dots"><i></i><i></i><i></i></div><div class="url">ogsnap.dev</div><span class="edge">Live prototype</span></div>
+    <div class="frame-body">
+      <div class="hero">
+        <div>
+          <h2>Stop sharing <span class="greybox" id="greybox">grey&nbsp;boxes.</span></h2>
+          <p class="lede">Paste your URL. OGSnap reads your logo, colors and fonts and gives your site a branded preview on X, LinkedIn, Slack, WhatsApp and iMessage. Two tags, once. $9 a site.</p>
+          <form class="composer" id="hero-form">
+            <label for="hero-url">Your website address</label>
+            <input id="hero-url" name="url" value="tidepool.app" autocomplete="off" spellcheck="false">
+            <button class="btn flash" type="submit">Develop my link</button>
+          </form>
+          <div class="fine"><span>Free check · no signup</span><span>Works on Lovable, Framer, Webflow, any HTML</span></div>
+        </div>
+        <div class="chat" id="chat" aria-live="polite">
+          <div class="chat-head">Maya · Messages</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:18px">Try it: type any domain above and press the button. The prototype makes a card from the domain name. The real hero streams <code>/api/preview</code> exactly as <code>LiveRenderDemo</code> does today. Only its presentation changes.</p>
+
+  <!-- DIAGNOSIS -->
+  <section class="doc" id="diagnosis">
+    <div class="sec-head">
+      <p class="edge">Diagnosis</p>
+      <h2>Why the current design reads as AI slop</h2>
+      <p class="body">It isn't one bad choice. Three problems stack: the page talks to the wrong person, every section uses the same template, and nothing in the visuals comes from the product's own world.</p>
+    </div>
+    <div class="grid3">
+      <div class="diag">
+        <h3>Two audiences in one page</h3>
+        <ul>
+          <li>The hero sells to Lovable founders. Four sections later we show a <code>3-line route handler</code> and "Framework coverage".</li>
+          <li>The FAQ is titled "for search + AI answers" and talks about "render pipelines".</li>
+          <li>The Twitter meta still says "OG images in 3 lines. Every modern JavaScript framework."</li>
+          <li><code>docs/06</code> and <code>docs/07</code> still describe a dark, indigo, developer-first brand.</li>
+        </ul>
+      </div>
+      <div class="diag">
+        <h3>One template, six times</h3>
+        <ul>
+          <li>Each section is a Badge eyebrow, a serif H2, a paragraph and a grid of cards.</li>
+          <li>Feature grids of icon + title + two lines of copy, which every SaaS template ships.</li>
+          <li>The same <code>Reveal</code> fade-up on every block, so nothing stands out.</li>
+          <li>Numbered "01 02 03" cards that read as decoration.</li>
+        </ul>
+      </div>
+      <div class="diag">
+        <h3>Nothing from the subject</h3>
+        <ul>
+          <li>Cream gradient, blurred blobs and dot grain are generic textures.</li>
+          <li>Cormorant Garamond plus Work Sans says "boutique", which has nothing to do with links or sharing.</li>
+          <li>The product is about how a link looks <em>inside other apps</em>, yet no chat, feed or Slack message appears on the page.</li>
+          <li>The dashboard has seven equal tabs, and three of them are for an API this audience never uses.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONCEPT -->
+  <section class="doc" id="concept">
+    <div class="sec-head">
+      <p class="edge">Concept</p>
+      <h2>A darkroom for links</h2>
+      <p class="body">"Snap" is already a camera word. A link preview is a small photograph of your site that crawlers take when someone shares it. Without an <code>og:image</code> the photo comes out blank. OGSnap develops it. That gives us a villain (the grey box), a hero moment (developing), and a vocabulary: develop, snap, print, frame, contact sheet.</p>
+    </div>
+    <div class="principles">
+      <div><p class="edge">Principle</p><h3>We are the frame. You are the picture.</h3><p>OGSnap's own chrome is ink, paper and fog. Saturated color appears only inside previews, and it is always the customer's brand. That makes every customer's site the most colorful thing on our page.</p></div>
+      <div><p class="edge">Principle</p><h3>One motion: develop</h3><p>Grey → blurred → sharp color, with a soft flash at the end. We use it for every "your preview is ready" moment on the landing page, in onboarding and in the install check. Nothing else animates to draw attention.</p></div>
+      <div><p class="edge">Principle</p><h3>Show the feed, not features</h3><p>Every claim appears inside a message, post or Slack thread, because that is where the customer sees the problem. We don't use icon grids.</p></div>
+      <div><p class="edge">Principle</p><h3>Talk like a founder friend</h3><p>No "pipelines", "SDK" or "render events" on public pages. Say "your link", "your site", "paste this". Developer terms go into a single Developer page inside the app.</p></div>
+    </div>
+  </section>
+
+  <!-- SYSTEM -->
+  <section class="doc" id="system">
+    <div class="sec-head">
+      <p class="edge">System</p>
+      <h2>Tokens, type and three primitives</h2>
+      <p class="body">This page is built with the system it describes. Toggle your OS theme to see the dark palette. Flash yellow is the only action color and keeps its value in both themes.</p>
+    </div>
+
+    <h3 class="sub">Color</h3>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:var(--paper)"></div><div class="lab"><b>Paper</b><span>#F2F3EF / #0E100F<br>page ground</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--print)"></div><div class="lab"><b>Print</b><span>#FFFFFF / #171A18<br>surfaces</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--ink)"></div><div class="lab"><b>Ink</b><span>#121413 / #EEF0EC<br>text, primary button</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--fog)"></div><div class="lab"><b>Fog</b><span>#D3D7D2 / #2A2F2C<br>the grey box, skeletons</span></div></div>
+      <div class="sw"><div class="chip" style="background:var(--flash)"></div><div class="lab"><b>Flash</b><span>#FFD60A both themes<br>one CTA per view</span></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(90deg,var(--ok) 0 33%,var(--warn) 33% 66%,var(--bad) 66%)"></div><div class="lab"><b>Status</b><span>live · waiting · broken<br>app only, never decoration</span></div></div>
+    </div>
+    <p class="note">Fog is a meaning, not a neutral. Anywhere fog appears, it signals "not developed yet": a blank preview, a loading skeleton, a page without tags. The loading state is on-concept at no extra cost.</p>
+
+    <h3 class="sub" style="margin-top:12px">Type</h3>
+    <div>
+      <div class="type-row">
+        <div class="spec"><b>Display</b><span class="edge">Archivo · 800–900 · wdth 62–80</span></div>
+        <div>
+          <div class="t-display" id="wdth-demo">Links, developed.</div>
+          <div class="slider"><label class="edge" for="wdth">Width axis</label><input id="wdth" type="range" min="62" max="125" value="72"><span class="edge" id="wdth-val">72</span></div>
+        </div>
+      </div>
+      <div class="type-row"><div class="spec"><b>Heading</b><span class="edge">Archivo · 800 · wdth 72 · −0.02em</span></div><div class="t-h">Your preview is live on 4 pages</div></div>
+      <div class="type-row"><div class="spec"><b>Body</b><span class="edge">Geist · 400 · 16–19px / 1.6</span></div><div class="t-body">Paste two tags into your site's head. Every time someone shares a link, X, LinkedIn and Slack load your branded image instead of a grey box.</div></div>
+      <div class="type-row"><div class="spec"><b>Utility</b><span class="edge">Geist Mono · 500 · labels, domains, sizes</span></div><div class="t-mono">og:image · 1200 × 630 · 86 KB · tidepool.app/pricing</div></div>
+    </div>
+    <p class="note">Why Archivo: its width axis runs from condensed to extended in one file. Condensed at 900 weight gives poster-sized headlines that still fit on a phone, and animating the width is the page's typographic move. Geist is neutral and very readable at small sizes, and its mono shows domains and pixel sizes, which are this product's real data. Cormorant, Work Sans and the Badge eyebrows are removed.</p>
+
+    <h3 class="sub" style="margin-top:12px">Primitives</h3>
+    <div class="prims">
+      <div class="prim">
+        <h4>Aperture mark</h4>
+        <div class="ap-stage"><svg class="aperture" id="ap-big" viewBox="-50 -50 100 100" role="button" tabindex="0" aria-label="Snap the aperture"></svg></div>
+        <p>The logo is live SVG: six blades drawn from one hexagon. It snaps shut and opens on success, on click, and once per page load. Replaces the placeholder wordmark.</p>
+      </div>
+      <div class="prim">
+        <h4>Develop</h4>
+        <div class="dev" id="dev-demo">
+          <div class="og blank"><span>NO og:image</span></div>
+          <div class="og after" style="--b:#1E3B2F;--f:#F2EBDD;--a:#C9F27B"><div class="shape"></div><div class="in"><div class="top"><span class="logo">F</span>fernhouse.studio</div><strong class="ttl">Interiors that feel like weekends</strong></div></div>
+        </div>
+        <button class="btn sm ghost" id="dev-replay" type="button">Replay develop</button>
+        <p>CSS only: an animated mask radius plus a filter from grayscale+blur to none, then a white flash at 80% opacity. 1.25s. Reduced motion shows a plain crossfade.</p>
+      </div>
+      <div class="prim">
+        <h4>Fog skeleton</h4>
+        <div style="display:grid;gap:10px;padding-block:8px">
+          <div class="og blank" style="max-width:100%"><span>READING tidepool.app …</span></div>
+          <div class="fogline" style="width:80%"></div>
+          <div class="fogline" style="width:55%"></div>
+        </div>
+        <p>Loading states use fog with a slow shimmer. Spinners are replaced by status lines streamed from the server ("Found your logo").</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LANDING -->
+  <section class="doc" id="landing">
+    <div class="sec-head">
+      <p class="edge">Landing page</p>
+      <h2>Six sections. Each one has a job.</h2>
+      <p class="body">The page is told as a story: the problem in a feed, the fix in three frames, proof that it scales to every page, the price, and questions. Each section below is a working prototype of its final layout. The hero is at the top of this document.</p>
+    </div>
+
+    <h3 class="sub">2 · The grey wall</h3>
+    <p class="body">Six real places a link gets shared, each showing the blank card founders see today. When the section scrolls into view, the cards develop one after another. This replaces the "trust signals" and "feature pillars" grids.</p>
+    <div class="wall" id="wall"></div>
+    <div class="wall-foot">
+      <div><span class="counter" id="wall-count">0</span> <span class="edge">of 6 developed</span></div>
+      <button class="btn sm ghost" id="wall-replay" type="button">Replay</button>
+    </div>
+
+    <h3 class="sub" style="margin-top:24px">3 · How it works, in three frames</h3>
+    <p class="body">These steps really are a sequence, so they are numbered like frames on a film strip. Each frame loops a small animation of the step. No icons.</p>
+    <div class="strip">
+      <div class="step">
+        <div class="stage"><div class="typer"><span>tidepool.app</span></div></div>
+        <div class="txt"><p class="edge">Frame 1 of 3</p><h4>Paste your address</h4><p>No account needed for the free check.</p></div>
+      </div>
+      <div class="step">
+        <div class="stage">
+          <div class="site-mock"><div class="nav"><div class="lg"></div><div class="cta"></div></div><div class="hl"></div><div class="hl2"></div><div class="hl2" style="width:40%"></div><div class="font">Aa · Satoshi</div></div>
+          <div class="dropper" aria-hidden="true"></div>
+          <div class="found" aria-hidden="true"><i></i><i></i><i></i></div>
+        </div>
+        <div class="txt"><p class="edge">Frame 2 of 3</p><h4>We read your brand</h4><p>Logo, colors and font, taken from your live site. You can change any of them.</p></div>
+      </div>
+      <div class="step">
+        <div class="stage"><div class="tags"><span class="k">&lt;meta</span> property="og:image"
+  content="…/og.png" /&gt;
+<span class="k">&lt;meta</span> name="twitter:card"
+  content="summary_large_image" /&gt;</div></div>
+        <div class="txt"><p class="edge">Frame 3 of 3</p><h4>Paste two tags</h4><p>Or paste one prompt into Lovable. Framer and Webflow get their own two-step guide.</p></div>
+      </div>
+    </div>
+
+    <h3 class="sub" style="margin-top:24px">4 · Every page, its own print</h3>
+    <p class="body">A sitemap that draws itself, with each page getting its own card and title. This is the upgrade story for per-page previews. Copy must stay honest: the site-wide image works on every platform, and per-page cards need a custom domain on Cloudflare (T10).</p>
+    <div class="tree" id="tree">
+      <svg viewBox="0 0 760 300" role="img" aria-label="Sitemap: the home page branches to pricing, blog and changelog, each with its own preview card">
+        <path class="wire" d="M380 92 C380 140, 130 130, 130 176"/>
+        <path class="wire" d="M380 92 L380 176"/>
+        <path class="wire" d="M380 92 C380 140, 630 130, 630 176"/>
+        <g class="node" style="animation-delay:0s">
+          <rect x="290" y="12" width="180" height="80" rx="8" fill="#0A3A5C"/><circle cx="450" cy="20" r="34" fill="#FF7A59"/>
+          <text x="304" y="74" font-size="13" font-weight="700" fill="#F7F3EA" style="font-family:var(--display)">Build habits that stick</text>
+          <text x="380" y="112" text-anchor="middle" font-size="12" class="t-muted">/</text>
+        </g>
+        <g class="node" style="animation-delay:.7s">
+          <rect x="40" y="176" width="180" height="80" rx="8" fill="#0A3A5C"/><rect x="176" y="186" width="34" height="34" rx="6" fill="#FF7A59"/>
+          <text x="54" y="238" font-size="13" font-weight="700" fill="#F7F3EA" style="font-family:var(--display)">Pricing · Free for 14 days</text>
+          <text x="130" y="276" text-anchor="middle" font-size="12" class="t-muted">/pricing</text>
+        </g>
+        <g class="node" style="animation-delay:.85s">
+          <rect x="290" y="176" width="180" height="80" rx="8" fill="#F7F3EA" stroke="#0A3A5C" stroke-width="1"/><rect x="304" y="188" width="54" height="6" rx="3" fill="#FF7A59"/>
+          <text x="304" y="238" font-size="13" font-weight="700" fill="#0A3A5C" style="font-family:var(--display)">Why streaks fail at day 9</text>
+          <text x="380" y="276" text-anchor="middle" font-size="12" class="t-muted">/blog/streaks</text>
+        </g>
+        <g class="node" style="animation-delay:1s">
+          <rect x="540" y="176" width="180" height="80" rx="8" fill="#FF7A59"/><circle cx="700" cy="196" r="12" fill="#0A3A5C"/>
+          <text x="554" y="238" font-size="13" font-weight="700" fill="#0A3A5C" style="font-family:var(--display)">Changelog · v2.4</text>
+          <text x="630" y="276" text-anchor="middle" font-size="12" class="t-muted">/changelog</text>
+        </g>
+      </svg>
+    </div>
+
+    <h3 class="sub" style="margin-top:24px">5 · Pricing as prints</h3>
+    <p class="body">Three instant prints, slightly rotated on the page, that straighten on hover. The price is the photo. This is the one playful risk on the page, and it stays small.</p>
+    <div class="prints">
+      <div class="print" style="--rot:-2deg"><div class="img" style="background:var(--fog);color:var(--ink)">$0</div><h4>Preview check</h4><ul><li>Today vs. branded, side by side</li><li>Brand read from your site</li><li>No signup</li></ul><button class="btn ghost sm" type="button">Check my site</button></div>
+      <div class="print" style="--rot:1.2deg"><div class="img" style="background:#0A3A5C;color:#F7F3EA;display:grid;gap:6px;align-content:center;justify-items:center">$9<small>per site / month</small></div><h4>Site</h4><ul><li>Branded preview everywhere</li><li>Install with two tags</li><li>Lovable, Framer, Webflow, HTML</li><li>No watermark</li></ul><button class="btn flash sm" type="button">Check my site</button></div>
+      <div class="print" style="--rot:-.8deg"><div class="img" style="background:#FF7A59;color:#0A3A5C;display:grid;gap:6px;align-content:center;justify-items:center">$49<small>10 sites / month</small></div><h4>Agency</h4><ul><li>10 client sites</li><li>A separate brand for each</li><li>Setup help for each client</li></ul><button class="btn ghost sm" type="button">Start with one site</button></div>
+    </div>
+
+    <h3 class="sub" style="margin-top:24px">6 · Questions a founder asks</h3>
+    <div class="faq">
+      <details open><summary>Do I need to code?</summary><p>No. You paste two lines into your site's settings. On Lovable, you paste one prompt and it makes the change for you.</p></details>
+      <details><summary>Where do the colors come from?</summary><p>From your live site: the logo, main colors and heading font. You can change any of them before you install.</p></details>
+      <details><summary>What happens to my current preview image?</summary><p>You replace it. If you already have a good one for a page, keep it and we skip that page.</p></details>
+      <details><summary>Why does LinkedIn still show the old image?</summary><p>LinkedIn keeps previews for about a week. Paste your link into their Post Inspector to refresh it now. The app gives you the direct link.</p></details>
+      <details><summary>I run an agency. Can each client keep their own brand?</summary><p>Yes. The $49 plan covers 10 sites, and each has its own logo, colors and font.</p></details>
+      <details><summary>Can I cancel?</summary><p>Anytime, from Billing. Your site goes back to its old preview at the end of the month.</p></details>
+    </div>
+    <p class="note">FAQ copy is a draft. The Post Inspector and cancellation answers describe intended behavior. Confirm both before shipping (Phase 0 rule: no false claims).</p>
+
+    <h3 class="sub" style="margin-top:24px">Footer</h3>
+    <div class="wordmark" aria-label="OGSnap"><svg class="aperture" id="ap-foot" viewBox="-50 -50 100 100" aria-hidden="true"></svg>OGSnap</div>
+  </section>
+
+  <!-- APP -->
+  <section class="doc" id="app">
+    <div class="sec-head">
+      <p class="edge">App</p>
+      <h2>The app is a list of sites</h2>
+      <p class="body">A customer has one question when they log in: are my links working? The home screen answers it in one line, and each site opens into a preview wall and an install check.</p>
+    </div>
+
+    <h3 class="sub">Navigation, before and after</h3>
+    <div class="ia">
+      <ol><li><s>Overview</s><em>merged into Sites</em></li><li><s>Sites</s></li><li><s>API Keys</s><em>→ Developer</em></li><li><s>Brand Kit</s><em>per site now</em></li><li><s>Renders</s><em>→ Developer</em></li><li><s>Billing</s></li><li><s>Playground</s><em>→ Developer</em></li></ol>
+      <div class="arrow" aria-hidden="true">→</div>
+      <ol><li><b>Sites</b><em>home</em></li><li><b>Billing</b></li><li><b>Account</b><em>holds Developer, off by default</em></li></ol>
+    </div>
+
+    <h3 class="sub" style="margin-top:12px">Sites home + site detail</h3>
+    <p class="body">Click a row to open that site. Click <b>Check install</b> to run the verifier, or switch it to the failure case. The verifier uses the existing <code>/api/check</code> audit, so this is a design change and needs no new backend.</p>
+    <div class="frame">
+      <div class="frame-top"><div class="dots"><i></i><i></i><i></i></div><div class="url">ogsnap.dev/sites</div><span class="edge">Live prototype</span></div>
+      <div class="app">
+        <aside class="rail">
+          <span class="brand"><svg class="aperture" viewBox="-50 -50 100 100" aria-hidden="true"></svg>OGSnap</span>
+          <a href="#app" class="on">Sites <span>3</span></a>
+          <a href="#app">Billing</a>
+          <div class="spacer"></div>
+          <a href="#app">Account</a>
+        </aside>
+        <div class="main">
+          <div class="main-head">
+            <div style="display:grid;gap:8px"><h3>Sites</h3><div class="summary"><span><b id="sum-live">1</b> live</span><span><b>1</b> waiting for tags</span><span><b>1</b> broken</span></div></div>
+            <button class="btn flash sm" type="button">Add a site</button>
+          </div>
+          <div class="rows" id="rows"></div>
+          <div class="detail">
+            <div class="panel">
+              <h4><span id="d-domain">tidepool.app</span><span class="seg" id="plat" role="group" aria-label="Platform"></span></h4>
+              <div class="platform-card" id="pcard"></div>
+              <div class="pages" id="pages"></div>
+            </div>
+            <div class="panel">
+              <h4>Install check <span class="seg" id="mode" role="group" aria-label="Scenario"><button type="button" aria-pressed="true" data-m="ok">Tags found</button><button type="button" aria-pressed="false" data-m="bad">Tags missing</button></span></h4>
+              <div class="log" id="log" aria-live="polite"><div class="dim">Press Check install to fetch your site the way X and LinkedIn do.</div></div>
+              <button class="btn flash" id="check" type="button">Check install</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="sub" style="margin-top:12px">States</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>State</th><th>What the user sees</th><th>Copy</th></tr></thead>
+      <tbody>
+        <tr><td>No sites</td><td>One large composer (same as the landing hero) with a fog card beside it</td><td>"Add your first site. We'll read your brand from it."</td></tr>
+        <tr><td>Reading brand</td><td>Fog skeleton card with server status lines streaming under it</td><td>"Found your logo" · "Picked 3 colors" · "Heading font: Satoshi"</td></tr>
+        <tr><td>Preview ready</td><td>Develop animation + aperture snap, once</td><td>"Here's your link. Install it in two minutes."</td></tr>
+        <tr><td>Waiting for tags</td><td>Amber pill, install panel opens by default for that platform</td><td>"We haven't seen your tags yet. Paste them, publish, then check again."</td></tr>
+        <tr><td>Broken</td><td>Red pill, failing check line highlighted</td><td>"Your og:image tag points to lovable.dev's default image. Paste the Lovable prompt again and publish."</td></tr>
+        <tr><td>Trial ending</td><td>Quiet banner above the rows, never a modal</td><td>"3 days left on tidepool.app. $9/month keeps it live."</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- VOICE -->
+  <section class="doc" id="voice">
+    <div class="sec-head">
+      <p class="edge">Voice</p>
+      <h2>Rewrite for founders, not engineers</h2>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Where</th><th>Now</th><th>Rewrite</th></tr></thead>
+      <tbody>
+        <tr><td>Section H2</td><td><s>Production standards without internal OG toil.</s></td><td>Your links should look like your site.</td></tr>
+        <tr><td>Feature</td><td><s>Framework Native APIs</s></td><td>Works on Lovable, Framer, Webflow and plain HTML.</td></tr>
+        <tr><td>Feature</td><td><s>Render + Cache Strategy</s></td><td>(cut; nobody in this audience asks)</td></tr>
+        <tr><td>Twitter meta</td><td><s>OG images in 3 lines. Every modern JavaScript framework.</s></td><td>Your site, looking good every time it's shared. $9 a site.</td></tr>
+        <tr><td>Error</td><td><s>Preview failed</s></td><td>We couldn't open tidepool.app. Check the address, or make sure the site is published.</td></tr>
+        <tr><td>Dashboard CTA</td><td><s>Activate</s></td><td>Keep it live · $9/month</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- BUILD -->
+  <section class="doc" id="build">
+    <div class="sec-head">
+      <p class="edge">Build plan</p>
+      <h2>No new dependencies. Landing first.</h2>
+      <p class="body">Everything here uses CSS, inline SVG and the existing <code>Reveal</code> IntersectionObserver. Landing work comes first because the day-30 gate depends on outreach traffic converting on that page. The app redesign can wait until the first paying sites exist.</p>
+    </div>
+    <ol class="build">
+      <li><div><h4>Tokens, fonts, logo</h4><p>Swap the palette to Paper/Print/Ink/Fog/Flash. Load Archivo with its wdth axis, Geist and Geist Mono via <code>next/font</code>. Delete the body gradients, <code>.bg-grain</code>, Cormorant and Work Sans.</p><p class="files">globals.css · tailwind.config.ts · app/layout.tsx · ~0.5 day</p></div></li>
+      <li><div><h4>Four primitives</h4><p><code>&lt;Aperture&gt;</code> (SVG plus 20 lines of math), <code>&lt;Develop&gt;</code> (a class toggle and CSS), <code>&lt;OgCard&gt;</code>, and <code>&lt;PlatformFrame variant="x|linkedin|slack|imessage|whatsapp|discord"&gt;</code>. Stop using Badge as an eyebrow.</p><p class="files">components/brand/aperture.tsx · components/ui/develop.tsx · components/preview/* · ~0.5 day</p></div></li>
+      <li><div><h4>Landing rewrite</h4><p>Hero composer and chat (restyled <code>LiveRenderDemo</code>, same stream), grey wall, three frames, sitemap, prints, FAQ, wordmark footer. Delete the SDK, framework and trust-signal sections. Fix metadata and JSON-LD copy.</p><p class="files">app/page.tsx · components/onboarding/live-render-demo.tsx · ~1.5 days</p></div></li>
+      <li><div><h4>Checker page</h4><p><code>/check</code> gets the same hero and uses the log component from the install check.</p><p class="files">app/check/* · ~0.5 day</p></div></li>
+      <li><div><h4>App shell and Sites</h4><p>Rail nav with three items. Keys, Renders and Playground move to <code>/dashboard/developer</code>. Sites becomes rows plus a detail view with the preview wall and install check.</p><p class="files">dashboard/layout.tsx · dashboard-nav.tsx · dashboard/sites/page.tsx · ~1.5 days</p></div></li>
+      <li><div><h4>Retire the old brand docs</h4><p>Replace <code>docs/06</code> and <code>docs/07</code> with a link to this spec. That follows the plan's "no new docs" rule and removes the stale indigo guidance.</p><p class="files">docs/06-DESIGN-SYSTEM.md · docs/07-BRAND.md · 10 min</p></div></li>
+    </ol>
+    <div class="note"><b>Open decisions.</b> (1) The plan leaves the name open for the no-code audience. This direction works with any name, but the aperture and "snap" language assume we keep OGSnap. (2) Should the chat in the hero show a real customer's site once one exists? That would be stronger than the fictional Tidepool. (3) Platform frames stay generic and don't copy any platform's real UI or logos.</div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const $ = (s, r = document) => r.querySelector(s);
+
+  // ---------- aperture ----------
+  function aperture(svg, t) {
+    const R = 46, r = 6 + 30 * t, th = (1 - t) * 1.1 + 0.3, v = [];
+    for (let i = 0; i < 6; i++) { const a = th + i * Math.PI / 3; v.push([r * Math.cos(a), r * Math.sin(a)]); }
+    let lines = "";
+    for (let i = 0; i < 6; i++) {
+      const [x, y] = v[i], [nx, ny] = v[(i + 1) % 6];
+      let dx = nx - x, dy = ny - y; const L = Math.hypot(dx, dy); dx /= L; dy /= L;
+      const b = x * dx + y * dy, s = -b + Math.sqrt(b * b - (x * x + y * y) + R * R);
+      lines += `M${(x - dx * .01).toFixed(2)} ${(y - dy * .01).toFixed(2)}L${(x + dx * s).toFixed(2)} ${(y + dy * s).toFixed(2)}`;
+    }
+    svg.innerHTML = `<circle r="${R + 3}" fill="currentColor"/><polygon points="${v.map(p => p.map(n => n.toFixed(2)).join(",")).join(" ")}" fill="var(--flash)"/><path d="${lines}" stroke="var(--paper)" stroke-width="2.4" stroke-linecap="round" fill="none"/>`;
+  }
+  const apertures = [...document.querySelectorAll("svg.aperture")];
+  apertures.forEach(s => aperture(s, 1));
+  function snap(svgs = apertures) {
+    if (reduce) return;
+    const t0 = performance.now(), D = 520;
+    (function f(now) {
+      const p = Math.min(1, (now - t0) / D);
+      const t = p < .35 ? 1 - (p / .35) * .92 : .08 + ((p - .35) / .65) * .92;
+      const e = 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 2);
+      svgs.forEach(s => aperture(s, p < .35 ? t : e));
+      if (p < 1) requestAnimationFrame(f); else svgs.forEach(s => aperture(s, 1));
+    })(t0);
+  }
+  $("#logo-btn").addEventListener("click", () => snap());
+  const big = $("#ap-big");
+  big.addEventListener("click", () => snap([big]));
+  big.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); snap([big]); } });
+  setTimeout(() => snap(), 500);
+
+  // ---------- develop ----------
+  function develop(el) { el.classList.remove("is-dev"); void el.offsetWidth; el.classList.add("is-dev"); }
+  $("#dev-replay").addEventListener("click", () => develop($("#dev-demo")));
+  setTimeout(() => develop($("#dev-demo")), 900);
+
+  // ---------- brand from domain ----------
+  const palettes = [
+    { b: "#0A3A5C", f: "#F7F3EA", a: "#FF7A59" },
+    { b: "#1E3B2F", f: "#F2EBDD", a: "#C9F27B" },
+    { b: "#F6E7D8", f: "#3A1F12", a: "#C8553D" },
+    { b: "#15133A", f: "#F4F1FF", a: "#8C7BFF" },
+    { b: "#FFE8F3", f: "#46102E", a: "#E0317E" },
+    { b: "#102A2A", f: "#E9FFF7", a: "#2FD3A6" },
+  ];
+  const clean = v => (v || "").trim().replace(/^https?:\/\//i, "").replace(/\/.*$/, "").toLowerCase() || "yoursite.com";
+  const brandOf = d => { let h = 0; for (const c of d) h = (h * 31 + c.charCodeAt(0)) >>> 0; const n = d.split(".")[0]; return { ...palettes[h % palettes.length], name: n.charAt(0).toUpperCase() + n.slice(1), d }; };
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const headlines = { "tidepool.app": "Build habits that stick, one tide at a time", "fernhouse.studio": "Interiors that feel like weekends", "kilnworks.co": "Handmade stoneware, fired in Leeds" };
+  const card = (br, title) => `<div class="og after" style="--b:${br.b};--f:${br.f};--a:${br.a}"><div class="shape"></div><div class="shape2"></div><div class="in"><div class="top"><span class="logo">${esc(br.name[0] || "?")}</span>${esc(br.d)}</div><strong class="ttl">${esc(title || headlines[br.d] || br.name + ", made for people who ship")}</strong><div class="foot">${esc(br.d)}</div></div></div>`;
+  const devCard = (br, title) => `<div class="dev"><div class="og blank"><span>NO og:image</span></div>${card(br, title)}</div>`;
+
+  // ---------- hero chat ----------
+  const chat = $("#chat"); let run = 0;
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+  function add(html, cls) { const d = document.createElement("div"); d.className = "msg " + cls; d.innerHTML = html; chat.appendChild(d); return d; }
+  async function play(domain) {
+    const id = ++run, br = brandOf(domain);
+    chat.querySelectorAll(".msg").forEach(m => m.remove());
+    add("is this your new site??", "them"); await wait(900); if (id !== run) return;
+    const link = add(`${devCard(br)}<div class="cap"><b>${esc(br.name)}</b><span>${esc(br.d)}</span></div>`, "me link");
+    await wait(1400); if (id !== run) return;
+    develop(link.querySelector(".dev")); snap();
+    await wait(1700); if (id !== run) return;
+    const ty = add('<div class="typing"><i></i><i></i><i></i></div>', "them"); ty.style.padding = "0";
+    await wait(1100); if (id !== run) return;
+    ty.remove(); add("ok that looks legit. who designed it?", "them");
+    await wait(6000); if (id === run && !reduce) play(domain);
+  }
+  $("#hero-form").addEventListener("submit", e => { e.preventDefault(); const d = clean($("#hero-url").value); $("#hero-url").value = d; play(d); });
+  play("tidepool.app");
+  setTimeout(() => $("#greybox").classList.add("go"), 2600);
+
+  // ---------- width slider ----------
+  const w = $("#wdth"), wd = $("#wdth-demo");
+  w.addEventListener("input", () => { wd.style.setProperty("--w", w.value); $("#wdth-val").textContent = w.value; });
+
+  // ---------- grey wall ----------
+  const posts = [
+    { k: "X", cls: "", who: "Maya Chen", h: "@mayabuilds", txt: "Finally shipped the new site", d: "tidepool.app" },
+    { k: "LinkedIn", cls: "", who: "Sam Ortiz", h: "Founder, Fernhouse", txt: "We redesigned everything. Have a look.", d: "fernhouse.studio" },
+    { k: "Slack", cls: "slack", who: "#launches", h: "", txt: "new landing is up →", d: "kilnworks.co" },
+    { k: "iMessage", cls: "bubble", who: "Priya", h: "", txt: "", d: "loopdesk.io" },
+    { k: "WhatsApp", cls: "bubble", who: "Studio group", h: "", txt: "client site is live!", d: "northpaw.vet" },
+    { k: "Discord", cls: "slack", who: "#show-and-tell", h: "", txt: "made this with lovable in a weekend", d: "gridnotes.app" },
+  ];
+  const wall = $("#wall");
+  wall.innerHTML = posts.map(p => `<article class="pf ${p.cls}"><div class="who"><span class="av"></span><b>${p.who}</b><span>${p.h}</span></div>${p.txt ? `<p class="txt">${p.txt}</p>` : ""}${devCard(brandOf(p.d))}<p class="edge">${p.k} · ${p.d}</p></article>`).join("");
+  let wallRun = 0;
+  async function developWall() {
+    const id = ++wallRun, devs = [...wall.querySelectorAll(".dev")];
+    devs.forEach(d => d.classList.remove("is-dev")); $("#wall-count").textContent = 0;
+    for (let i = 0; i < devs.length; i++) { await wait(i ? 380 : 200); if (id !== wallRun) return; develop(devs[i]); $("#wall-count").textContent = i + 1; }
+  }
+  $("#wall-replay").addEventListener("click", developWall);
+
+  // ---------- observers ----------
+  const once = (el, fn) => new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { fn(); o.disconnect(); } }), { threshold: .35 }).observe(el);
+  once(wall, developWall);
+  once($("#tree"), () => $("#tree").classList.add("drawn"));
+
+  // ---------- app prototype ----------
+  const sites = [
+    { d: "tidepool.app", via: "Lovable · 4 pages", st: "live", label: "Live", t: "checked 2h ago", pages: [["/", "Live"], ["/pricing", "Live"], ["/blog/streaks", "Live"], ["/changelog", "Live"]] },
+    { d: "fernhouse.studio", via: "Framer · 7 pages", st: "wait", label: "Waiting for tags", t: "added today", pages: [["/", "No tags yet"], ["/work", "No tags yet"], ["/contact", "No tags yet"]] },
+    { d: "kilnworks.co", via: "Webflow · 12 pages", st: "broken", label: "Broken on 2 pages", t: "checked 1d ago", pages: [["/", "Live"], ["/shop", "Old image"], ["/shop/mugs", "Old image"]] },
+  ];
+  let sel = 0, plat = "X", mode = "ok";
+  const rows = $("#rows");
+  function renderRows() {
+    rows.innerHTML = sites.map((s, i) => `<div class="row ${i === sel ? "sel" : ""}" role="button" tabindex="0" data-i="${i}">${s.st === "wait" ? `<div class="og blank"><span>NO og:image</span></div>` : card(brandOf(s.d)).replace("og after", "og")}<div class="dom">${s.d}<small>${s.via}</small></div><span class="pill ${s.st}">${s.label}</span><time>${s.t}</time></div>`).join("");
+  }
+  const plats = ["X", "LinkedIn", "Slack", "iMessage"];
+  const chromeFor = { X: s => `<b>You</b> · posted a link`, LinkedIn: s => `<b>You</b> shared a link · 1,204 followers`, Slack: s => `<b>#general</b> · link unfurled`, iMessage: s => `<b>To: Maya</b>` };
+  function renderDetail() {
+    const s = sites[sel];
+    $("#d-domain").textContent = s.d;
+    $("#plat").innerHTML = plats.map(p => `<button type="button" aria-pressed="${p === plat}" data-p="${p}">${p}</button>`).join("");
+    const pc = $("#pcard");
+    pc.innerHTML = `<div class="chrome">${chromeFor[plat](s)}</div>${devCard(brandOf(s.d))}<p class="edge">${plat} · 1200 × 630 · ${s.d}/og.png</p>`;
+    const dv = pc.querySelector(".dev");
+    if (s.st !== "wait") develop(dv);
+    $("#pages").innerHTML = s.pages.map(([p, st]) => `<div>${s.d}${p}<span>${st}</span></div>`).join("");
+  }
+  rows.addEventListener("click", e => { const r = e.target.closest(".row"); if (!r) return; sel = +r.dataset.i; renderRows(); renderDetail(); resetLog(); });
+  rows.addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("row")) { e.preventDefault(); e.target.click(); } });
+  $("#plat").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; plat = b.dataset.p; renderDetail(); });
+  $("#mode").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; mode = b.dataset.m; [...$("#mode").children].forEach(x => x.setAttribute("aria-pressed", x === b)); resetLog(); });
+  const log = $("#log");
+  function resetLog() { log.innerHTML = `<div class="dim">Press Check install to fetch your site the way X and LinkedIn do.</div>`; }
+  let checkRun = 0;
+  $("#check").addEventListener("click", async () => {
+    const id = ++checkRun, d = sites[sel].d; log.innerHTML = "";
+    const line = (t, c = "") => { const x = document.createElement("div"); x.className = c; x.textContent = t; log.appendChild(x); };
+    const steps = mode === "ok"
+      ? [[`GET https://${d}/  as Twitterbot`, "dim"], ["200 OK · 312 ms", ""], ['found <meta property="og:image">', "ok"], ["image 1200 × 630 · 86 KB · 41 ms", "ok"], ["twitter:card = summary_large_image", "ok"], ["Your preview is live.", "ok"]]
+      : [[`GET https://${d}/  as Twitterbot`, "dim"], ["200 OK · 288 ms", ""], ["og:image → lovable.dev/opengraph-image.png", "bad"], ["That's Lovable's default image, not yours.", "bad"], ["Paste the Lovable prompt again, publish, then check again.", ""]];
+    for (const [t, c] of steps) { await wait(420); if (id !== checkRun) return; line(t, c); }
+    if (mode === "ok") snap();
+  });
+  renderRows(); renderDetail();
+})();
+</script>

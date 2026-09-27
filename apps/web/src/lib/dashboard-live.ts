@@ -74,14 +74,8 @@ export function useRendersDashboardData(
     | undefined;
 }
 
-export function useCreateApiKey(): (args: {
-  userId: string;
-  name: string;
-}) => Promise<{ rawKey: string; keyPrefix: string }> {
-  return useMutation(createApiKeyMutation) as (args: {
-    userId: string;
-    name: string;
-  }) => Promise<{ rawKey: string; keyPrefix: string }>;
+export function useCreateApiKey(): (args: { name: string }) => Promise<{ rawKey: string; keyPrefix: string }> {
+  return useMutation(createApiKeyMutation) as (args: { name: string }) => Promise<{ rawKey: string; keyPrefix: string }>;
 }
 
 export interface DashboardSite {
@@ -97,6 +91,7 @@ export interface DashboardSite {
 export interface DashboardSites {
   sites: DashboardSite[];
   agency: { used: number } | null;
+  canManageBilling: boolean;
 }
 
 const listSitesQuery = "sites/queries:listMine" as unknown as FunctionReference<"query">;

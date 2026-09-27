@@ -2,23 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
+@property --develop-r {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
 :root {
-  --background: 38 30% 96%;
-  --foreground: 215 25% 18%;
+  --background: 75 14% 94.5%;
+  --foreground: 150 5% 7.5%;
   --card: 0 0% 100%;
-  --card-foreground: 215 25% 18%;
-  --primary: 197 90% 42%;
-  --primary-foreground: 0 0% 98%;
-  --secondary: 32 50% 90%;
-  --secondary-foreground: 214 24% 21%;
-  --muted: 32 30% 93%;
-  --muted-foreground: 214 12% 42%;
-  --accent: 25 66% 86%;
-  --accent-foreground: 214 24% 21%;
-  --border: 28 24% 83%;
-  --input: 28 24% 83%;
-  --ring: 197 90% 42%;
-  --radius: 0.8rem;
+  --card-foreground: 150 5% 7.5%;
+  --primary: 150 5% 7.5%;
+  --primary-foreground: 75 14% 94.5%;
+  --secondary: 108 6% 83%;
+  --secondary-foreground: 150 5% 7.5%;
+  --muted: 90 7% 90%;
+  --muted-foreground: 143 4% 38%;
+  --accent: 90 7% 90%;
+  --accent-foreground: 150 5% 7.5%;
+  --border: 96 7% 86%;
+  --input: 96 7% 86%;
+  --ring: 150 5% 7.5%;
+  --fog: 108 6% 83%;
+  --fog-deep: 138 4% 65%;
+  --flash: 50 100% 52%;
+  --flash-foreground: 150 5% 7.5%;
+  --terminal: 150 5% 7.5%;
+  --terminal-foreground: 75 14% 94.5%;
+  --ok: 155 64% 33%;
+  --warn: 36 81% 36%;
+  --bad: 9 65% 48%;
+  --radius: 0.75rem;
+  --ease-develop: cubic-bezier(0.2, 0.7, 0, 1);
+  --ease-snap: cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+/* Same roles, darkroom at night. Flash keeps its value; brand colors inside previews never change. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --background: 150 7% 6%;
+    --foreground: 90 12% 93%;
+    --card: 140 6% 10%;
+    --card-foreground: 90 12% 93%;
+    --primary: 90 12% 93%;
+    --primary-foreground: 150 7% 6%;
+    --secondary: 144 6% 17%;
+    --secondary-foreground: 90 12% 93%;
+    --muted: 144 6% 14%;
+    --muted-foreground: 143 4% 59%;
+    --accent: 144 6% 14%;
+    --accent-foreground: 90 12% 93%;
+    --border: 144 6% 18%;
+    --input: 144 6% 18%;
+    --ring: 90 12% 93%;
+    --fog: 144 6% 17%;
+    --fog-deep: 143 5% 33%;
+    --ok: 154 51% 49%;
+    --warn: 38 73% 55%;
+    --bad: 9 83% 63%;
+    --terminal: 150 8% 3.5%;
+  }
 }
 
 * {
@@ -27,10 +72,6 @@
 
 body {
   @apply min-h-screen bg-background text-foreground antialiased;
-  background-image:
-    radial-gradient(circle at 0% 0%, rgba(248, 230, 201, 0.65), transparent 44%),
-    radial-gradient(circle at 100% 0%, rgba(182, 226, 255, 0.45), transparent 46%),
-    linear-gradient(140deg, #f8f4ea 0%, #f2ece0 40%, #efe6d7 100%);
 }
 
 a {
@@ -38,19 +79,138 @@ a {
 }
 
 ::selection {
-  background: hsl(var(--primary) / 0.28);
+  background: hsl(var(--flash));
+  color: hsl(var(--flash-foreground));
 }
 
-.bg-grain {
-  position: relative;
+@layer utilities {
+  .wdth-62 { font-variation-settings: "wdth" 62; }
+  .wdth-70 { font-variation-settings: "wdth" 70; }
+  .wdth-80 { font-variation-settings: "wdth" 80; }
+  .wdth-90 { font-variation-settings: "wdth" 90; }
 }
 
-.bg-grain::before {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  opacity: 0.08;
-  background-image: radial-gradient(#5b4d39 0.5px, transparent 0.5px);
-  background-size: 3px 3px;
+@layer components {
+  /* Develop: grey card → brand card. Toggle .is-dev, or let an [data-inview] ancestor start it. --delay staggers. */
+  .develop {
+    display: grid;
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .develop > * {
+    grid-area: 1 / 1;
+  }
+  .develop > .develop-after {
+    mask: radial-gradient(circle at 12% 108%, #000 calc(var(--develop-r) - 22%), transparent var(--develop-r));
+  }
+  .develop.is-dev > .develop-after,
+  [data-inview] .develop > .develop-after {
+    animation: develop 1.25s var(--ease-develop) var(--delay, 0s) both;
+  }
+  .develop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .develop.is-dev::after,
+  [data-inview] .develop::after {
+    animation: snap-flash 0.55s ease-out calc(var(--delay, 0s) + 1s);
+  }
+
+  .og-card {
+    container-type: inline-size;
+    position: relative;
+    aspect-ratio: 1.91 / 1;
+    width: 100%;
+    overflow: hidden;
+    background: var(--og-bg);
+    color: var(--og-fg);
+  }
+  .og-card-title {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 78;
+    font-weight: 800;
+    font-size: 8.6cqi;
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    max-width: 15ch;
+  }
+  .og-card-blank {
+    container-type: inline-size;
+    aspect-ratio: 1.91 / 1;
+    width: 100%;
+    display: grid;
+    place-items: center;
+    background: hsl(var(--fog));
+    color: hsl(var(--fog-deep));
+  }
+  .og-card-blank > span {
+    font: 500 max(9px, 3.4cqi)/1.2 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    padding-inline: 6cqi;
+  }
+
+  .greybox {
+    background: linear-gradient(hsl(var(--flash)), hsl(var(--flash))) left / 0% 100% no-repeat, hsl(var(--fog));
+    padding-inline: 0.12em;
+    border-radius: 0.08em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    animation: fill-flash 1.1s var(--ease-develop) 2.6s forwards;
+  }
+
+  .fog-shimmer {
+    background: linear-gradient(90deg, hsl(var(--fog)) 0 40%, hsl(var(--fog) / 0.45) 50%, hsl(var(--fog)) 60% 100%) 0 0 / 300% 100%;
+    animation: fog-shimmer 1.6s linear infinite;
+  }
+
+  .sitemap-wire {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+  }
+  [data-inview] .sitemap-wire {
+    animation: draw 1.4s var(--ease-develop) var(--delay, 0s) forwards;
+  }
+  .sitemap-node {
+    opacity: 0;
+  }
+  [data-inview] .sitemap-node {
+    animation: pop-in 0.5s var(--ease-snap) var(--delay, 0s) forwards;
+  }
+
+  .pop-in {
+    animation: pop-in 0.35s var(--ease-snap) both;
+  }
+}
+
+@keyframes develop {
+  0% { --develop-r: 0%; filter: grayscale(1) blur(10px) contrast(0.55) brightness(1.15); }
+  55% { filter: grayscale(0.5) blur(3px) contrast(0.85) brightness(1.05); }
+  100% { --develop-r: 170%; filter: none; }
+}
+@keyframes snap-flash { 0% { opacity: 0; } 8% { opacity: 0.8; } 100% { opacity: 0; } }
+@keyframes fog-shimmer { to { background-position: -150% 0; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop-in { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes typing { 50% { opacity: 0.25; } }
+@keyframes type-in { 0%, 10% { width: 0; } 45%, 100% { width: 13ch; } }
+@keyframes sample { 0%, 12% { left: 10px; top: 8px; } 30%, 42% { left: 40%; top: 32px; } 60%, 72% { left: 12px; top: 92px; } 88%, 100% { left: 70%; top: 118px; } }
+@keyframes land { 0%, 6% { transform: scale(0); } 12%, 92% { transform: scale(1); } 100% { transform: scale(0); } }
+@keyframes fill-flash { to { background-size: 100% 100%, auto; color: hsl(var(--flash-foreground)); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+  .develop::after { display: none; }
 }

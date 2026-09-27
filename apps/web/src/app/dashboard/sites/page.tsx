@@ -1,143 +1,29 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import Link from "next/link";
-import { ConvexError } from "convex/values";
 import { useAuth } from "@clerk/nextjs";
-import { Check, Copy, Globe } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { BlankCard } from "@/components/preview/og-card";
+import { SiteDetail, StatusPill, Thumb, errorText, openBillingPortal, openCheckout } from "@/components/dashboard/site-detail";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { UrlComposer } from "@/components/ui/url-composer";
 import { AGENCY_SITES, PLAN_PRICES } from "@/lib/pricing";
-import { type DashboardSite, siteImageUrl, useCreateSite, useSites } from "@/lib/dashboard-live";
-
-const snippetFor = (siteId: string) => {
-  const url = siteImageUrl(siteId);
-  return [
-    `<meta property="og:image" content="${url}" />`,
-    `<meta name="twitter:card" content="summary_large_image" />`,
-    `<meta name="twitter:image" content="${url}" />`,
-  ].join("\n");
-};
-
-// ponytail: Lovable is a Vite SPA, and crawlers only read index.html, so the prompt pins the edit there
-const lovablePromptFor = (snippet: string) =>
-  [
-    "Update this site's social share image. Edit index.html only; social crawlers don't run JavaScript, so don't use react-helmet or any React component for this.",
-    "1. In <head>, delete every existing og:image, twitter:image and twitter:card meta tag, including the default lovable.dev opengraph image.",
-    "2. Add exactly these tags inside <head>:",
-    snippet,
-    "3. Don't change anything else and don't add packages.",
-  ].join("\n");
-
-async function openCheckout(body: { siteId: string } | { plan: "agency" }) {
-  const response = await fetch("/api/billing/create-checkout", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) throw new Error(await response.text());
-  const { checkoutUrl } = (await response.json()) as { checkoutUrl: string };
-  window.location.assign(checkoutUrl);
-}
-
-function SiteCard({ site }: { site: DashboardSite }) {
-  const [copied, setCopied] = useState<"snippet" | "lovable" | null>(null);
-  const [activating, setActivating] = useState(false);
-  const [billingError, setBillingError] = useState<string | null>(null);
-  const snippet = snippetFor(site.id);
-
-  async function activate() {
-    setActivating(true);
-    setBillingError(null);
-    try {
-      await openCheckout({ siteId: site.id });
-    } catch (error) {
-      setBillingError(error instanceof Error ? error.message : "Could not start checkout");
-      setActivating(false);
-    }
-  }
-
-  async function copy(kind: "snippet" | "lovable") {
-    await navigator.clipboard.writeText(kind === "lovable" ? lovablePromptFor(snippet) : snippet);
-    setCopied(kind);
-    setTimeout(() => setCopied(null), 2000);
-  }
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-        <h2 className="flex items-center gap-2 font-display text-xl tracking-tight">
-          <Globe className="h-4 w-4 text-primary" aria-hidden="true" />
-          {site.domain}
-        </h2>
-        <Badge variant={site.status === "active" ? "default" : "secondary"}>
-          {site.coveredByPlan ? "active · agency" : site.status}
-        </Badge>
-      </CardHeader>
-      <CardContent className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-        {site.imageUrl ? (
-          <img
-            src={site.imageUrl}
-            alt={`Link preview image for ${site.domain}`}
-            className="aspect-[1.91/1] w-full rounded-lg border border-border/70 object-cover"
-          />
-        ) : (
-          <div className="flex aspect-[1.91/1] w-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 p-4 text-center text-sm text-muted-foreground">
-            {site.renderError ? `Render failed: ${site.renderError}` : "Building your preview..."}
-          </div>
-        )}
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">Paste into your site&apos;s &lt;head&gt;</p>
-          <pre className="overflow-x-auto rounded-lg border border-border/70 bg-muted/40 p-3 text-xs leading-relaxed">
-            <code>{snippet}</code>
-          </pre>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={() => copy("snippet")}>
-              {copied === "snippet" ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-              {copied === "snippet" ? "Copied" : "Copy snippet"}
-            </Button>
-            <Button type="button" variant="outline" size="sm" onClick={() => copy("lovable")}>
-              {copied === "lovable" ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-              {copied === "lovable" ? "Copied" : "Copy Lovable prompt"}
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            On Lovable? Paste the prompt into Lovable chat, then click Publish. Check it at <Link href="/check" className="underline">/check</Link>.
-          </p>
-          {site.status !== "active" ? (
-            <div className="space-y-1 pt-2">
-              <Button type="button" size="sm" onClick={activate} disabled={activating}>
-                {activating ? "Opening checkout..." : `Activate for $${PLAN_PRICES.site}/month`}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                {site.status === "trial"
-                  ? "Trial previews carry a small watermark until the site is active."
-                  : "This site is canceled, so shares show a neutral image."}
-              </p>
-              {billingError ? (
-                <p role="alert" className="text-xs text-red-600">
-                  {billingError}
-                </p>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+import { useCreateSite, useSites } from "@/lib/dashboard-live";
+import { cn } from "@/lib/utils";
 
 export default function DashboardSitesPage(): React.ReactElement {
   const { isSignedIn } = useAuth();
-  const sites = useSites(Boolean(isSignedIn));
+  const data = useSites(Boolean(isSignedIn));
   const createSite = useCreateSite();
   const [domain, setDomain] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
-  const agency = sites?.agency;
+  const [openingPortal, setOpeningPortal] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const sites = data?.sites ?? [];
+  const agency = data?.agency;
+  const selected = sites.find((site) => site.id === selectedId) ?? sites[0];
+  const active = sites.filter((site) => site.status === "active").length;
 
   async function upgrade() {
     setUpgrading(true);
@@ -145,8 +31,19 @@ export default function DashboardSitesPage(): React.ReactElement {
     try {
       await openCheckout({ plan: "agency" });
     } catch (upgradeError) {
-      setError(upgradeError instanceof Error ? upgradeError.message : "Could not start checkout");
+      setError(errorText(upgradeError, "Could not start checkout"));
       setUpgrading(false);
+    }
+  }
+
+  async function manageBilling() {
+    setOpeningPortal(true);
+    setError(null);
+    try {
+      await openBillingPortal();
+    } catch (portalError) {
+      setError(errorText(portalError, "Could not open billing"));
+      setOpeningPortal(false);
     }
   }
 
@@ -155,67 +52,113 @@ export default function DashboardSitesPage(): React.ReactElement {
     setSaving(true);
     setError(null);
     try {
-      await createSite({ domain });
+      setSelectedId(await createSite({ domain }));
       setDomain("");
     } catch (createError) {
-      setError(
-        createError instanceof ConvexError
-          ? String(createError.data)
-          : createError instanceof Error
-            ? createError.message
-            : "Could not add site",
-      );
+      setError(errorText(createError, "Could not add site"));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <h1 className="font-display text-3xl tracking-tight">Sites</h1>
-          <CardDescription>Add a site, then paste its snippet once. Every share uses your branded preview.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={addSite} className="flex flex-col gap-2 sm:flex-row">
-            <label htmlFor="site-domain" className="sr-only">
-              Site domain
-            </label>
-            <Input
-              id="site-domain"
-              placeholder="yoursite.com"
-              required
-              value={domain}
-              onChange={(event) => setDomain(event.target.value)}
-            />
-            <Button type="submit" disabled={saving || !domain.trim()}>
-              {saving ? "Adding..." : "Add site"}
-            </Button>
-          </form>
-          {error ? (
-            <p role="alert" className="mt-2 text-sm text-red-600">
-              {error}
+    <div className="space-y-6">
+      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2">
+          <h1 className="wdth-70 font-display text-4xl font-extrabold tracking-[-0.02em]">Sites</h1>
+          {sites.length ? (
+            <p className="text-sm text-muted-foreground">
+              <b className="text-foreground">{sites.length}</b> {sites.length === 1 ? "site" : "sites"} ·{" "}
+              <b className="text-foreground">{active}</b> active
+              {agency ? ` · Agency plan: ${agency.used} of ${AGENCY_SITES} in use` : ""}
+              {data?.canManageBilling ? (
+                <>
+                  {" · "}
+                  <button type="button" onClick={manageBilling} disabled={openingPortal} className="font-medium text-foreground underline underline-offset-2 disabled:opacity-50">
+                    {openingPortal ? "Opening billing..." : "Manage billing"}
+                  </button>
+                </>
+              ) : null}
             </p>
           ) : null}
-          {agency ? (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Agency plan: {agency.used} of {AGENCY_SITES} sites in use.
-            </p>
-          ) : (
-            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-              <span>Managing client sites? Get {AGENCY_SITES} sites for ${PLAN_PRICES.agency}/month.</span>
-              <Button type="button" variant="outline" size="sm" onClick={upgrade} disabled={upgrading}>
-                {upgrading ? "Opening checkout..." : "Get agency plan"}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+        <UrlComposer
+          id="site-domain"
+          label="Site domain"
+          value={domain}
+          onChange={setDomain}
+          onSubmit={addSite}
+          busy={saving}
+          className="w-full md:w-[26rem]"
+        >
+          {saving ? "Adding..." : "Add a site"}
+        </UrlComposer>
+      </div>
+      {error ? (
+        <p role="alert" className="text-sm text-bad">
+          {error}
+        </p>
+      ) : null}
 
-      {sites === undefined ? <p className="text-sm text-muted-foreground">Loading sites...</p> : null}
-      {sites?.sites.length === 0 ? <p className="text-sm text-muted-foreground">No sites yet.</p> : null}
-      {sites?.sites.map((site) => <SiteCard key={site.id} site={site} />)}
+      {data === undefined ? (
+        <div className="space-y-2" aria-label="Loading sites">
+          {[0, 1].map((row) => (
+            <div key={row} className="fog-shimmer h-[76px] rounded-xl" />
+          ))}
+        </div>
+      ) : sites.length === 0 ? (
+        <div className="grid items-center gap-6 rounded-xl border border-border bg-card p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="space-y-2">
+            <h2 className="wdth-80 font-display text-2xl font-extrabold">Add your first site.</h2>
+            <p className="text-foreground/75">Type its address above. We&apos;ll read your logo, colors and fonts and build its preview.</p>
+          </div>
+          <div className="overflow-hidden rounded-lg">
+            <BlankCard />
+          </div>
+        </div>
+      ) : (
+        <>
+          <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
+            {sites.map((site) => (
+              <li key={site.id}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedId(site.id)}
+                  aria-current={site.id === selected?.id ? "true" : undefined}
+                  className={cn(
+                    "grid w-full grid-cols-[96px_minmax(0,1fr)_auto] items-center gap-4 px-4 py-3 text-left transition-colors hover:bg-background sm:grid-cols-[120px_minmax(0,1fr)_auto_auto]",
+                    site.id === selected?.id && "bg-background",
+                  )}
+                >
+                  <Thumb site={site} />
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{site.domain}</span>
+                    <span className="block font-mono text-xs text-muted-foreground">
+                      added {new Date(site.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </span>
+                  </span>
+                  <StatusPill site={site} />
+                  <span aria-hidden="true" className="hidden font-mono text-muted-foreground sm:block">
+                    →
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          {selected ? <SiteDetail key={selected.id} site={selected} /> : null}
+        </>
+      )}
+
+      {!agency ? (
+        <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5 text-sm text-muted-foreground">
+          <span>
+            Managing client sites? Get {AGENCY_SITES} sites for ${PLAN_PRICES.agency}/month, each with its own brand.
+          </span>
+          <Button type="button" variant="outline" size="sm" onClick={upgrade} disabled={upgrading}>
+            {upgrading ? "Opening checkout..." : "Get agency plan"}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

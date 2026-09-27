@@ -1,4 +1,4 @@
-import { mutation } from "../_generated/server";
+import { internalMutation } from "../_generated/server";
 import { v } from "convex/values";
 
 const identityArgs = {
@@ -15,7 +15,8 @@ const identityArgs = {
   },
 };
 
-export const upsertFromIdentity = mutation({
+// Internal only: callers must be server code that already verified who the user is.
+export const upsertFromIdentity = internalMutation({
   ...identityArgs,
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -50,37 +51,6 @@ export const upsertFromIdentity = mutation({
       organizationId: args.organizationId,
       organizationSlug: args.organizationSlug,
       organizationRole: args.organizationRole,
-      createdAt: now,
-      updatedAt: now,
-      lastSeenAt: now,
-    });
-  },
-});
-
-export const ensureUser = mutation({
-  args: {
-    clerkId: v.string(),
-    email: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    const now = Date.now();
-    const existing = await ctx.db
-      .query("users")
-      .withIndex("by_clerk", (q) => q.eq("clerkId", args.clerkId))
-      .first();
-
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        email: args.email ?? existing.email,
-        updatedAt: now,
-        lastSeenAt: now,
-      });
-      return existing._id;
-    }
-
-    return await ctx.db.insert("users", {
-      clerkId: args.clerkId,
-      email: args.email,
       createdAt: now,
       updatedAt: now,
       lastSeenAt: now,

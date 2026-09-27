@@ -2,17 +2,17 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import { ConvexClerkProvider } from "@/components/providers/convex-clerk-provider";
-import { Reveal } from "@/components/ui/reveal";
 import { syncUserToConvex } from "@/lib/user-sync";
 
+// ponytail: API tools keep their URLs and sit behind Developer; move them only if the API product is cut
 const navItems = [
-  { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/sites", label: "Sites" },
-  { href: "/dashboard/keys", label: "API Keys" },
-  { href: "/dashboard/brand", label: "Brand Kit" },
-  { href: "/dashboard/renders", label: "Renders" },
-  { href: "/dashboard/billing", label: "Billing" },
-  { href: "/dashboard/playground", label: "Playground" },
+  {
+    href: "/dashboard/developer",
+    label: "Developer",
+    also: ["/dashboard/keys", "/dashboard/brand", "/dashboard/renders", "/dashboard/playground", "/dashboard/billing"],
+    quiet: true,
+  },
 ];
 
 export default async function DashboardLayout({
@@ -34,11 +34,9 @@ export default async function DashboardLayout({
 
   return (
     <ConvexClerkProvider>
-      <div className="space-y-4">
-        <Reveal>
-          <DashboardNav items={navItems} />
-        </Reveal>
-        <Reveal delay={70}>{children}</Reveal>
+      <div className="grid gap-6 lg:grid-cols-[168px_minmax(0,1fr)] lg:gap-10">
+        <DashboardNav items={navItems} />
+        <div className="min-w-0">{children}</div>
       </div>
     </ConvexClerkProvider>
   );

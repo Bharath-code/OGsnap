@@ -104,3 +104,14 @@ export const markWebhookProcessed = internalMutation({
     await ctx.db.patch(args.webhookEventId, { processed: true });
   },
 });
+
+// Every Dodo purchase (site or agency) carries the customer; keep it on the user so the portal works for both.
+export const setCustomerId = internalMutation({
+  args: { userId: v.string(), customerId: v.string() },
+  handler: async (ctx, args) => {
+    const userId = ctx.db.normalizeId("users", args.userId);
+    const user = userId ? await ctx.db.get(userId) : null;
+    if (!userId || !user || user.paymentCustomerId === args.customerId) return;
+    await ctx.db.patch(userId, { paymentCustomerId: args.customerId });
+  },
+});

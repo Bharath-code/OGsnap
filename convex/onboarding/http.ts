@@ -56,7 +56,7 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const subscription = await ctx.runMutation(api.render.mutations.seedDefaultSubscriptionIfMissing, {
+        const subscription = await ctx.runMutation(internal.render.mutations.seedDefaultSubscriptionIfMissing, {
           userId,
         });
 
