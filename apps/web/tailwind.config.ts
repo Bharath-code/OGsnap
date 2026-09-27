@@ -35,6 +35,11 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        fog: {
+          DEFAULT: "hsl(var(--fog))",
+          deep: "hsl(var(--fog-deep))",
+        },
+        flash: "hsl(var(--flash))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -43,16 +48,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        display: ["var(--font-display)", "Georgia", "serif"],
-      },
-      keyframes: {
-        shimmer: {
-          "0%": { transform: "translateX(-100%)" },
-          "100%": { transform: "translateX(100%)" },
-        },
-      },
-      animation: {
-        shimmer: "shimmer 2s linear infinite",
+        display: ["var(--font-display)", "Arial Narrow", "Helvetica Neue", "Arial", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "SF Mono", "Menlo", "monospace"],
       },
     },
   },

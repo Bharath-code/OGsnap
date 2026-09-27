@@ -1,55 +1,37 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AGENCY_SITES, PLAN_PRICES } from "@/lib/pricing";
-import {
-  ArrowRight,
-  BadgeCheck,
-  Blocks,
-  Braces,
-  ChartColumnIncreasing,
-  Check,
-  Clock3,
-  Cloud,
-  Code2,
-  Layers,
-  Rocket,
-  ShieldCheck,
-  Sparkles,
-  Wand2,
-} from "lucide-react";
+import { Aperture } from "@/components/brand/aperture";
 import { LiveRenderDemo } from "@/components/onboarding/live-render-demo";
-import { Badge } from "@/components/ui/badge";
+import { demoBrands } from "@/components/preview/brands";
+import { BlankCard, OgCard } from "@/components/preview/og-card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Reveal } from "@/components/ui/reveal";
+import { Develop } from "@/components/ui/develop";
+import { InView } from "@/components/ui/in-view";
+import { cn } from "@/lib/utils";
 
 const siteUrl = "https://ogsnap.dev";
 const canonicalUrl = `${siteUrl}/`;
-
-const keywords = [
-  "open graph image api",
-  "dynamic og image generator",
-  "next.js og image",
-  "astro og image",
-  "sveltekit og image",
-  "remix og image",
-  "tanstack start og image",
-  "developer tools saas",
-  "brand aware og image pipeline",
-];
+const description =
+  "Paste your URL and OGSnap builds a branded link preview from your logo, colors and fonts. Install once on Lovable, Framer, Webflow or any site.";
 
 export const metadata: Metadata = {
-  title: "OGSnap | Your Site Looks Great When Shared",
-  description:
-    "Paste your URL and OGSnap builds branded link previews from your logo, colors and fonts. Install once on Lovable, Framer, Webflow or any site.",
-  keywords,
-  alternates: {
-    canonical: canonicalUrl,
-  },
+  title: "OGSnap | Stop sharing grey boxes",
+  description,
+  keywords: [
+    "link preview image",
+    "open graph image generator",
+    "lovable og image",
+    "framer social image",
+    "webflow open graph image",
+    "og:image",
+    "social share preview",
+  ],
+  alternates: { canonical: canonicalUrl },
   openGraph: {
-    title: "OGSnap | Your Site Looks Great When Shared",
-    description:
-      "Branded link previews for every page of your site. Install once on Lovable, Framer, Webflow or any site.",
+    title: "OGSnap | Stop sharing grey boxes",
+    description: "Branded link previews for your site on X, LinkedIn, Slack, WhatsApp and iMessage.",
     url: canonicalUrl,
     siteName: "OGSnap",
     locale: "en_US",
@@ -57,484 +39,353 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "OGSnap | Open Graph Image API",
-    description:
-      "OG images in 3 lines. Every modern JavaScript framework. Brand-aware, cached, and production-ready.",
+    title: "OGSnap | Stop sharing grey boxes",
+    description: `Your site, looking good every time it's shared. $${PLAN_PRICES.site} a site.`,
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
-    },
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
   },
 };
 
-const trustSignals = [
-  {
-    value: "3 lines",
-    title: "Fast integration",
-    description: "Install SDK, set your key, export the route handler.",
-  },
-  {
-    value: "3 frameworks",
-    title: "Broad JS support",
-    description: "Next.js, Astro, and SvelteKit.",
-  },
-  {
-    value: "One pipeline",
-    title: "Operationally simple",
-    description: "Brand onboarding, rendering, caching, and billing in one flow.",
-  },
-  {
-    value: "Built for scale",
-    title: "Production path",
-    description: "R2-backed storage plus tracked render events and usage limits.",
-  },
-];
-
-const featurePillars = [
-  {
-    icon: Sparkles,
-    title: "Brand-Aware Output",
-    description: "Extract colors, logos, and typography once and reuse them across every OG render.",
-  },
-  {
-    icon: Code2,
-    title: "Framework Native APIs",
-    description: "Drop into route handlers with familiar ergonomics for modern JavaScript stacks.",
-  },
-  {
-    icon: Clock3,
-    title: "Render + Cache Strategy",
-    description: "Generate once, cache smartly, and ship reliable social previews every time.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Usage And Billing Gates",
-    description: "Manage API keys, usage limits, and monetization controls without custom glue code.",
-  },
-  {
-    icon: Cloud,
-    title: "Storage You Can Trust",
-    description: "Persist generated images to object storage for stable URLs and repeatable sharing.",
-  },
-  {
-    icon: ChartColumnIncreasing,
-    title: "Operator Visibility",
-    description: "Track renders, cache hits, and pipeline behavior with practical dashboard signals.",
-  },
-];
-
-const implementationSteps = [
-  {
-    step: "01",
-    title: "Connect Your Brand Source",
-    description: "Point OGSnap at your site once so the system can infer visual defaults and tone.",
-  },
-  {
-    step: "02",
-    title: "Wire A Route In Minutes",
-    description: "Use the SDK in your framework and expose an OG endpoint with a tiny code surface.",
-  },
-  {
-    step: "03",
-    title: "Ship And Monitor",
-    description: "Publish, watch usage and renders, and tighten performance with cache-aware behavior.",
-  },
+const posts = [
+  { app: "X", who: "Maya Chen", handle: "@mayabuilds", text: "Finally shipped the new site", thread: false },
+  { app: "LinkedIn", who: "Sam Ortiz", handle: "Founder, Fernhouse", text: "We redesigned everything. Have a look.", thread: false },
+  { app: "Slack", who: "#launches", handle: "", text: "new landing is up", thread: true },
+  { app: "iMessage", who: "Priya", handle: "", text: "", thread: false },
+  { app: "WhatsApp", who: "Studio group", handle: "", text: "client site is live!", thread: false },
+  { app: "Discord", who: "#show-and-tell", handle: "", text: "made this with lovable in a weekend", thread: true },
 ];
 
 const pricing = [
   {
     plan: "Preview check",
     price: "$0",
-    cadence: "",
-    description: "See how your site looks when someone shares it.",
+    note: "",
     features: ["Today vs. branded preview", "Brand pulled from your site", "No signup"],
     cta: "Check my site",
-    href: "#preview",
-    highlight: false,
+    tilt: "-rotate-2",
+    style: { background: "hsl(var(--fog))", color: "hsl(var(--foreground))" },
+    flash: false,
   },
   {
     plan: "Site",
     price: `$${PLAN_PRICES.site}`,
-    cadence: "/month",
-    description: "One site, branded link previews everywhere it's shared.",
-    features: ["Branded preview image", "Install with two meta tags", "Lovable, Framer, Webflow or any site", "No watermark"],
+    note: "per site / month",
+    features: ["Branded preview image", "Install with three lines", "Lovable, Framer, Webflow or any site", "No watermark"],
     cta: "Check my site",
-    href: "#preview",
-    highlight: true,
+    tilt: "rotate-1",
+    style: { background: demoBrands[0].bg, color: demoBrands[0].fg },
+    flash: true,
   },
   {
     plan: "Agency",
     price: `$${PLAN_PRICES.agency}`,
-    cadence: "/month",
-    description: `Up to ${AGENCY_SITES} client sites, each with its own brand.`,
-    features: [`${AGENCY_SITES} sites`, "Separate brand per site", "Setup help for each client"],
+    note: `${AGENCY_SITES} sites / month`,
+    features: [`${AGENCY_SITES} client sites`, "A separate brand for each", "Setup help for each client"],
     cta: "Start with one site",
-    href: "#preview",
-    highlight: false,
+    tilt: "-rotate-1",
+    style: { background: demoBrands[0].accent, color: demoBrands[0].bg },
+    flash: false,
   },
 ];
 
 const faqItems = [
   {
-    question: "What is OGSnap?",
-    answer:
-      "OGSnap is a developer-focused SaaS for generating Open Graph images from a brand-aware rendering pipeline. It combines onboarding, rendering, caching, and delivery so teams avoid maintaining custom screenshot infrastructure.",
+    question: "Do I need to code?",
+    answer: "No. You paste three lines into your site's head. On Lovable, you paste one prompt and Lovable makes the edit for you.",
   },
   {
-    question: "How fast can a team integrate OGSnap?",
-    answer:
-      "Most teams can ship the first endpoint quickly because the SDK pattern is intentionally small: install the package, provide an API key, and export a handler in your framework route.",
+    question: "Where do the colors come from?",
+    answer: "From your live site. OGSnap reads your logo, main colors and fonts and builds the preview from them.",
   },
   {
-    question: "Which frameworks are supported?",
-    answer:
-      "OGSnap supports modern JavaScript stacks including Next.js, Astro, and SvelteKit, with similar integration flow across each framework.",
+    question: "Will it change how my site looks?",
+    answer: "No. It only changes the image people see when your link is shared. Visitors to your site see nothing different.",
   },
   {
-    question: "How does caching work?",
-    answer:
-      "The render pipeline is designed to detect reusable results, reducing repeated work and improving consistency. You can inspect render behavior and cache outcomes from the dashboard.",
+    question: "Why does LinkedIn still show my old image?",
+    answer: "LinkedIn caches link previews. Paste your link into LinkedIn's Post Inspector and it fetches the new one.",
   },
   {
-    question: "Can I control branding defaults?",
-    answer:
-      "Yes. OGSnap stores brand defaults such as logo and color cues from onboarding so your generated images remain visually consistent without repeated manual setup.",
+    question: "I run an agency. Can each client keep their own brand?",
+    answer: `Yes. The Agency plan covers ${AGENCY_SITES} sites for $${PLAN_PRICES.agency} a month, and each site gets its own brand.`,
   },
   {
-    question: "Is OGSnap suitable for production usage?",
-    answer:
-      "Yes. OGSnap includes persistent storage, API key controls, usage tracking, and billing pathways so teams can move from demo to production without re-architecting the pipeline.",
+    question: "Can I cancel?",
+    answer: "Yes, anytime.",
   },
 ];
 
-const softwareApplicationSchema = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "OGSnap",
-  applicationCategory: "DeveloperApplication",
-  operatingSystem: "Web",
-  url: siteUrl,
-  description:
-    "Open Graph image API for modern JavaScript teams with brand extraction, rendering, caching, and delivery.",
-  offers: [
-    { "@type": "Offer", price: String(PLAN_PRICES.site), priceCurrency: "USD", category: "Site" },
-    { "@type": "Offer", price: String(PLAN_PRICES.agency), priceCurrency: "USD", category: "Agency" },
-  ],
-  featureList: [
-    "Brand-aware OG image generation",
-    "SDK integrations for modern JS frameworks",
-    "Render caching and usage tracking",
-    "Object storage persistence",
-  ],
-};
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "OGSnap",
+    applicationCategory: "WebApplication",
+    operatingSystem: "Web",
+    url: siteUrl,
+    description,
+    offers: [
+      { "@type": "Offer", price: String(PLAN_PRICES.site), priceCurrency: "USD", category: "Site" },
+      { "@type": "Offer", price: String(PLAN_PRICES.agency), priceCurrency: "USD", category: "Agency" },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqItems.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "OGSnap",
+    url: siteUrl,
+    logo: `${siteUrl}/logo.svg`,
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: faqItems.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-};
+const h2 = "wdth-70 max-w-[18ch] text-balance font-display text-[clamp(2.4rem,5.2vw,4rem)] font-extrabold leading-[0.95] tracking-[-0.025em]";
+const edge = "font-mono text-[11px] uppercase tracking-[0.08em] text-muted-foreground";
 
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "OGSnap",
-  url: siteUrl,
-  logo: `${siteUrl}/logo.svg`,
-  sameAs: ["https://github.com"],
-};
+const tree = [
+  { x: 290, y: 12, path: "/", brand: demoBrands[0], title: "Build habits that stick", delay: 0 },
+  { x: 40, y: 176, path: "/pricing", brand: demoBrands[0], title: "Pricing · Free for 14 days", delay: 700 },
+  { x: 290, y: 176, path: "/blog/streaks", brand: { ...demoBrands[0], bg: "#F7F3EA", fg: "#0A3A5C" }, title: "Why streaks fail at day 9", delay: 850 },
+  { x: 540, y: 176, path: "/changelog", brand: { ...demoBrands[0], bg: "#FF7A59", fg: "#0A3A5C", accent: "#0A3A5C" }, title: "Changelog · v2.4", delay: 1000 },
+];
 
 export default function HomePage() {
   return (
-    <div className="space-y-20 pb-6 sm:space-y-24">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
-      />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+    <div className="space-y-28 pb-6 sm:space-y-36">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <section className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-[linear-gradient(145deg,#fdf7ea_0%,#f5ebd8_45%,#eef1df_100%)] p-6 shadow-[0_40px_120px_-80px_rgba(44,34,12,0.8)] sm:p-10">
-        <div className="pointer-events-none absolute -left-16 top-8 h-56 w-56 rounded-full bg-primary/25 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 bottom-6 h-56 w-56 rounded-full bg-[#e8b484]/40 blur-3xl" />
-        <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:radial-gradient(#85745f_0.7px,transparent_0.7px)] [background-size:5px_5px]" />
-
-        <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
-          <Reveal className="space-y-6">
-            <Badge className="w-fit bg-card/80 text-foreground">For Lovable, Framer, Webflow and any website</Badge>
-            <h1 className="max-w-3xl font-display text-5xl leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              Every page of your site looks great when shared.
-            </h1>
-            <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-              Paste your URL. OGSnap pulls your logo, colors and fonts and builds a branded link preview. Install it once
-              and links on X, LinkedIn, Slack and iMessage stop showing a blank card.
-            </p>
-            <p className="text-base font-medium text-foreground">
-              ${PLAN_PRICES.site}/site/mo · Agencies ${PLAN_PRICES.agency}/{AGENCY_SITES} sites
-            </p>
-            <ul className="grid gap-2 text-sm text-foreground/85 sm:grid-cols-2">
-              {["No code or design work", "Branded from your own site", "Install once, done", "Cancel anytime"].map((item) => (
-                <li key={item} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-primary" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-
-          <Reveal delay={180}>
-            <LiveRenderDemo />
-          </Reveal>
-        </div>
-      </section>
-
-      <section aria-label="Trust signals" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {trustSignals.map((signal, index) => (
-          <Reveal key={signal.title} delay={index * 70}>
-            <Card className="h-full border-border/80 bg-card/75">
-              <CardHeader className="space-y-1">
-                <p className="font-display text-3xl leading-none text-foreground">{signal.value}</p>
-                <CardTitle className="text-lg">{signal.title}</CardTitle>
-                <CardDescription>{signal.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          </Reveal>
-        ))}
-      </section>
-
-      <section id="features" className="space-y-7">
-        <Reveal>
-          <div className="space-y-3">
-            <Badge className="w-fit">Why teams switch to OGSnap</Badge>
-            <h2 className="font-display text-4xl leading-tight sm:text-5xl">Production standards without internal OG toil.</h2>
-            <p className="max-w-3xl text-muted-foreground">
-              OGSnap replaces scattered scripts and brittle screenshot jobs with one maintained service layer purpose-built
-              for developer teams.
-            </p>
-          </div>
-        </Reveal>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {featurePillars.map((feature, index) => (
-            <Reveal key={feature.title} delay={index * 75}>
-              <Card className="h-full border-border/80 bg-card/70">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <feature.icon className="h-5 w-5 text-primary" />
-                    {feature.title}
-                  </CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">{feature.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
-        <Reveal className="space-y-4">
-          <Badge className="w-fit">Implementation path</Badge>
-          <h2 className="font-display text-4xl leading-tight sm:text-5xl">How to launch dynamic OG images in one sprint.</h2>
-          <p className="text-muted-foreground">
-            This workflow is built for the real-world question teams ask: what is the safest way to ship dynamic OG images
-            while keeping DX clean and ops predictable?
+      <section className="pt-4 sm:pt-10">
+        <LiveRenderDemo>
+          <h1 className="wdth-62 text-balance font-display text-[clamp(3.25rem,8vw,6.5rem)] font-black leading-[0.88] tracking-[-0.035em]">
+            Stop sharing <span className="greybox">grey&nbsp;boxes.</span>
+          </h1>
+          <p className="mt-6 max-w-[34rem] text-lg leading-relaxed text-foreground/80">
+            Paste your URL. OGSnap reads your logo, colors and fonts and gives your site a branded preview on X, LinkedIn,
+            Slack, WhatsApp and iMessage. Install it once. ${PLAN_PRICES.site} a site.
           </p>
-          <div className="space-y-3">
-            {implementationSteps.map((item, index) => (
-              <Card key={item.step} className="border-border/70 bg-card/70">
-                <CardHeader className="space-y-1">
-                  <CardDescription className="font-mono text-xs uppercase tracking-[0.18em] text-primary">
-                    {item.step}
-                  </CardDescription>
-                  <CardTitle className="text-2xl">{item.title}</CardTitle>
-                  <CardDescription>{item.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
-        </Reveal>
-        <Reveal delay={160}>
-          <Card className="overflow-hidden border-foreground/10 bg-[#152338] text-white">
-            <CardContent className="space-y-4 p-0">
-              <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-                <div className="flex items-center gap-2 text-sm text-white/80">
-                  <Wand2 className="h-4 w-4 text-[#7dd3fc]" />
-                  Live Render Preview
-                </div>
-                <Badge className="bg-white/10 text-white">Route-ready</Badge>
-              </div>
-              <div className="space-y-4 px-5 pb-5">
-                <div className="rounded-lg border border-white/15 bg-white/5 p-4 font-mono text-xs text-white/90">
-                  <div>{`POST /api/demo-render`}</div>
-                  <div className="mt-2 text-[#7dd3fc]">{`{ "url": "https://example.com/post" }`}</div>
-                </div>
-                <div className="rounded-lg border border-white/10 bg-[linear-gradient(140deg,#132034_0%,#273a56_48%,#0e1a2d_100%)] p-5">
-                  <div className="mb-3 text-xs uppercase tracking-[0.18em] text-white/55">Generated OG</div>
-                  <div className="rounded-md border border-white/10 bg-white/95 p-4 text-[#13203a]">
-                    <div className="mb-2 text-xs uppercase tracking-wide text-[#3c4f71]">OGSnap</div>
-                    <div className="font-display text-2xl leading-tight">
-                      Stop maintaining custom OG workers for every app.
-                    </div>
-                    <div className="mt-3 text-xs text-[#516289]">ogsnap.dev</div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Reveal>
+        </LiveRenderDemo>
       </section>
 
-      <section className="space-y-6">
-        <Reveal className="space-y-3">
-          <Badge className="w-fit">Developer-ready SDK</Badge>
-          <h2 className="font-display text-4xl leading-tight sm:text-5xl">Integrate with a route, not a rewrite.</h2>
-        </Reveal>
-        <div className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-          <Reveal>
-            <Card className="overflow-hidden border-border/80 bg-[#1a2130] text-[#dbe6ff]">
-              <CardHeader className="border-b border-white/10 bg-[#20293a]">
-                <CardTitle className="flex items-center gap-2 text-xl text-white">
-                  <Braces className="h-5 w-5 text-[#9ad5ff]" />
-                  3-line route handler
-                </CardTitle>
-                <CardDescription className="text-[#b7c7e8]">Answer-first integration for modern app routers.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <pre className="overflow-x-auto p-5 font-mono text-xs leading-relaxed sm:text-sm">{`import { generateOG } from "@ogsnap/next";
-
-export const { GET } = generateOG({
-  apiKey: process.env.OGSNAP_API_KEY!,
-});`}</pre>
-              </CardContent>
-            </Card>
-          </Reveal>
-          <Reveal delay={90}>
-            <Card className="h-full border-border/80 bg-card/75">
-              <CardHeader>
-                <CardTitle className="text-2xl">Framework coverage</CardTitle>
-                <CardDescription>Use the same mental model across your app stack.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-2 pt-0">
-                {["Next.js", "Astro", "SvelteKit"].map((item) => (
-                  <div
-                    key={item}
-                    className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-background/60 px-3 py-2 text-sm"
-                  >
-                    <Blocks className="h-4 w-4 text-primary" />
-                    {item}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </Reveal>
+      <section className="space-y-10">
+        <div className="space-y-4">
+          <h2 className={h2}>This is how most sites look when shared.</h2>
+          <p className="max-w-[60ch] text-foreground/75">
+            No image, a stretched logo, or a screenshot of the cookie banner. OGSnap replaces all of them with one preview
+            built from your brand.
+          </p>
         </div>
-      </section>
-
-      <section id="pricing" className="space-y-6">
-        <Reveal className="space-y-3">
-          <Badge className="w-fit">Simple pricing</Badge>
-          <h2 className="font-display text-4xl leading-tight sm:text-5xl">Choose the plan that matches your shipping pace.</h2>
-        </Reveal>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {pricing.map((tier, index) => (
-            <Reveal key={tier.plan} delay={index * 80}>
-              <Card
-                className={`h-full border-border/80 ${
-                  tier.highlight
-                    ? "bg-[linear-gradient(150deg,#fef1d8_0%,#f9e9cc_38%,#f3f0e1_100%)] shadow-[0_30px_90px_-60px_rgba(112,72,22,0.9)]"
-                    : "bg-card/75"
-                }`}
+        <InView className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post, index) => {
+            const brand = demoBrands[index];
+            return (
+              <article
+                key={post.app}
+                className={cn(
+                  "grid content-start gap-2.5 rounded-2xl border border-border bg-card p-3.5",
+                  post.thread && "border-l-4 border-l-fog-deep",
+                )}
               >
-                <CardHeader className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-2xl">{tier.plan}</CardTitle>
-                    {tier.highlight ? <Badge className="bg-primary text-primary-foreground">Most popular</Badge> : null}
-                  </div>
-                  <p className="font-display text-4xl text-foreground">
-                    {tier.price}
-                    <span className="ml-1 font-sans text-base text-muted-foreground">{tier.cadence}</span>
-                  </p>
-                  <CardDescription>{tier.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-2">
-                    {tier.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2 text-sm text-foreground/85">
-                        <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <Button asChild className="w-full" variant={tier.highlight ? "default" : "outline"}>
-                    <Link href={tier.href}>{tier.cta}</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </Reveal>
+                <div className="flex items-center gap-2 text-[13px]">
+                  <span className="h-6 w-6 shrink-0 rounded-full bg-fog" />
+                  <b className="font-semibold">{post.who}</b>
+                  <span className="text-muted-foreground">{post.handle}</span>
+                </div>
+                {post.text ? <p className="text-sm text-foreground/80">{post.text}</p> : null}
+                <Develop
+                  className={post.app === "iMessage" || post.app === "WhatsApp" ? "rounded-2xl" : "rounded-lg"}
+                  delay={200 + index * 380}
+                  before={<BlankCard />}
+                  after={<OgCard brand={brand} />}
+                />
+                <p className={edge}>
+                  {post.app} · {brand.domain}
+                </p>
+              </article>
+            );
+          })}
+        </InView>
+      </section>
+
+      <section className="space-y-10">
+        <h2 className={h2}>Live in three frames.</h2>
+        <ol className="grid gap-4 md:grid-cols-3">
+          <li className="grid grid-rows-[210px_auto] overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="grid place-items-center border-b border-border bg-background p-5" aria-hidden="true">
+              <div className="flex w-full rounded-full border border-border bg-card px-4 py-3 font-mono text-[15px]">
+                <span className="w-0 animate-[type-in_5s_steps(13)_infinite] overflow-hidden whitespace-nowrap border-r-2 border-foreground">
+                  tidepool.app
+                </span>
+              </div>
+            </div>
+            <div className="grid gap-1.5 p-5">
+              <p className={edge}>Frame 1 of 3</p>
+              <h3 className="wdth-80 font-display text-2xl font-extrabold leading-tight">Paste your address</h3>
+              <p className="text-sm text-foreground/75">No account needed for the free check.</p>
+            </div>
+          </li>
+          <li className="grid grid-rows-[210px_auto] overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="relative overflow-hidden border-b border-border bg-background p-5" aria-hidden="true">
+              <div className="grid h-full content-start gap-2 rounded-lg border border-border bg-card p-3">
+                <div className="flex items-center justify-between">
+                  <span className="h-[22px] w-[22px] rounded-md" style={{ background: demoBrands[0].bg }} />
+                  <span className="h-[18px] w-16 rounded-full" style={{ background: demoBrands[0].accent }} />
+                </div>
+                <span className="h-3.5 w-[70%] rounded-sm" style={{ background: demoBrands[0].bg }} />
+                <span className="h-2 w-1/2 rounded-sm bg-fog" />
+                <span className="h-2 w-2/5 rounded-sm bg-fog" />
+                <span className="font-mono text-[10px] text-muted-foreground">Aa · Satoshi</span>
+              </div>
+              <span className="absolute left-4 top-3.5 h-7 w-7 animate-[sample_6s_var(--ease-develop)_infinite] rounded-full border-2 border-foreground shadow-[0_0_0_3px_hsl(var(--card))]" />
+              <span className="absolute bottom-3 right-3 flex gap-1.5">
+                {[demoBrands[0].bg, demoBrands[0].accent, demoBrands[0].fg].map((color, index) => (
+                  <i
+                    key={color}
+                    className="block h-[22px] w-[22px] animate-[land_6s_infinite_both] rounded-md border-2 border-card shadow-[0_0_0_1px_hsl(var(--border))]"
+                    style={{ background: color, animationDelay: `${0.4 + index * 1.2}s` }}
+                  />
+                ))}
+              </span>
+            </div>
+            <div className="grid gap-1.5 p-5">
+              <p className={edge}>Frame 2 of 3</p>
+              <h3 className="wdth-80 font-display text-2xl font-extrabold leading-tight">We read your brand</h3>
+              <p className="text-sm text-foreground/75">Logo, colors and fonts, taken from your live site.</p>
+            </div>
+          </li>
+          <li className="grid grid-rows-[210px_auto] overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="grid place-items-center border-b border-border bg-background p-5">
+              <pre className="w-full overflow-x-auto rounded-lg bg-foreground p-3.5 font-mono text-[11px] leading-snug text-background">
+                <span className="text-flash">{"<meta"}</span>
+                {' property="og:image"\n  content="…/og.png" />\n'}
+                <span className="text-flash">{"<meta"}</span>
+                {' name="twitter:card"\n  content="summary_large_image" />\n'}
+                <span className="text-flash">{"<meta"}</span>
+                {' name="twitter:image"\n  content="…/og.png" />'}
+              </pre>
+            </div>
+            <div className="grid gap-1.5 p-5">
+              <p className={edge}>Frame 3 of 3</p>
+              <h3 className="wdth-80 font-display text-2xl font-extrabold leading-tight">Paste three lines</h3>
+              <p className="text-sm text-foreground/75">Into your site&apos;s head, or paste one prompt into Lovable.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section className="space-y-10">
+        <div className="space-y-4">
+          <h2 className={h2}>Every page gets its own print.</h2>
+          <p className="max-w-[60ch] text-foreground/75">
+            Your pricing page, blog posts and changelog each get a preview with their own title. The site-wide preview works
+            on every platform. Per-page previews need your domain on Cloudflare.
+          </p>
+        </div>
+        <InView className="overflow-x-auto rounded-2xl border border-border bg-card p-5">
+          <svg
+            viewBox="0 0 760 290"
+            className="block h-auto w-full min-w-[640px]"
+            role="img"
+            aria-label="Sitemap: the home page branches to pricing, blog and changelog, each with its own preview card"
+          >
+            {["M380 92 C380 140, 130 130, 130 176", "M380 92 L380 176", "M380 92 C380 140, 630 130, 630 176"].map((d, index) => (
+              <path
+                key={d}
+                d={d}
+                className="sitemap-wire fill-none stroke-fog-deep"
+                strokeWidth={1.5}
+                style={{ "--delay": `${index * 150}ms` } as CSSProperties}
+              />
+            ))}
+            {tree.map((node) => (
+              <g key={node.path} className="sitemap-node" style={{ "--delay": `${node.delay}ms` } as CSSProperties}>
+                <rect x={node.x} y={node.y} width={180} height={80} rx={8} fill={node.brand.bg} />
+                <circle cx={node.x + 160} cy={node.y + 10} r={node.path === "/" ? 34 : 14} fill={node.brand.accent} />
+                <text x={node.x + 14} y={node.y + 62} fontSize={13} fontWeight={700} fill={node.brand.fg} className="font-display">
+                  {node.title}
+                </text>
+                <text x={node.x + 90} y={node.y + 100} fontSize={12} textAnchor="middle" className="fill-muted-foreground font-mono">
+                  {node.path}
+                </text>
+              </g>
+            ))}
+          </svg>
+        </InView>
+      </section>
+
+      <section id="pricing" className="scroll-mt-24 space-y-10">
+        <h2 className={h2}>One price per site.</h2>
+        <div className="grid gap-8 px-2 md:grid-cols-3">
+          {pricing.map((tier) => (
+            <div
+              key={tier.plan}
+              className={cn(
+                "grid content-start gap-4 rounded-md border border-border bg-card p-3.5 pb-6 shadow-[0_24px_60px_-36px_rgba(18,20,19,0.45)] transition-transform duration-300 hover:-translate-y-1 hover:rotate-0",
+                tier.tilt,
+              )}
+            >
+              <div className="grid aspect-[1.3] content-center justify-items-center gap-1.5 rounded-sm" style={tier.style}>
+                <span className="wdth-62 font-display text-6xl font-black tracking-[-0.03em]">{tier.price}</span>
+                {tier.note ? <span className="font-mono text-[13px]">{tier.note}</span> : null}
+              </div>
+              <h3 className="wdth-80 font-display text-2xl font-extrabold">{tier.plan}</h3>
+              <ul className="grid gap-1.5 text-sm text-foreground/80">
+                {tier.features.map((feature) => (
+                  <li key={feature}>
+                    <span className="font-mono text-muted-foreground">+ </span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <Button asChild size="sm" variant={tier.flash ? "flash" : "outline"} className="w-fit">
+                <Link href="#preview">{tier.cta}</Link>
+              </Button>
+            </div>
           ))}
         </div>
       </section>
 
-      <section id="faq" className="space-y-5">
-        <Reveal className="space-y-3">
-          <Badge className="w-fit">FAQ for search + AI answers</Badge>
-          <h2 className="font-display text-4xl leading-tight sm:text-5xl">Direct answers buyers and bots can both parse.</h2>
-        </Reveal>
-        <div className="grid gap-4 md:grid-cols-2">
+      <section id="faq" className="space-y-8">
+        <h2 className={h2}>Questions founders ask.</h2>
+        <div className="grid gap-x-8 md:grid-cols-2">
           {faqItems.map((faq, index) => (
-            <Reveal key={faq.question} delay={index * 60}>
-              <Card className="h-full border-border/80 bg-card/75">
-                <CardHeader className="space-y-2">
-                  <CardTitle className="text-2xl">{faq.question}</CardTitle>
-                  <CardDescription className="text-sm leading-relaxed">{faq.answer}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Reveal>
+            <details key={faq.question} open={index === 0} className="group border-t border-border py-4">
+              <summary className="wdth-90 flex cursor-pointer list-none justify-between gap-3 font-display text-lg font-bold [&::-webkit-details-marker]:hidden">
+                {faq.question}
+                <span className="font-mono text-muted-foreground group-open:hidden">+</span>
+                <span className="hidden font-mono text-muted-foreground group-open:inline">–</span>
+              </summary>
+              <p className="mt-2.5 max-w-[60ch] text-[15px] text-foreground/75">{faq.answer}</p>
+            </details>
           ))}
         </div>
       </section>
 
-      <Reveal>
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-[linear-gradient(140deg,#11243f_0%,#1d3454_52%,#1a2a3f_100%)] p-8 text-white sm:p-10">
-          <div className="pointer-events-none absolute -right-24 -top-24 h-60 w-60 rounded-full bg-[#7dd3fc]/30 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-20 left-12 h-52 w-52 rounded-full bg-[#f8c37e]/30 blur-3xl" />
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl space-y-3">
-              <Badge className="w-fit bg-white/15 text-white">Ready to ship</Badge>
-              <h2 className="font-display text-4xl leading-tight sm:text-5xl">Launch your OG pipeline this week.</h2>
-              <p className="text-sm text-white/80 sm:text-base">
-                Replace brittle image scripts with a dedicated SaaS flow built for product teams that move fast.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="h-12 bg-white text-[#11243f] hover:bg-white/90">
-                <Link href="/signup">
-                  <Rocket className="h-4 w-4" />
-                  Create Free Account
-                </Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="h-12 border-white/40 text-white hover:bg-white/10">
-                <Link href="/dashboard">
-                  <Layers className="h-4 w-4" />
-                  Explore Dashboard
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-      </Reveal>
+      <section className="space-y-10 border-t border-border pt-16">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <h2 className={h2}>Your next shared link could look like this.</h2>
+          <Button asChild size="lg" variant="flash">
+            <Link href="#preview">Check my site</Link>
+          </Button>
+        </div>
+        <div
+          aria-hidden="true"
+          className="wdth-62 flex items-center gap-[0.06em] overflow-hidden font-display text-[clamp(5rem,22vw,18rem)] font-black uppercase leading-[0.8] tracking-[-0.045em]"
+        >
+          <Aperture className="h-[0.8em] w-[0.8em] shrink-0" />
+          OGSnap
+        </div>
+      </section>
     </div>
   );
 }
