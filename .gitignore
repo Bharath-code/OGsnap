@@ -6,6 +6,7 @@ coverage
 .turbo
 .env
 .env.local
+.env.mcp
 .convex
 .DS_Store
 
@@ -13,3 +14,4 @@ coverage
 marketing/ogsnap-film/*.mp4
 marketing/ogsnap-film/*.webm
 marketing/ogsnap-film/*.gif
+*.tsbuildinfo
