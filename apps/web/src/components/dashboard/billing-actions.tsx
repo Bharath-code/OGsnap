@@ -9,7 +9,6 @@ import { PLAN_PRICES } from "@/lib/pricing";
 
 export function BillingActions() {
   const [email, setEmail] = useState("");
-  const [customerId, setCustomerId] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
   async function startCheckout(plan: "hobby" | "pro" | "scale") {
@@ -37,10 +36,6 @@ export function BillingActions() {
 
     const response = await fetch("/api/billing/portal", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ customerId }),
     });
 
     if (!response.ok) {
@@ -69,11 +64,6 @@ export function BillingActions() {
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
-
-      <label className="grid gap-2 text-sm">
-        <span className="font-medium text-foreground">Customer ID for portal</span>
-        <Input value={customerId} onChange={(event) => setCustomerId(event.target.value)} />
-      </label>
 
       <Button type="button" onClick={openPortal} variant="outline">
         Open Customer Portal

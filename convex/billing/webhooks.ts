@@ -64,6 +64,12 @@ export const dodoWebhook = httpAction(async (ctx, request) => {
   }
 
   const data = payload.data;
+  if (data?.metadata?.userId && data.customer?.customer_id) {
+    await ctx.runMutation(internal.billing.mutations.setCustomerId, {
+      userId: data.metadata.userId,
+      customerId: data.customer.customer_id,
+    });
+  }
   const siteStatus = SITE_STATUS_BY_EVENT[eventType];
 
   if (data?.metadata?.siteId) {

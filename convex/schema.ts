@@ -12,6 +12,7 @@ export default defineSchema({
     organizationId: v.optional(v.string()),
     organizationSlug: v.optional(v.string()),
     organizationRole: v.optional(v.string()),
+    paymentCustomerId: v.optional(v.string()),
     createdAt: v.number(),
     updatedAt: v.number(),
     lastSeenAt: v.number(),

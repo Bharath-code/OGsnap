@@ -11,7 +11,7 @@ export const listMine = query({
       .query("users")
       .withIndex("by_clerk", (q) => q.eq("clerkId", identity.subject))
       .first();
-    if (!user) return { sites: [], agency: null };
+    if (!user) return { sites: [], agency: null, canManageBilling: false };
 
     const subscription = await ctx.db
       .query("subscriptions")
@@ -36,6 +36,7 @@ export const listMine = query({
         subscription?.plan === "agency" && subscription.status === "active"
           ? { used: sites.filter((site) => site.coveredByPlan).length }
           : null,
+      canManageBilling: Boolean(user.paymentCustomerId ?? subscription?.paymentCustomerId),
     };
   },
 });

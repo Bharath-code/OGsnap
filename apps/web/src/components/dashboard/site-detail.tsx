@@ -43,6 +43,13 @@ export async function openCheckout(body: { siteId: string } | { plan: "agency" }
   window.location.assign(checkoutUrl);
 }
 
+export async function openBillingPortal() {
+  const response = await fetch("/api/billing/portal", { method: "POST" });
+  if (!response.ok) throw new Error(await response.text());
+  const { portalUrl } = (await response.json()) as { portalUrl: string };
+  window.location.assign(portalUrl);
+}
+
 export const errorText = (error: unknown, fallback: string) =>
   error instanceof ConvexError ? String(error.data) : error instanceof Error && error.message ? error.message : fallback;
 

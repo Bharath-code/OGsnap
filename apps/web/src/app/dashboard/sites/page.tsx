@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { BlankCard } from "@/components/preview/og-card";
-import { SiteDetail, StatusPill, Thumb, errorText, openCheckout } from "@/components/dashboard/site-detail";
+import { SiteDetail, StatusPill, Thumb, errorText, openBillingPortal, openCheckout } from "@/components/dashboard/site-detail";
 import { Button } from "@/components/ui/button";
 import { UrlComposer } from "@/components/ui/url-composer";
 import { AGENCY_SITES, PLAN_PRICES } from "@/lib/pricing";
@@ -18,6 +18,7 @@ export default function DashboardSitesPage(): React.ReactElement {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upgrading, setUpgrading] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const sites = data?.sites ?? [];
   const agency = data?.agency;
@@ -32,6 +33,17 @@ export default function DashboardSitesPage(): React.ReactElement {
     } catch (upgradeError) {
       setError(errorText(upgradeError, "Could not start checkout"));
       setUpgrading(false);
+    }
+  }
+
+  async function manageBilling() {
+    setOpeningPortal(true);
+    setError(null);
+    try {
+      await openBillingPortal();
+    } catch (portalError) {
+      setError(errorText(portalError, "Could not open billing"));
+      setOpeningPortal(false);
     }
   }
 
@@ -59,6 +71,14 @@ export default function DashboardSitesPage(): React.ReactElement {
               <b className="text-foreground">{sites.length}</b> {sites.length === 1 ? "site" : "sites"} ·{" "}
               <b className="text-foreground">{active}</b> active
               {agency ? ` · Agency plan: ${agency.used} of ${AGENCY_SITES} in use` : ""}
+              {data?.canManageBilling ? (
+                <>
+                  {" · "}
+                  <button type="button" onClick={manageBilling} disabled={openingPortal} className="font-medium text-foreground underline underline-offset-2 disabled:opacity-50">
+                    {openingPortal ? "Opening billing..." : "Manage billing"}
+                  </button>
+                </>
+              ) : null}
             </p>
           ) : null}
         </div>

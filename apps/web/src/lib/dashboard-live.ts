@@ -97,6 +97,7 @@ export interface DashboardSite {
 export interface DashboardSites {
   sites: DashboardSite[];
   agency: { used: number } | null;
+  canManageBilling: boolean;
 }
 
 const listSitesQuery = "sites/queries:listMine" as unknown as FunctionReference<"query">;
