@@ -1,5 +1,5 @@
 import { httpAction } from "../_generated/server";
-import { api } from "../_generated/api";
+import { internal } from "../_generated/api";
 
 interface SyncUserBody {
   clerkId?: unknown;
@@ -41,7 +41,7 @@ export const syncUserFromIdentity = httpAction(async (ctx, request) => {
     return new Response("clerkId is required", { status: 400 });
   }
 
-  const userId = await ctx.runMutation(api.users.mutations.upsertFromIdentity, {
+  const userId = await ctx.runMutation(internal.users.mutations.upsertFromIdentity, {
     clerkId,
     email: optionalString(body.email),
     firstName: optionalString(body.firstName),

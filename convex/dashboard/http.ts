@@ -1,5 +1,5 @@
 import { httpAction } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 
 interface DashboardBody {
@@ -42,7 +42,7 @@ export const getDashboardData = httpAction(async (ctx, request) => {
     return new Response("clerkId is required", { status: 400 });
   }
 
-  const user = await ctx.runQuery(api.users.queries.getByClerkId, { clerkId });
+  const user = await ctx.runQuery(internal.users.queries.getByClerkId, { clerkId });
   if (!user) {
     return new Response("User not found for clerkId", { status: 404 });
   }

@@ -1,5 +1,5 @@
 import { httpAction } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 
 export const bootstrapDemo = httpAction(async (ctx, request) => {
   if (process.env.NODE_ENV === "production") {
@@ -23,7 +23,7 @@ export const bootstrapDemo = httpAction(async (ctx, request) => {
   };
 
   const clerkId = body.clerkId ?? `dev_${Date.now()}`;
-  const userId = await ctx.runMutation(api.users.mutations.upsertFromIdentity, {
+  const userId = await ctx.runMutation(internal.users.mutations.upsertFromIdentity, {
     clerkId,
     email: body.email,
     fullName: "Development User",
