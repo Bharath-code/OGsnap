@@ -7,8 +7,8 @@ export default function DashboardBillingPage() {
     <Reveal>
       <Card>
         <CardHeader>
-          <CardTitle>Billing</CardTitle>
-          <CardDescription>DodoPayments checkout + customer portal integration scaffold.</CardDescription>
+          <CardTitle>API billing</CardTitle>
+          <CardDescription>Plans for the render API. Sites are billed from the Sites page.</CardDescription>
         </CardHeader>
         <BillingActions />
       </Card>

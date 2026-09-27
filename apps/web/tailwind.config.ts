@@ -40,6 +40,9 @@ const config: Config = {
           deep: "hsl(var(--fog-deep))",
         },
         flash: "hsl(var(--flash))",
+        ok: "hsl(var(--ok))",
+        warn: "hsl(var(--warn))",
+        bad: "hsl(var(--bad))",
       },
       borderRadius: {
         lg: "var(--radius)",

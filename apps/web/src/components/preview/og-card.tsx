@@ -29,5 +29,9 @@ export function OgCard({ brand }: { brand: DemoBrand }) {
 }
 
 export function BlankCard({ label = "No og:image" }: { label?: string }) {
-  return <div className="og-card-blank">{label}</div>;
+  return (
+    <div className="og-card-blank">
+      <span>{label}</span>
+    </div>
+  );
 }

@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Develop } from "@/components/ui/develop";
 import { Input } from "@/components/ui/input";
+import { UrlComposer } from "@/components/ui/url-composer";
 import { demoBrands } from "@/components/preview/brands";
 import { BlankCard, OgCard } from "@/components/preview/og-card";
 
@@ -151,30 +152,18 @@ export function LiveRenderDemo({ children }: { children: ReactNode }) {
       <div>
         {children}
 
-        <form
-          id="preview"
+        <UrlComposer
+          formId="preview"
+          id="site-url"
+          label="Your website address"
+          value={url}
+          onChange={setUrl}
           onSubmit={runPreview}
-          className="mt-8 flex max-w-lg scroll-mt-28 gap-1.5 rounded-full border border-border bg-card p-1.5 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-foreground"
+          busy={phase === "loading"}
+          className="mt-8 scroll-mt-28"
         >
-          <label htmlFor="site-url" className="sr-only">
-            Your website address
-          </label>
-          <input
-            id="site-url"
-            type="text"
-            inputMode="url"
-            autoComplete="url"
-            spellCheck={false}
-            placeholder="yoursite.com"
-            required
-            value={url}
-            onChange={(event) => setUrl(event.target.value)}
-            className="min-w-0 flex-1 bg-transparent px-4 font-mono text-base outline-none placeholder:text-muted-foreground"
-          />
-          <Button type="submit" variant="flash" disabled={phase === "loading" || !url.trim()}>
-            {phase === "loading" ? "Developing..." : "Develop my link"}
-          </Button>
-        </form>
+          {phase === "loading" ? "Developing..." : "Develop my link"}
+        </UrlComposer>
         <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-muted-foreground">
           <span>Free check, no signup</span>
           <span>Lovable, Framer, Webflow or any site</span>
