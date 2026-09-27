@@ -88,7 +88,8 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
 
         sendSSE(controller, "status", { message: "Generating previews..." });
 
-        const renderPromises = PREVIEW_TITLES.map(async (item, index) => {
+        const previews = [{ title: brand.title, description: brand.description }, ...PREVIEW_TITLES.slice(1)];
+        const renderPromises = previews.map(async (item, index) => {
           try {
             const preview = await ctx.runAction(api.render.actions.generateImage, {
               userId,

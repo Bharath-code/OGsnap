@@ -74,12 +74,12 @@ const fetchAs = (url: string, ua: string) =>
   fetch(url, { headers: { "User-Agent": ua }, redirect: "follow", signal: AbortSignal.timeout(TIMEOUT_MS) });
 
 // ponytail: bot filters 403 a spoofed crawler UA from our IP; real crawlers pass, so retry as a browser
-async function get(url: string) {
+export async function get(url: string) {
   const res = await fetchAs(url, UA);
   return res.status === 403 ? fetchAs(url, BROWSER_UA) : res;
 }
 
-async function previewImage(url: string) {
+export async function previewImage(url: string) {
   const res = await get(url);
   const html = res.ok ? await res.text() : "";
   const meta = parseMeta(html);
@@ -148,20 +148,22 @@ function selfTest() {
   console.log("self-test ok");
 }
 
-const arg = process.argv[2];
-if (arg === "--self-test") {
-  selfTest();
-} else if (!arg) {
-  console.error("Usage: node scripts/audit-previews.ts <urls.txt>");
-  process.exit(1);
-} else {
-  const urls = readFileSync(arg, "utf8").split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
-  console.log("url,platform_guess,has_og_image,image_status,width,height,has_og_title,verdict");
-  for (const url of urls) {
-    try {
-      console.log(csv(await audit(url)));
-    } catch (err) {
-      console.log(csv([url, "", "false", err instanceof Error ? err.message : "error", "", "", "false", "broken"]));
+if (import.meta.main) {
+  const arg = process.argv[2];
+  if (arg === "--self-test") {
+    selfTest();
+  } else if (!arg) {
+    console.error("Usage: node scripts/audit-previews.ts <urls.txt>");
+    process.exit(1);
+  } else {
+    const urls = readFileSync(arg, "utf8").split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("#"));
+    console.log("url,platform_guess,has_og_image,image_status,width,height,has_og_title,verdict");
+    for (const url of urls) {
+      try {
+        console.log(csv(await audit(url)));
+      } catch (err) {
+        console.log(csv([url, "", "false", err instanceof Error ? err.message : "error", "", "", "false", "broken"]));
+      }
     }
   }
 }
