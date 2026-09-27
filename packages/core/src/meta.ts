@@ -1,4 +1,4 @@
-// Shared by convex/sites (per-page titles) and scripts/audit-previews.ts; keep it plain TS so Node can strip types
+// Shared by convex/sites (per-page titles), apps/web /api/check and scripts/audit-previews.ts; keep it plain TS so Node can strip types
 export const decodeEntities = (s: string) =>
   s.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
 

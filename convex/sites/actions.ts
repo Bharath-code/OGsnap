@@ -3,7 +3,7 @@
 import { internalAction } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
-import { pageTitle, parseMeta, titleFromPath } from "../lib/meta";
+import { pageTitle, parseMeta, titleFromPath } from "../../packages/core/src/meta";
 
 export const render = internalAction({
   args: {

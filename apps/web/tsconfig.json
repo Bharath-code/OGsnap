@@ -16,6 +16,9 @@
       ],
       "@ogsnap/core": [
         "../../packages/core/src"
+      ],
+      "@ogsnap/core/*": [
+        "../../packages/core/src/*"
       ]
     },
     "isolatedModules": true

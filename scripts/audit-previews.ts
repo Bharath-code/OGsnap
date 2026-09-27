@@ -2,108 +2,21 @@
 //        node scripts/audit-previews.ts --self-test
 import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
-import { parseMeta } from "../convex/lib/meta.ts";
-
-type Verdict = "missing" | "broken" | "generic" | "ok" | "unknown";
-
-// ponytail: fetch as a social crawler so we see what X/LinkedIn/Slack see, not what a browser sees
-const UA = "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)";
-const TIMEOUT_MS = 10_000;
-
-// ponytail: hand-kept list of known platform stock images; extend as outreach finds more
-const PLATFORM_DEFAULTS = [/lovable\.dev\/opengraph-image/i, /gptengineer/i];
-
-export function guessPlatform(html: string, host: string, headers: Headers): string {
-  const gen = parseMeta(html).get("generator")?.toLowerCase() ?? "";
-  const server = headers.get("server")?.toLowerCase() ?? "";
-  if (/framer\.(app|website)$/.test(host) || gen.includes("framer") || server.includes("framer")) return "framer";
-  if (/webflow\.io$/.test(host) || gen.includes("webflow") || html.includes("data-wf-site")) return "webflow";
-  if (/lovable\.app$/.test(host) || /cdn\.gpteng\.co|lovable-tagger|lovable\.app\//i.test(html)) return "lovable";
-  if (html.includes("framerusercontent.com")) return "framer";
-  return "other";
-}
-
-export function imageSize(b: Buffer): { width: number; height: number } | null {
-  if (b.length >= 24 && b.readUInt32BE(0) === 0x89504e47) return { width: b.readUInt32BE(16), height: b.readUInt32BE(20) };
-  if (b.length >= 10 && b.toString("ascii", 0, 3) === "GIF") return { width: b.readUInt16LE(6), height: b.readUInt16LE(8) };
-  if (b.length >= 30 && b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP") {
-    const chunk = b.toString("ascii", 12, 16);
-    if (chunk === "VP8 ") return { width: b.readUInt16LE(26) & 0x3fff, height: b.readUInt16LE(28) & 0x3fff };
-    if (chunk === "VP8L")
-      return { width: 1 + (((b[22] & 0x3f) << 8) | b[21]), height: 1 + (((b[24] & 0x0f) << 10) | (b[23] << 2) | ((b[22] & 0xc0) >> 6)) };
-    if (chunk === "VP8X") return { width: 1 + b.readUIntLE(24, 3), height: 1 + b.readUIntLE(27, 3) };
-  }
-  if (b.length >= 4 && b[0] === 0xff && b[1] === 0xd8) {
-    let i = 2;
-    while (i + 9 < b.length) {
-      if (b[i] !== 0xff) return null;
-      const marker = b[i + 1];
-      if (marker === 0xff) { i++; continue; }
-      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker))
-        return { width: b.readUInt16BE(i + 7), height: b.readUInt16BE(i + 5) };
-      i += 2 + b.readUInt16BE(i + 2);
-    }
-  }
-  return null;
-}
-
-export function classify(p: { image?: string; imageOk: boolean; homepageImage?: string; isHomepage: boolean }): Verdict {
-  if (!p.image) return "missing";
-  if (!p.imageOk) return "broken";
-  if (PLATFORM_DEFAULTS.some((re) => re.test(p.image!))) return "generic";
-  if (!p.isHomepage && p.image === p.homepageImage) return "generic";
-  return "ok";
-}
-
-const BROWSER_UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36";
-const fetchAs = (url: string, ua: string) =>
-  fetch(url, { headers: { "User-Agent": ua }, redirect: "follow", signal: AbortSignal.timeout(TIMEOUT_MS) });
-
-// ponytail: bot filters 403 a spoofed crawler UA from our IP; real crawlers pass, so retry as a browser
-export async function get(url: string) {
-  const res = await fetchAs(url, UA);
-  return res.status === 403 ? fetchAs(url, BROWSER_UA) : res;
-}
-
-export async function previewImage(url: string) {
-  const res = await get(url);
-  const html = res.ok ? await res.text() : "";
-  const meta = parseMeta(html);
-  const raw = meta.get("og:image") ?? meta.get("twitter:image") ?? meta.get("twitter:image:src");
-  return { res, html, meta, image: raw ? new URL(raw, res.url || url).href : undefined };
-}
+import { parseMeta } from "../packages/core/src/meta.ts";
+import { checkPreview, classify, imageSize, isPublicUrl } from "../packages/core/src/preview-audit.ts";
 
 async function audit(url: string): Promise<string[]> {
-  const page = await previewImage(url);
-  if ([403, 429].includes(page.res.status)) return [url, "", "", `page ${page.res.status} bot-blocked`, "", "", "", "unknown"];
-  if (!page.res.ok) throw new Error(`page ${page.res.status}`);
-  const u = new URL(page.res.url || url);
-  const isHomepage = u.pathname === "/" || u.pathname === "";
-  const homepageImage = isHomepage ? page.image : await previewImage(u.origin).then((h) => h.image, () => undefined);
-
-  let imageStatus = "";
-  let size: { width: number; height: number } | null = null;
-  if (page.image) {
-    try {
-      const img = await get(page.image);
-      imageStatus = String(img.status);
-      if (img.ok && img.headers.get("content-type")?.startsWith("image/")) size = imageSize(Buffer.from(await img.arrayBuffer()));
-      else if (img.ok) imageStatus = `${img.status} non-image`;
-    } catch (err) {
-      imageStatus = err instanceof Error ? err.name : "error";
-    }
-  }
-
-  const verdict = classify({ image: page.image, imageOk: imageStatus === "200", homepageImage, isHomepage });
+  const r = await checkPreview(url);
+  const known = r.verdict !== "unknown";
   return [
     url,
-    guessPlatform(page.html, u.hostname, page.res.headers),
-    String(Boolean(page.image)),
-    imageStatus,
-    String(size?.width ?? ""),
-    String(size?.height ?? ""),
-    String(page.meta.has("og:title")),
-    verdict,
+    r.platform,
+    known ? String(Boolean(r.image)) : "",
+    r.imageStatus,
+    String(r.width ?? ""),
+    String(r.height ?? ""),
+    known ? String(r.hasOgTitle) : "",
+    r.verdict,
   ];
 }
 
@@ -131,6 +44,11 @@ function selfTest() {
   assert.equal(classify({ image: "https://lovable.dev/opengraph-image-p98pqg.png", imageOk: true, isHomepage: true }), "generic");
   assert.equal(classify({ image: "https://a/x.png", imageOk: true, homepageImage: "https://a/x.png", isHomepage: false }), "generic");
   assert.equal(classify({ image: "https://a/x.png", imageOk: true, homepageImage: "https://a/x.png", isHomepage: true }), "ok");
+  assert.equal(isPublicUrl("https://example.com/a"), true);
+  assert.equal(isPublicUrl("https://1.1.1.1/"), true);
+  for (const bad of ["http://localhost:3000", "http://127.0.0.1", "http://10.0.0.5", "http://169.254.169.254/latest",
+    "http://192.168.1.1", "http://172.20.0.1", "http://[::1]/", "http://2130706433/", "file:///etc/passwd", "http://db.internal"])
+    assert.equal(isPublicUrl(bad), false, bad);
   console.log("self-test ok");
 }
 
