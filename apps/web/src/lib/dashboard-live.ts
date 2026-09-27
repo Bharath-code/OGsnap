@@ -74,14 +74,8 @@ export function useRendersDashboardData(
     | undefined;
 }
 
-export function useCreateApiKey(): (args: {
-  userId: string;
-  name: string;
-}) => Promise<{ rawKey: string; keyPrefix: string }> {
-  return useMutation(createApiKeyMutation) as (args: {
-    userId: string;
-    name: string;
-  }) => Promise<{ rawKey: string; keyPrefix: string }>;
+export function useCreateApiKey(): (args: { name: string }) => Promise<{ rawKey: string; keyPrefix: string }> {
+  return useMutation(createApiKeyMutation) as (args: { name: string }) => Promise<{ rawKey: string; keyPrefix: string }>;
 }
 
 export interface DashboardSite {

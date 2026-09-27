@@ -1,4 +1,4 @@
-import { query } from "../_generated/server";
+import { internalQuery, query } from "../_generated/server";
 import { v } from "convex/values";
 
 export const getByHash = query({
@@ -20,7 +20,7 @@ export const getByHash = query({
   },
 });
 
-export const listByUser = query({
+export const listByUser = internalQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     return await ctx.db

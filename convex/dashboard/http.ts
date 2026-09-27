@@ -52,9 +52,9 @@ export const getDashboardData = httpAction(async (ctx, request) => {
   const renderLimit = Math.min(optionalPositiveInt(body.renderLimit) ?? 25, 100);
 
   const [keys, renders, usage] = await Promise.all([
-    ctx.runQuery(api.apiKeys.queries.listByUser, { userId }),
-    ctx.runQuery(api.render.queries.listRecentByUser, { userId, limit: renderLimit }),
-    ctx.runQuery(api.usage.queries.getUsageForCurrentMonth, { userId }),
+    ctx.runQuery(internal.apiKeys.queries.listByUser, { userId }),
+    ctx.runQuery(internal.render.queries.listRecentByUser, { userId, limit: renderLimit }),
+    ctx.runQuery(internal.usage.queries.getUsageForCurrentMonth, { userId }),
   ]);
 
   const visibleKeys = keys

@@ -1,8 +1,8 @@
-import { query } from "../_generated/server";
+import { internalQuery } from "../_generated/server";
 import { v } from "convex/values";
 import { monthBucket } from "../lib/cache";
 
-export const getUsageForCurrentMonth = query({
+export const getUsageForCurrentMonth = internalQuery({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const month = monthBucket(Date.now());

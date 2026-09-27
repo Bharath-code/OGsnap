@@ -29,11 +29,11 @@ export const bootstrapDemo = httpAction(async (ctx, request) => {
     fullName: "Development User",
   });
 
-  await ctx.runMutation(api.render.mutations.seedDefaultSubscriptionIfMissing, {
+  await ctx.runMutation(internal.render.mutations.seedDefaultSubscriptionIfMissing, {
     userId,
   });
 
-  const key = await ctx.runMutation(api.apiKeys.mutations.create, {
+  const key = await ctx.runMutation(internal.apiKeys.mutations.createForUser, {
     userId,
     name: "demo-key",
   });

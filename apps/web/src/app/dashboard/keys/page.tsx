@@ -99,10 +99,7 @@ export default function DashboardKeysPage(): React.ReactElement {
     setCopied(false);
 
     try {
-      const created = await createApiKey({
-        userId: payload.user.id,
-        name,
-      });
+      const created = await createApiKey({ name });
       setNewRawKey(created.rawKey);
       setKeyName("");
     } catch (error) {
