@@ -1,5 +1,5 @@
 import { httpAction } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 
 interface OnboardingBody {
@@ -93,7 +93,7 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
         const previews = [{ title: brand.title, description: brand.description }, ...PREVIEW_TITLES.slice(1)].slice(0, previewCount);
         const renderPromises = previews.map(async (item, index) => {
           try {
-            const preview = await ctx.runAction(api.render.actions.generateImage, {
+            const preview = await ctx.runAction(internal.render.actions.generateImageInternal, {
               userId,
               plan: subscription?.plan ?? "free",
               url,

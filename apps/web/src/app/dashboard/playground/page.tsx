@@ -99,8 +99,6 @@ export default function PlaygroundPage() {
 
     try {
       const response = await generateImage({
-        userId: payload.user.id as any,
-        plan: payload.usage.plan,
         url,
         title: title || undefined,
         description: description || undefined,

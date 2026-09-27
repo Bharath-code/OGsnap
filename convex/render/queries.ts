@@ -1,4 +1,4 @@
-import { query } from "../_generated/server";
+import { query, internalQuery } from "../_generated/server";
 import { v } from "convex/values";
 
 export const getCachedRender = query({
@@ -27,5 +27,24 @@ export const listRecentByUser = query({
       .take(args.limit ?? 20);
 
     return rows;
+  },
+});
+
+export const getCallerPlan = internalQuery({
+  args: {
+    clerkId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+    if (!user) return null;
+
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+    return { userId: user._id, plan: subscription?.plan ?? ("free" as const) };
   },
 });

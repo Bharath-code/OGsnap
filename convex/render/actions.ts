@@ -1,12 +1,12 @@
 "use node";
 
-import { action } from "../_generated/server";
+import { action, internalAction } from "../_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "../_generated/api";
 import { buildOgHtml } from "./template";
 import { generateSocialMetadata } from "../lib/llm";
 
-export const generateImage = action({
+export const generateImageInternal = internalAction({
   args: {
     userId: v.id("users"),
     plan: v.union(v.literal("free"), v.literal("hobby"), v.literal("pro"), v.literal("scale")),
@@ -128,5 +128,31 @@ export const generateImage = action({
       metadata: metadata ?? undefined,
       renderTimeMs: Math.round(performance.now() - startedAt),
     };
+  },
+});
+
+// Public entry for the dashboard playground: user and plan come from the Clerk session, never from the client
+export const generateImage = action({
+  args: {
+    url: v.string(),
+    title: v.optional(v.string()),
+    description: v.optional(v.string()),
+    width: v.optional(v.number()),
+    height: v.optional(v.number()),
+    multi: v.optional(v.boolean()),
+    polish: v.optional(v.boolean()),
+  },
+  handler: async (ctx, args): Promise<unknown> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not signed in");
+
+    const caller = await ctx.runQuery(internal.render.queries.getCallerPlan, { clerkId: identity.subject });
+    if (!caller) throw new Error("User not found");
+
+    return await ctx.runAction(internal.render.actions.generateImageInternal, {
+      ...args,
+      userId: caller.userId,
+      plan: caller.plan,
+    });
   },
 });

@@ -1,5 +1,5 @@
 import { httpAction } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { hashApiKey } from "../lib/security";
 import { buildRenderCacheKey } from "../lib/cache";
 
@@ -63,7 +63,7 @@ export const renderImage = httpAction(async (ctx, request) => {
   });
 
   if (body.multi) {
-    const renderResult = (await ctx.runAction(api.render.actions.generateImage, {
+    const renderResult = (await ctx.runAction(internal.render.actions.generateImageInternal, {
       userId: apiKey.userId,
       plan: seededSubscription?.plan ?? "free",
       url: body.url,
@@ -127,7 +127,7 @@ export const renderImage = httpAction(async (ctx, request) => {
     );
   }
 
-  const renderResult = (await ctx.runAction(api.render.actions.generateImage, {
+  const renderResult = (await ctx.runAction(internal.render.actions.generateImageInternal, {
     userId: apiKey.userId,
     plan: seededSubscription?.plan ?? "free",
     url: body.url,

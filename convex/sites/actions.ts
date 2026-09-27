@@ -34,7 +34,7 @@ export const render = internalAction({
         description = brand.description || undefined;
       }
 
-      const rendered = await ctx.runAction(api.render.actions.generateImage, {
+      const rendered = await ctx.runAction(internal.render.actions.generateImageInternal, {
         userId: site.userId,
         brandKitId,
         plan: site.status === "active" ? "hobby" : "free",
