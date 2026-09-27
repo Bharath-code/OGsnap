@@ -173,7 +173,7 @@ export function LiveRenderDemo({ children }: { children: ReactNode }) {
           {phase === "loading" ? status : phase === "done" ? "Your branded preview is ready." : ""}
         </p>
         {error ? (
-          <p role="alert" className="mt-4 text-sm text-red-700">
+          <p role="alert" className="mt-4 text-sm text-bad">
             {error}
           </p>
         ) : null}
@@ -204,7 +204,7 @@ export function LiveRenderDemo({ children }: { children: ReactNode }) {
                 </Button>
               </div>
               {leadError ? (
-                <p role="alert" className="text-sm text-red-700">
+                <p role="alert" className="text-sm text-bad">
                   {leadError}
                 </p>
               ) : null}

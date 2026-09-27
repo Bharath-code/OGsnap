@@ -265,7 +265,7 @@ export default function HomePage() {
           </li>
           <li className="grid grid-rows-[210px_auto] overflow-hidden rounded-2xl border border-border bg-card">
             <div className="grid place-items-center border-b border-border bg-background p-5">
-              <pre className="w-full overflow-x-auto rounded-lg bg-foreground p-3.5 font-mono text-[11px] leading-snug text-background">
+              <pre className="w-full overflow-x-auto rounded-lg bg-terminal p-3.5 font-mono text-[11px] leading-snug text-terminal-foreground">
                 <span className="text-flash">{"<meta"}</span>
                 {' property="og:image"\n  content="…/og.png" />\n'}
                 <span className="text-flash">{"<meta"}</span>

@@ -111,7 +111,7 @@ function InstallCheck({ site }: { site: DashboardSite }) {
         <h3 className="wdth-90 font-display text-lg font-bold">Install check</h3>
         {passed ? <Aperture trigger={passed} className="h-6 w-6 text-foreground" /> : null}
       </div>
-      <div aria-live="polite" className="min-h-[132px] overflow-x-auto rounded-lg bg-foreground p-3.5 font-mono text-xs leading-relaxed text-background">
+      <div aria-live="polite" className="min-h-[132px] overflow-x-auto rounded-lg bg-terminal p-3.5 font-mono text-xs leading-relaxed text-terminal-foreground">
         {lines.length ? (
           lines.map((line, index) => (
             <p

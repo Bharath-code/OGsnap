@@ -159,7 +159,7 @@ export default function DashboardKeysPage(): React.ReactElement {
                 </div>
               </div>
             ) : null}
-            {createError ? <p className="text-sm text-red-500">{createError}</p> : null}
+            {createError ? <p className="text-sm text-bad">{createError}</p> : null}
           </CardHeader>
         </Card>
       </Reveal>

@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
+  darkMode: "media",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -39,7 +39,14 @@ const config: Config = {
           DEFAULT: "hsl(var(--fog))",
           deep: "hsl(var(--fog-deep))",
         },
-        flash: "hsl(var(--flash))",
+        flash: {
+          DEFAULT: "hsl(var(--flash))",
+          foreground: "hsl(var(--flash-foreground))",
+        },
+        terminal: {
+          DEFAULT: "hsl(var(--terminal))",
+          foreground: "hsl(var(--terminal-foreground))",
+        },
         ok: "hsl(var(--ok))",
         warn: "hsl(var(--warn))",
         bad: "hsl(var(--bad))",

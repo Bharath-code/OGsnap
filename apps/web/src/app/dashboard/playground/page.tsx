@@ -203,7 +203,7 @@ export default function PlaygroundPage() {
                     checked={multi}
                     onChange={(e) => setMulti(e.target.checked)}
                     disabled={loading}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary accent-primary"
                   />
                 </div>
 
@@ -223,14 +223,14 @@ export default function PlaygroundPage() {
                     checked={polish}
                     onChange={(e) => setPolish(e.target.checked)}
                     disabled={loading}
-                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary accent-primary"
+                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary accent-primary"
                   />
                 </div>
               </div>
 
               {isFreePlan && (
-                <div role="alert" className="flex gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 text-xs">
-                  <Info className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" aria-hidden="true" />
+                <div role="alert" className="flex gap-2 p-3 rounded-lg bg-warn/10 border border-warn/20 text-warn text-xs">
+                  <Info className="h-4 w-4 shrink-0 text-warn mt-0.5" aria-hidden="true" />
                   <div>
                     <strong>Free Tier Notice:</strong> Renders are processed using the low-latency <strong>Satori Engine</strong> and will include an OGSnap watermark. Upgrade to remove.
                   </div>
@@ -238,8 +238,8 @@ export default function PlaygroundPage() {
               )}
 
               {error && (
-                <div role="alert" className="flex gap-2 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-800 text-xs">
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600 mt-0.5" aria-hidden="true" />
+                <div role="alert" className="flex gap-2 p-3 rounded-lg bg-bad/10 border border-bad/20 text-bad text-xs">
+                  <AlertTriangle className="h-4 w-4 shrink-0 text-bad mt-0.5" aria-hidden="true" />
                   <div className="break-all">{error}</div>
                 </div>
               )}
@@ -290,7 +290,7 @@ export default function PlaygroundPage() {
                   >
                     {copiedKey === "main-url" ? (
                       <>
-                        <Check className="h-3.5 w-3.5 text-green-600" />
+                        <Check className="h-3.5 w-3.5 text-ok" />
                         Copied URL!
                       </>
                     ) : (
@@ -349,12 +349,12 @@ export default function PlaygroundPage() {
                                   onClick={() => setSelectedSize(key)}
                                   className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition flex items-center gap-1.5 ${
                                     active
-                                      ? "bg-primary border-primary text-white shadow-md"
+                                      ? "bg-primary border-primary text-primary-foreground shadow-md"
                                       : "bg-background border-border/60 hover:border-border text-muted-foreground hover:text-foreground"
                                   }`}
                                 >
                                   <span>{SIZE_LABELS[key]?.label || key}</span>
-                                  <span className={`opacity-80 text-[10px] px-1 rounded ${active ? "bg-white/25 text-white" : "bg-muted/80"}`}>
+                                  <span className={`opacity-80 text-[10px] px-1 rounded ${active ? "bg-primary-foreground/25 text-primary-foreground" : "bg-muted/80"}`}>
                                     {SIZE_LABELS[key]?.dimensions}
                                   </span>
                                 </button>
@@ -413,7 +413,7 @@ export default function PlaygroundPage() {
                             onClick={() => triggerCopy(activeMetadata.altText, "alt")}
                           >
                             {copiedKey === "alt" ? (
-                              <Check className="h-3 w-3 text-green-600" />
+                              <Check className="h-3 w-3 text-ok" />
                             ) : (
                               <Copy className="h-3 w-3" />
                             )}
@@ -439,7 +439,7 @@ export default function PlaygroundPage() {
                             onClick={() => triggerCopy(activeMetadata.twitterCopy, "twitter")}
                           >
                             {copiedKey === "twitter" ? (
-                              <Check className="h-3 w-3 text-green-600" />
+                              <Check className="h-3 w-3 text-ok" />
                             ) : (
                               <Copy className="h-3 w-3" />
                             )}
@@ -465,7 +465,7 @@ export default function PlaygroundPage() {
                             onClick={() => triggerCopy(activeMetadata.linkedinCopy, "linkedin")}
                           >
                             {copiedKey === "linkedin" ? (
-                              <Check className="h-3 w-3 text-green-600" />
+                              <Check className="h-3 w-3 text-ok" />
                             ) : (
                               <Copy className="h-3 w-3" />
                             )}

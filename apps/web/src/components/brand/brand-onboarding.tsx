@@ -161,7 +161,7 @@ export function BrandOnboarding() {
           </div>
         ) : null}
 
-        {error ? <p role="alert" className="text-sm text-red-500">{error}</p> : null}
+        {error ? <p role="alert" className="text-sm text-bad">{error}</p> : null}
 
         {result?.brand ? (
           <div className="grid gap-4 md:grid-cols-2">
