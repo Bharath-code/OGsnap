@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { PLAN_PRICES } from "@/lib/pricing";
 import {
   ArrowRight,
   BadgeCheck,
@@ -40,7 +41,7 @@ const keywords = [
 export const metadata: Metadata = {
   title: "OGSnap | Open Graph Image API For Modern JavaScript Teams",
   description:
-    "Generate production-ready Open Graph images in 3 lines. OGSnap handles brand extraction, rendering, caching, and delivery for Next.js, Astro, SvelteKit, Remix, and TanStack Start.",
+    "Generate production-ready Open Graph images in 3 lines. OGSnap handles brand extraction, rendering, caching, and delivery for Next.js, Astro, and SvelteKit.",
   keywords,
   alternates: {
     canonical: canonicalUrl,
@@ -48,7 +49,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "OGSnap | Open Graph Image API For Modern JavaScript Teams",
     description:
-      "Ship high-quality OG images in minutes with a brand-aware pipeline built for Next.js, Astro, SvelteKit, Remix, and TanStack Start.",
+      "Ship high-quality OG images in minutes with a brand-aware pipeline built for Next.js, Astro, and SvelteKit.",
     url: canonicalUrl,
     siteName: "OGSnap",
     locale: "en_US",
@@ -80,9 +81,9 @@ const trustSignals = [
     description: "Install SDK, set your key, export the route handler.",
   },
   {
-    value: "5+ frameworks",
+    value: "3 frameworks",
     title: "Broad JS support",
-    description: "Next.js, Astro, SvelteKit, Remix, and TanStack Start.",
+    description: "Next.js, Astro, and SvelteKit.",
   },
   {
     value: "One pipeline",
@@ -160,7 +161,7 @@ const pricing = [
   },
   {
     plan: "Hobby",
-    price: "$7",
+    price: `$${PLAN_PRICES.hobby}`,
     cadence: "/month",
     description: "For solo builders shipping publicly.",
     features: ["No watermark", "Higher monthly render limits", "Faster support", "Brand defaults"],
@@ -194,7 +195,7 @@ const faqItems = [
   {
     question: "Which frameworks are supported?",
     answer:
-      "OGSnap supports modern JavaScript stacks including Next.js, Astro, SvelteKit, Remix, and TanStack Start, with similar integration flow across each framework.",
+      "OGSnap supports modern JavaScript stacks including Next.js, Astro, and SvelteKit, with similar integration flow across each framework.",
   },
   {
     question: "How does caching work?",
@@ -224,7 +225,7 @@ const softwareApplicationSchema = {
     "Open Graph image API for modern JavaScript teams with brand extraction, rendering, caching, and delivery.",
   offers: [
     { "@type": "Offer", price: "0", priceCurrency: "USD", category: "Starter" },
-    { "@type": "Offer", price: "7", priceCurrency: "USD", category: "Hobby" },
+    { "@type": "Offer", price: String(PLAN_PRICES.hobby), priceCurrency: "USD", category: "Hobby" },
   ],
   featureList: [
     "Brand-aware OG image generation",
@@ -444,7 +445,7 @@ export const { GET } = generateOG({
                 <CardDescription>Use the same mental model across your app stack.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-2 pt-0">
-                {["Next.js", "Astro", "SvelteKit", "Remix", "TanStack Start"].map((item) => (
+                {["Next.js", "Astro", "SvelteKit"].map((item) => (
                   <div
                     key={item}
                     className="inline-flex items-center gap-2 rounded-md border border-border/70 bg-background/60 px-3 py-2 text-sm"

@@ -5,6 +5,7 @@ import { ArrowRight, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { PLAN_PRICES } from "@/lib/pricing";
 
 export function BillingActions() {
   const [email, setEmail] = useState("");
@@ -60,11 +61,11 @@ export function BillingActions() {
 
       <div className="grid gap-2 sm:grid-cols-2">
         <Button type="button" onClick={() => startCheckout("hobby")}>
-          Start Hobby ($9)
+          Start Hobby (${PLAN_PRICES.hobby})
           <ArrowRight className="h-4 w-4" />
         </Button>
         <Button type="button" onClick={() => startCheckout("pro")} variant="secondary">
-          Start Pro ($29)
+          Start Pro (${PLAN_PRICES.pro})
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
