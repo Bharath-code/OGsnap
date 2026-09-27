@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PLAN_PRICES } from "@/lib/pricing";
+import { AGENCY_SITES, PLAN_PRICES } from "@/lib/pricing";
 import {
   ArrowRight,
   BadgeCheck,
@@ -39,17 +39,17 @@ const keywords = [
 ];
 
 export const metadata: Metadata = {
-  title: "OGSnap | Open Graph Image API For Modern JavaScript Teams",
+  title: "OGSnap | Your Site Looks Great When Shared",
   description:
-    "Generate production-ready Open Graph images in 3 lines. OGSnap handles brand extraction, rendering, caching, and delivery for Next.js, Astro, and SvelteKit.",
+    "Paste your URL and OGSnap builds branded link previews from your logo, colors and fonts. Install once on Lovable, Framer, Webflow or any site.",
   keywords,
   alternates: {
     canonical: canonicalUrl,
   },
   openGraph: {
-    title: "OGSnap | Open Graph Image API For Modern JavaScript Teams",
+    title: "OGSnap | Your Site Looks Great When Shared",
     description:
-      "Ship high-quality OG images in minutes with a brand-aware pipeline built for Next.js, Astro, and SvelteKit.",
+      "Branded link previews for every page of your site. Install once on Lovable, Framer, Webflow or any site.",
     url: canonicalUrl,
     siteName: "OGSnap",
     locale: "en_US",
@@ -150,33 +150,33 @@ const implementationSteps = [
 
 const pricing = [
   {
-    plan: "Starter",
+    plan: "Preview check",
     price: "$0",
-    cadence: "/month",
-    description: "Best for testing and side projects.",
-    features: ["Watermarked renders", "Core integrations", "Usage dashboard", "Community support"],
-    cta: "Start Free",
-    href: "/signup",
+    cadence: "",
+    description: "See how your site looks when someone shares it.",
+    features: ["Today vs. branded preview", "Brand pulled from your site", "No signup"],
+    cta: "Check my site",
+    href: "#preview",
     highlight: false,
   },
   {
-    plan: "Hobby",
-    price: `$${PLAN_PRICES.hobby}`,
+    plan: "Site",
+    price: `$${PLAN_PRICES.site}`,
     cadence: "/month",
-    description: "For solo builders shipping publicly.",
-    features: ["No watermark", "Higher monthly render limits", "Faster support", "Brand defaults"],
-    cta: "Get Hobby",
-    href: "/signup",
+    description: "One site, branded link previews everywhere it's shared.",
+    features: ["Branded preview image", "Install with two meta tags", "Lovable, Framer, Webflow or any site", "No watermark"],
+    cta: "Check my site",
+    href: "#preview",
     highlight: true,
   },
   {
-    plan: "Growth",
-    price: "Custom",
-    cadence: "",
-    description: "For teams with larger delivery volume.",
-    features: ["Custom quotas", "Priority support", "Launch planning", "Roadmap collaboration"],
-    cta: "Talk To Us",
-    href: "/dashboard/billing",
+    plan: "Agency",
+    price: `$${PLAN_PRICES.agency}`,
+    cadence: "/month",
+    description: `Up to ${AGENCY_SITES} client sites, each with its own brand.`,
+    features: [`${AGENCY_SITES} sites`, "Separate brand per site", "Setup help for each client"],
+    cta: "Start with one site",
+    href: "#preview",
     highlight: false,
   },
 ];
@@ -224,8 +224,8 @@ const softwareApplicationSchema = {
   description:
     "Open Graph image API for modern JavaScript teams with brand extraction, rendering, caching, and delivery.",
   offers: [
-    { "@type": "Offer", price: "0", priceCurrency: "USD", category: "Starter" },
-    { "@type": "Offer", price: String(PLAN_PRICES.hobby), priceCurrency: "USD", category: "Hobby" },
+    { "@type": "Offer", price: String(PLAN_PRICES.site), priceCurrency: "USD", category: "Site" },
+    { "@type": "Offer", price: String(PLAN_PRICES.agency), priceCurrency: "USD", category: "Agency" },
   ],
   featureList: [
     "Brand-aware OG image generation",
@@ -274,42 +274,24 @@ export default function HomePage() {
 
         <div className="relative grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <Reveal className="space-y-6">
-            <Badge className="w-fit bg-card/80 text-foreground">OG images in 3 lines. Every modern JS framework.</Badge>
+            <Badge className="w-fit bg-card/80 text-foreground">For Lovable, Framer, Webflow and any website</Badge>
             <h1 className="max-w-3xl font-display text-5xl leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-              The SaaS pipeline for Open Graph images that actually scales.
+              Every page of your site looks great when shared.
             </h1>
             <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-              OGSnap is the direct answer for teams asking how to generate dynamic Open Graph images without owning render
-              infrastructure. You plug in once, then ship brand-consistent social cards across your product surface.
+              Paste your URL. OGSnap pulls your logo, colors and fonts and builds a branded link preview. Install it once
+              and links on X, LinkedIn, Slack and iMessage stop showing a blank card.
             </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="h-12 px-7 text-base">
-                <Link href="/signup">
-                  Start Free
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="h-12 border-foreground/15 bg-card/60 px-7 text-base">
-                <Link href="/dashboard">Open Dashboard</Link>
-              </Button>
-            </div>
+            <p className="text-base font-medium text-foreground">
+              ${PLAN_PRICES.site}/site/mo · Agencies ${PLAN_PRICES.agency}/{AGENCY_SITES} sites
+            </p>
             <ul className="grid gap-2 text-sm text-foreground/85 sm:grid-cols-2">
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary" />
-                Brand extraction + defaults
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary" />
-                API key and usage controls
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary" />
-                Cache-aware render delivery
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-primary" />
-                Dashboard-first operations
-              </li>
+              {["No code or design work", "Branded from your own site", "Install once, done", "Cancel anytime"].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                  {item}
+                </li>
+              ))}
             </ul>
           </Reveal>
 

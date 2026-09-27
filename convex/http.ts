@@ -3,6 +3,7 @@ import { renderCorsPreflight, renderImage } from "./render/http";
 import { dodoWebhook } from "./billing/webhooks";
 import { bootstrapDemo } from "./dev/http";
 import { magicOnboarding } from "./onboarding/http";
+import { createLead } from "./leads/http";
 import { syncUserFromIdentity } from "./users/http";
 import { getDashboardData } from "./dashboard/http";
 
@@ -48,6 +49,12 @@ http.route({
   path: "/v1/internal/dashboard",
   method: "POST",
   handler: getDashboardData,
+});
+
+http.route({
+  path: "/v1/internal/leads",
+  method: "POST",
+  handler: createLead,
 });
 
 export default http;

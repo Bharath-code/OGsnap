@@ -49,7 +49,7 @@ async function buildIdentityPayload(authState: AuthIdentityInput): Promise<SyncI
   };
 }
 
-export async function syncUserToConvex(authState: AuthIdentityInput): Promise<string> {
+export async function postConvexInternal(path: string, body: unknown): Promise<Response> {
   const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
   if (!convexUrl) {
     throw new Error("NEXT_PUBLIC_CONVEX_URL is not configured");
@@ -60,16 +60,19 @@ export async function syncUserToConvex(authState: AuthIdentityInput): Promise<st
     throw new Error("INTERNAL_SERVICE_SECRET is not configured");
   }
 
-  const identity = await buildIdentityPayload(authState);
-  const response = await fetch(`${convexUrl}/v1/internal/sync-user`, {
+  return fetch(`${convexUrl}${path}`, {
     method: "POST",
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       "x-internal-secret": internalSecret,
     },
-    body: JSON.stringify(identity),
+    body: JSON.stringify(body),
   });
+}
+
+export async function syncIdentityToConvex(identity: SyncIdentityPayload): Promise<string> {
+  const response = await postConvexInternal("/v1/internal/sync-user", identity);
 
   if (!response.ok) {
     throw new Error(`Convex sync-user failed (${response.status}): ${await response.text()}`);
@@ -81,4 +84,8 @@ export async function syncUserToConvex(authState: AuthIdentityInput): Promise<st
   }
 
   return payload.userId;
+}
+
+export async function syncUserToConvex(authState: AuthIdentityInput): Promise<string> {
+  return syncIdentityToConvex(await buildIdentityPayload(authState));
 }

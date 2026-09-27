@@ -14,6 +14,10 @@ export function mutation<T extends HandlerConfig>(config: T): any {
   return config;
 }
 
+export function internalMutation<T extends HandlerConfig>(config: T): any {
+  return config;
+}
+
 export function action<T extends HandlerConfig>(config: T): any {
   return config;
 }

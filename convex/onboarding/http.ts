@@ -5,6 +5,7 @@ import type { Id } from "../_generated/dataModel";
 interface OnboardingBody {
   userId?: unknown;
   url?: unknown;
+  previews?: unknown;
 }
 
 function optionalString(value: unknown): string | undefined {
@@ -88,7 +89,8 @@ export const magicOnboarding = httpAction(async (ctx, request) => {
 
         sendSSE(controller, "status", { message: "Generating previews..." });
 
-        const previews = [{ title: brand.title, description: brand.description }, ...PREVIEW_TITLES.slice(1)];
+        const previewCount = typeof body.previews === "number" ? Math.min(Math.max(Math.floor(body.previews), 1), PREVIEW_TITLES.length) : PREVIEW_TITLES.length;
+        const previews = [{ title: brand.title, description: brand.description }, ...PREVIEW_TITLES.slice(1)].slice(0, previewCount);
         const renderPromises = previews.map(async (item, index) => {
           try {
             const preview = await ctx.runAction(api.render.actions.generateImage, {

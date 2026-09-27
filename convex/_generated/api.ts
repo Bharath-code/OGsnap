@@ -15,3 +15,5 @@ function createProxy(): AnyRecord {
 }
 
 export const api = createProxy();
+
+export const internal = createProxy();

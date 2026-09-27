@@ -25,7 +25,7 @@ export const extractFromUrl = action({
       return { success: false as const, error: "FIRECRAWL_API_KEY is not configured" };
     }
 
-    let data: { branding?: FirecrawlBranding; metadata?: { title?: string; description?: string } } | undefined;
+    let data: { branding?: FirecrawlBranding; metadata?: { title?: string; description?: string; ogImage?: string } } | undefined;
     try {
       const response = await fetch("https://api.firecrawl.dev/v2/scrape", {
         method: "POST",
@@ -70,6 +70,7 @@ export const extractFromUrl = action({
           branding.typography?.fontFamilies?.primary ??
           branding.fonts?.[0]?.family ??
           "Inter, system-ui, sans-serif",
+        currentOgImage: httpUrl(data?.metadata?.ogImage),
         brandExtractionMethod: "firecrawl-branding" as const,
       },
     };

@@ -76,6 +76,14 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_user_and_month", ["userId", "month"]),
 
+  leads: defineTable({
+    email: v.string(),
+    url: v.string(),
+    platform: v.optional(v.string()),
+    source: v.string(),
+    createdAt: v.number(),
+  }),
+
   webhookEvents: defineTable({
     provider: v.string(),
     eventId: v.string(),
