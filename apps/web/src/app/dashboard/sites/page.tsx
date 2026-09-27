@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { Check, Copy, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -19,8 +20,18 @@ const snippetFor = (siteId: string) => {
   ].join("\n");
 };
 
+// ponytail: Lovable is a Vite SPA, and crawlers only read index.html, so the prompt pins the edit there
+const lovablePromptFor = (snippet: string) =>
+  [
+    "Update this site's social share image. Edit index.html only; social crawlers don't run JavaScript, so don't use react-helmet or any React component for this.",
+    "1. In <head>, delete every existing og:image, twitter:image and twitter:card meta tag, including the default lovable.dev opengraph image.",
+    "2. Add exactly these tags inside <head>:",
+    snippet,
+    "3. Don't change anything else and don't add packages.",
+  ].join("\n");
+
 function SiteCard({ site }: { site: DashboardSite }) {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<"snippet" | "lovable" | null>(null);
   const [activating, setActivating] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
   const snippet = snippetFor(site.id);
@@ -43,10 +54,10 @@ function SiteCard({ site }: { site: DashboardSite }) {
     }
   }
 
-  async function copy() {
-    await navigator.clipboard.writeText(snippet);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  async function copy(kind: "snippet" | "lovable") {
+    await navigator.clipboard.writeText(kind === "lovable" ? lovablePromptFor(snippet) : snippet);
+    setCopied(kind);
+    setTimeout(() => setCopied(null), 2000);
   }
 
   return (
@@ -75,10 +86,19 @@ function SiteCard({ site }: { site: DashboardSite }) {
           <pre className="overflow-x-auto rounded-lg border border-border/70 bg-muted/40 p-3 text-xs leading-relaxed">
             <code>{snippet}</code>
           </pre>
-          <Button type="button" variant="outline" size="sm" onClick={copy}>
-            {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-            {copied ? "Copied" : "Copy snippet"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={() => copy("snippet")}>
+              {copied === "snippet" ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
+              {copied === "snippet" ? "Copied" : "Copy snippet"}
+            </Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => copy("lovable")}>
+              {copied === "lovable" ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
+              {copied === "lovable" ? "Copied" : "Copy Lovable prompt"}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            On Lovable? Paste the prompt into Lovable chat, then click Publish. Check it at <Link href="/check" className="underline">/check</Link>.
+          </p>
           {site.status !== "active" ? (
             <div className="space-y-1 pt-2">
               <Button type="button" size="sm" onClick={activate} disabled={activating}>
