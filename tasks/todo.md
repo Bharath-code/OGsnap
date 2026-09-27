@@ -9,22 +9,24 @@ Standard checks for code tasks: `pnpm typecheck` and `pnpm build` pass.
 
 ### T1: Use Firecrawl `branding` for brand extraction · S
 Replace the vision-LLM and regex extraction with Firecrawl's branding format.
-- [ ] `convex/brand/actions.ts` requests the `branding` format. Check the Firecrawl docs for whether this needs v2 `/v2/scrape`. The response maps to the existing `brandKits` fields: logo, primary/accent colors, font
-- [ ] `convex/lib/llm.ts` and the regex helpers (`extractLogoUrl`, `extractHexColor`, `extractPrimaryColor`) are deleted. No `claude-3-5-sonnet` string is left in the repo
+- [x] `convex/brand/actions.ts` requests the `branding` format. Check the Firecrawl docs for whether this needs v2 `/v2/scrape`. The response maps to the existing `brandKits` fields: logo, primary/accent colors, font
+- [x] `convex/lib/llm.ts` and the regex helpers (`extractLogoUrl`, `extractHexColor`, `extractPrimaryColor`) are deleted. No `claude-3-5-sonnet` string is left in the repo
 - [ ] On 10 test URLs (3 Lovable, 3 Framer, 2 Webflow, 2 SaaS sites), `POST /v1/onboarding/magic` returns a loadable logo for ≥8 and a non-default primary color for ≥8
-- [ ] If Firecrawl fails, the endpoint returns `success:false` with a message. It never returns a made-up `/logo.png`
+- [x] If Firecrawl fails, the endpoint returns `success:false` with a message. It never returns a made-up `/logo.png`
+
+  - blocked: needs `FIRECRAWL_API_KEY`
 
 **Verify:** typecheck; run the 10 URLs manually and record results in the PR description.
 **Deps:** none. **Files:** `convex/brand/actions.ts`, `convex/lib/llm.ts` (delete).
 
 ### T2: Make the landing page honest · XS
-- [ ] Remove Remix and TanStack Start from `apps/web/src/app/page.tsx` (lines around 43, 51, 85, 197, 447)
-- [ ] Home page prices match the checkout prices, from one shared constant
+- [x] Remove Remix and TanStack Start from `apps/web/src/app/page.tsx` (lines around 43, 51, 85, 197, 447)
+- [x] Home page prices match the checkout prices, from one shared constant
 **Verify:** `grep -rn "TanStack\|Remix" apps/web/src` returns nothing; manual check of the pricing section against checkout.
 **Deps:** none. **Files:** `apps/web/src/app/page.tsx`, `apps/web/src/lib/dodo.ts`.
 
 ### T3: Stop tracking `.env.mcp` · XS
-- [ ] `git rm --cached .env.mcp`, and add `.env.mcp` to `.gitignore`
+- [x] `git rm --cached .env.mcp`, and add `.env.mcp` to `.gitignore`
 **Verify:** `git ls-files .env.mcp` prints nothing. **Deps:** none.
 
 ### ✅ Checkpoint 0
@@ -37,23 +39,23 @@ Replace the vision-LLM and regex extraction with Firecrawl's branding format.
 
 ### T4: Preview audit script · S
 Given a URL list, report each URL's social preview health.
-- [ ] `scripts/audit-previews.ts` reads a file with one URL per line and writes CSV: `url, platform_guess, has_og_image, image_status, width, height, has_og_title, verdict`
-- [ ] Detects the platform (Lovable, Framer, Webflow, other) from HTML or headers
-- [ ] Verdict is one of `missing`, `broken` (non-200), `generic` (the same image as the homepage, or a platform default), `ok`
+- [x] `scripts/audit-previews.ts` reads a file with one URL per line and writes CSV: `url, platform_guess, has_og_image, image_status, width, height, has_og_title, verdict`
+- [x] Detects the platform (Lovable, Framer, Webflow, other) from HTML or headers
+- [x] Verdict is one of `missing`, `broken` (non-200), `generic` (the same image as the homepage, or a platform default), `ok`
 **Verify:** run on 5 known sites (1 per verdict, plus 1 Framer) and check each verdict by hand.
 **Deps:** none. **Files:** `scripts/audit-previews.ts`.
 
 ### T5: Before/after image generator · S
-- [ ] `scripts/before-after.ts <url>` calls the magic onboarding pipeline and writes a 1200×630 PNG: current preview on the left (or a "no preview" placeholder), OGSnap preview on the right
-- [ ] Completes in under 20s per URL; one bad URL doesn't stop a batch
+- [x] `scripts/before-after.ts <url>` calls the magic onboarding pipeline and writes a 1200×630 PNG: current preview on the left (or a "no preview" placeholder), OGSnap preview on the right
+- [x] Completes in under 20s per URL; one bad URL doesn't stop a batch
 **Verify:** 30 PNGs produced from the T7 prospect list; spot-check 5 visually.
 **Deps:** T1, T4. **Files:** `scripts/before-after.ts`.
 
 ### T6: Pivot landing page and lead capture · M
-- [ ] The hero message is about sharing a site, not code, e.g. "Every page of your site looks great when shared. Install once." The primary CTA is a URL input, not "Start Free"
-- [ ] Submitting a URL runs magic onboarding and shows the before/after result without signup. An email is required only to get the install snippet
-- [ ] A new Convex table `leads {email, url, platform, createdAt, source}` stores each submission
-- [ ] The page shows a real price: "$9/site/mo · Agencies $49/10 sites"
+- [x] The hero message is about sharing a site, not code, e.g. "Every page of your site looks great when shared. Install once." The primary CTA is a URL input, not "Start Free"
+- [x] Submitting a URL runs magic onboarding and shows the before/after result without signup. An email is required only to get the install snippet
+- [x] A new Convex table `leads {email, url, platform, createdAt, source}` stores each submission
+- [x] The page shows a real price: "$9/site/mo · Agencies $49/10 sites"
 **Verify:** submit 3 URLs end to end; rows appear in the Convex dashboard; Lighthouse accessibility score ≥90.
 **Deps:** T1, T2. **Files:** `apps/web/src/app/page.tsx`, `convex/schema.ts`, `convex/leads/mutations.ts`, `apps/web/src/components/onboarding/live-render-demo.tsx`.
 
@@ -72,17 +74,20 @@ Given a URL list, report each URL's social preview health.
 ## Phase 2: Concierge delivery and payment (Days 8–14)
 
 ### T8: Stable site-wide image endpoint · M
-- [ ] New `sites {userId, domain, brandKitId, status: trial|active|canceled, createdAt}` table
-- [ ] `GET /v1/site/{siteId}/og.png` returns the rendered branded image (302 to R2 or streamed), cached. The response is well under 2s so it doesn't hit crawler timeouts
-- [ ] Unknown or canceled `siteId` → falls back to a neutral image, never an error (so a customer's preview never breaks)
-- [ ] The dashboard shows the copy-paste snippet: `og:image` and `twitter:image` pointing at that URL
+- [x] New `sites {userId, domain, brandKitId, status: trial|active|canceled, createdAt}` table
+- [x] `GET /v1/site/{siteId}/og.png` returns the rendered branded image (302 to R2 or streamed), cached. The response is well under 2s so it doesn't hit crawler timeouts
+- [x] Unknown or canceled `siteId` → falls back to a neutral image, never an error (so a customer's preview never breaks)
+- [x] The dashboard shows the copy-paste snippet: `og:image` and `twitter:image` pointing at that URL
+  - code done; live check pending the T12 Lovable test
+
 **Verify:** paste the snippet into a real Lovable project; the opengraph.xyz and LinkedIn Post Inspector previews show the branded image.
 **Deps:** T6. **Files:** `convex/schema.ts`, `convex/sites/*.ts`, `convex/http.ts`, `apps/web/src/app/dashboard/page.tsx`.
 
 ### T9: Per-site billing · S
 - [ ] A Dodo product "Site – $9/mo". The checkout link carries `siteId`
-- [ ] The webhook sets `sites.status = active` (idempotent, reusing the existing `webhookEvents` dedupe)
-- [ ] `trial` sites render with the existing watermark; `active` sites render without it
+  - code done (checkout passes `siteId`); blocked: create the product in Dodo, set `DODO_SITE_PRODUCT_ID`, run a test-mode purchase
+- [x] The webhook sets `sites.status = active` (idempotent, reusing the existing `webhookEvents` dedupe)
+- [x] `trial` sites render with the existing watermark; `active` sites render without it
 **Verify:** a test-mode purchase flips status and the next image is un-watermarked; replaying the same webhook causes no double change.
 **Deps:** T8. **Files:** `convex/billing/mutations.ts`, `convex/billing/webhooks.ts`, `apps/web/src/app/api/billing/create-checkout/route.ts`.
 
@@ -102,7 +107,8 @@ Given a URL list, report each URL's social preview health.
 ### T10: Per-page previews via Worker proxy · M
 - [x] `packages/edge-worker` gains a proxy mode. For HTML responses, HTMLRewriter replaces or inserts `og:image` and `twitter:image` with `/v1/site/{siteId}/og.png?path={pathname}`. Non-HTML passes through unchanged
 - [x] The title per path comes from the page's `<title>` or `og:title`
-- [x] Added overhead on HTML requests: p50 <50ms (measured with `wrangler dev` plus 20 requests)
+- [ ] Added overhead on HTML requests: p50 <50ms (measured with `wrangler dev` plus 20 requests)
+  - blocked: `wrangler dev` measurement and deploy not run yet
 **Verify:** 3 routes on a test site return 3 distinct images in opengraph.xyz; images, JS and CSS are byte-identical through the proxy.
 **Deps:** T8. **Files:** `packages/edge-worker/index.ts`, `packages/edge-worker/wrangler.toml`, `packages/edge-worker/README.md`.
 
@@ -129,8 +135,9 @@ Pick the channel with more T7 replies.
 ## Phase 4: Agencies and MCP (Days 22–30)
 
 ### T13: Agency plan (multiple sites) · S
-- [ ] A user can own N sites. The agency plan ($49/mo) allows 10 active sites, enforced when creating a site
-- [ ] The dashboard lists sites with status and snippet
+- [x] A user can own N sites. The agency plan ($49/mo) allows 10 active sites, enforced when creating a site
+- [x] The dashboard lists sites with status and snippet
+  - 2026-09-27: code done; `node scripts/check-agency-sites.ts` passes. Pending: Dodo "Agency – $49/mo" product + `DODO_AGENCY_PRODUCT_ID`, then a live 11th-site check
 **Verify:** creating an 11th site on the agency plan is refused with an upgrade message.
 **Deps:** T9. **Files:** `convex/sites/mutations.ts`, `convex/billing/mutations.ts`, dashboard page.
 

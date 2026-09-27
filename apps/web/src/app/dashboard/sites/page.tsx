@@ -2,13 +2,14 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { ConvexError } from "convex/values";
 import { useAuth } from "@clerk/nextjs";
 import { Check, Copy, Globe } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { PLAN_PRICES } from "@/lib/pricing";
+import { AGENCY_SITES, PLAN_PRICES } from "@/lib/pricing";
 import { type DashboardSite, siteImageUrl, useCreateSite, useSites } from "@/lib/dashboard-live";
 
 const snippetFor = (siteId: string) => {
@@ -30,6 +31,17 @@ const lovablePromptFor = (snippet: string) =>
     "3. Don't change anything else and don't add packages.",
   ].join("\n");
 
+async function openCheckout(body: { siteId: string } | { plan: "agency" }) {
+  const response = await fetch("/api/billing/create-checkout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) throw new Error(await response.text());
+  const { checkoutUrl } = (await response.json()) as { checkoutUrl: string };
+  window.location.assign(checkoutUrl);
+}
+
 function SiteCard({ site }: { site: DashboardSite }) {
   const [copied, setCopied] = useState<"snippet" | "lovable" | null>(null);
   const [activating, setActivating] = useState(false);
@@ -40,14 +52,7 @@ function SiteCard({ site }: { site: DashboardSite }) {
     setActivating(true);
     setBillingError(null);
     try {
-      const response = await fetch("/api/billing/create-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ siteId: site.id }),
-      });
-      if (!response.ok) throw new Error(await response.text());
-      const { checkoutUrl } = (await response.json()) as { checkoutUrl: string };
-      window.location.assign(checkoutUrl);
+      await openCheckout({ siteId: site.id });
     } catch (error) {
       setBillingError(error instanceof Error ? error.message : "Could not start checkout");
       setActivating(false);
@@ -67,7 +72,9 @@ function SiteCard({ site }: { site: DashboardSite }) {
           <Globe className="h-4 w-4 text-primary" aria-hidden="true" />
           {site.domain}
         </h2>
-        <Badge variant={site.status === "active" ? "default" : "secondary"}>{site.status}</Badge>
+        <Badge variant={site.status === "active" ? "default" : "secondary"}>
+          {site.coveredByPlan ? "active · agency" : site.status}
+        </Badge>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         {site.imageUrl ? (
@@ -129,6 +136,19 @@ export default function DashboardSitesPage(): React.ReactElement {
   const [domain, setDomain] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [upgrading, setUpgrading] = useState(false);
+  const agency = sites?.agency;
+
+  async function upgrade() {
+    setUpgrading(true);
+    setError(null);
+    try {
+      await openCheckout({ plan: "agency" });
+    } catch (upgradeError) {
+      setError(upgradeError instanceof Error ? upgradeError.message : "Could not start checkout");
+      setUpgrading(false);
+    }
+  }
 
   async function addSite(event: FormEvent) {
     event.preventDefault();
@@ -138,7 +158,13 @@ export default function DashboardSitesPage(): React.ReactElement {
       await createSite({ domain });
       setDomain("");
     } catch (createError) {
-      setError(createError instanceof Error ? createError.message : "Could not add site");
+      setError(
+        createError instanceof ConvexError
+          ? String(createError.data)
+          : createError instanceof Error
+            ? createError.message
+            : "Could not add site",
+      );
     } finally {
       setSaving(false);
     }
@@ -172,12 +198,24 @@ export default function DashboardSitesPage(): React.ReactElement {
               {error}
             </p>
           ) : null}
+          {agency ? (
+            <p className="mt-3 text-sm text-muted-foreground">
+              Agency plan: {agency.used} of {AGENCY_SITES} sites in use.
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <span>Managing client sites? Get {AGENCY_SITES} sites for ${PLAN_PRICES.agency}/month.</span>
+              <Button type="button" variant="outline" size="sm" onClick={upgrade} disabled={upgrading}>
+                {upgrading ? "Opening checkout..." : "Get agency plan"}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {sites === undefined ? <p className="text-sm text-muted-foreground">Loading sites...</p> : null}
-      {sites?.length === 0 ? <p className="text-sm text-muted-foreground">No sites yet.</p> : null}
-      {sites?.map((site) => <SiteCard key={site.id} site={site} />)}
+      {sites?.sites.length === 0 ? <p className="text-sm text-muted-foreground">No sites yet.</p> : null}
+      {sites?.sites.map((site) => <SiteCard key={site.id} site={site} />)}
     </div>
   );
 }
