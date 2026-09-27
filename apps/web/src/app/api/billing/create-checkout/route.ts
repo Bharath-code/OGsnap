@@ -7,6 +7,7 @@ const PLAN_TO_PRICE_ENV: Record<string, string> = {
   hobby: "DODO_HOBBY_PRICE_ID",
   pro: "DODO_PRO_PRICE_ID",
   scale: "DODO_SCALE_PRICE_ID",
+  agency: "DODO_AGENCY_PRODUCT_ID",
 };
 
 export async function POST(request: NextRequest) {
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json()) as {
-    plan?: "hobby" | "pro" | "scale";
+    plan?: "hobby" | "pro" | "scale" | "agency";
     siteId?: string;
     email?: string;
   };
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
   }
 
   const webBase = process.env.WEB_BASE_URL ?? "http://localhost:3000";
+  const returnPage = body.siteId || body.plan === "agency" ? "sites" : "billing";
 
   try {
     const convexUserId = await syncUserToConvex(authState);
@@ -50,8 +52,8 @@ export async function POST(request: NextRequest) {
     const checkout = await createCheckoutSession({
       customerEmail,
       productId,
-      successUrl: `${webBase}/dashboard/${body.siteId ? "sites" : "billing"}?checkout=success`,
-      cancelUrl: `${webBase}/dashboard/${body.siteId ? "sites" : "billing"}?checkout=cancelled`,
+      successUrl: `${webBase}/dashboard/${returnPage}?checkout=success`,
+      cancelUrl: `${webBase}/dashboard/${returnPage}?checkout=cancelled`,
       // ownership is enforced when the webhook applies the status (setStatusFromBilling)
       metadata: body.siteId ? { userId: convexUserId, siteId: body.siteId } : { userId: convexUserId, plan: body.plan! },
     });

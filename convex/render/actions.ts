@@ -9,7 +9,7 @@ import { generateSocialMetadata } from "../lib/llm";
 export const generateImageInternal = internalAction({
   args: {
     userId: v.id("users"),
-    plan: v.union(v.literal("free"), v.literal("hobby"), v.literal("pro"), v.literal("scale")),
+    plan: v.union(v.literal("free"), v.literal("hobby"), v.literal("pro"), v.literal("scale"), v.literal("agency")),
     url: v.string(),
     brandKitId: v.optional(v.id("brandKits")),
     title: v.optional(v.string()),

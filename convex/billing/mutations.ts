@@ -1,12 +1,18 @@
 import { internalMutation } from "../_generated/server";
+import { internal } from "../_generated/api";
 import { v } from "convex/values";
+import { agencySiteUpdates } from "../../packages/core/src/agency";
 
 const PLAN_LIMITS: Record<string, number> = {
   free: 100,
   hobby: 1000,
   pro: 5000,
   scale: 25000,
+  agency: 5000,
 };
+
+const PAID_PLANS = ["hobby", "pro", "scale", "agency"] as const;
+const toPlan = (plan: string) => PAID_PLANS.find((paid) => paid === plan) ?? "free";
 
 export const upsertSubscriptionByPaymentId = internalMutation({
   args: {
@@ -31,25 +37,35 @@ export const upsertSubscriptionByPaymentId = internalMutation({
         userId: args.userId,
         paymentSubscriptionId: args.paymentSubscriptionId,
         paymentCustomerId: args.paymentCustomerId,
-        plan: args.plan === "hobby" || args.plan === "pro" || args.plan === "scale" ? args.plan : "free",
+        plan: toPlan(args.plan),
         status: args.status,
         currentPeriodEnd: args.currentPeriodEnd,
         renderLimit,
         createdAt: now,
         updatedAt: now,
       });
-      return;
+    } else {
+      await ctx.db.patch(existing._id, {
+        paymentSubscriptionId: args.paymentSubscriptionId,
+        paymentCustomerId: args.paymentCustomerId,
+        plan: toPlan(args.plan),
+        status: args.status,
+        currentPeriodEnd: args.currentPeriodEnd,
+        renderLimit,
+        updatedAt: now,
+      });
     }
 
-    await ctx.db.patch(existing._id, {
-      paymentSubscriptionId: args.paymentSubscriptionId,
-      paymentCustomerId: args.paymentCustomerId,
-      plan: args.plan === "hobby" || args.plan === "pro" || args.plan === "scale" ? args.plan : "free",
-      status: args.status,
-      currentPeriodEnd: args.currentPeriodEnd,
-      renderLimit,
-      updatedAt: now,
-    });
+    const sites = await ctx.db
+      .query("sites")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    const covered = toPlan(args.plan) === "agency" && args.status === "active";
+    for (const { id, ...patch } of agencySiteUpdates(sites, covered)) {
+      await ctx.db.patch(id, patch);
+      // ponytail: re-renders the site image only; per-page images keep their old watermark state until their next render
+      await ctx.scheduler.runAfter(0, internal.sites.actions.render, { siteId: id });
+    }
   },
 });
 

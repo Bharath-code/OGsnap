@@ -24,7 +24,7 @@ export interface DashboardRender {
 
 export interface DashboardUsage {
   month: string;
-  plan: "free" | "hobby" | "pro" | "scale";
+  plan: "free" | "hobby" | "pro" | "scale" | "agency";
   rendersUsed: number;
   renderLimit: number;
   remaining: number;
@@ -88,16 +88,22 @@ export interface DashboardSite {
   id: string;
   domain: string;
   status: "trial" | "active" | "canceled";
+  coveredByPlan: boolean;
   imageUrl?: string;
   renderError?: string;
   createdAt: number;
 }
 
+export interface DashboardSites {
+  sites: DashboardSite[];
+  agency: { used: number } | null;
+}
+
 const listSitesQuery = "sites/queries:listMine" as unknown as FunctionReference<"query">;
 const createSiteMutation = "sites/mutations:create" as unknown as FunctionReference<"mutation">;
 
-export function useSites(signedIn: boolean): DashboardSite[] | null | undefined {
-  return useQuery(listSitesQuery, signedIn ? {} : "skip") as DashboardSite[] | null | undefined;
+export function useSites(signedIn: boolean): DashboardSites | null | undefined {
+  return useQuery(listSitesQuery, signedIn ? {} : "skip") as DashboardSites | null | undefined;
 }
 
 export function useCreateSite(): (args: { domain: string }) => Promise<string> {

@@ -1,6 +1,7 @@
 import { internalMutation, mutation } from "../_generated/server";
 import { internal } from "../_generated/api";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
+import { AGENCY_SITES } from "../../packages/core/src/agency";
 
 const HOSTNAME = /^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
 
@@ -29,7 +30,7 @@ export const create = mutation({
     if (!user) throw new Error("User not found");
 
     const domain = normalizeDomain(args.domain);
-    if (!domain) throw new Error("Enter a valid domain, like example.com");
+    if (!domain) throw new ConvexError("Enter a valid domain, like example.com");
 
     const existing = await ctx.db
       .query("sites")
@@ -37,10 +38,26 @@ export const create = mutation({
       .first();
     if (existing) return existing._id;
 
+    const subscription = await ctx.db
+      .query("subscriptions")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .first();
+    const agency = subscription?.plan === "agency" && subscription.status === "active";
+    if (agency) {
+      const sites = await ctx.db
+        .query("sites")
+        .withIndex("by_user", (q) => q.eq("userId", user._id))
+        .collect();
+      if (sites.filter((site) => site.coveredByPlan).length >= AGENCY_SITES) {
+        throw new ConvexError(`Your agency plan covers ${AGENCY_SITES} sites and all are in use. Contact us to raise the limit.`);
+      }
+    }
+
     const siteId = await ctx.db.insert("sites", {
       userId: user._id,
       domain,
-      status: "trial",
+      status: agency ? "active" : "trial",
+      ...(agency ? { coveredByPlan: true } : {}),
       createdAt: Date.now(),
     });
     await ctx.scheduler.runAfter(0, internal.sites.actions.render, { siteId });

@@ -21,7 +21,7 @@ export default defineSchema({
     userId: v.id("users"),
     paymentCustomerId: v.optional(v.string()),
     paymentSubscriptionId: v.optional(v.string()),
-    plan: v.union(v.literal("free"), v.literal("hobby"), v.literal("pro"), v.literal("scale")),
+    plan: v.union(v.literal("free"), v.literal("hobby"), v.literal("pro"), v.literal("scale"), v.literal("agency")),
     status: v.string(),
     currentPeriodEnd: v.optional(v.number()),
     renderLimit: v.number(),
@@ -85,6 +85,7 @@ export default defineSchema({
     imageUrl: v.optional(v.string()),
     renderError: v.optional(v.string()),
     renderedAt: v.optional(v.number()),
+    coveredByPlan: v.optional(v.boolean()),
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
