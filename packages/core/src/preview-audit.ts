@@ -1,4 +1,5 @@
 // Shared by scripts/audit-previews.ts (CLI) and apps/web /api/check; server-only (fetches arbitrary URLs), keep out of index.ts
+import { lookup } from "node:dns/promises";
 import { pageTitle, parseMeta } from "./meta.ts";
 
 export type Verdict = "missing" | "broken" | "generic" | "ok" | "unknown";
@@ -26,8 +27,18 @@ const MAX_REDIRECTS = 5;
 // ponytail: hand-kept list of known platform stock images; extend as outreach finds more
 const PLATFORM_DEFAULTS = [/lovable\.dev\/opengraph-image/i, /gptengineer/i];
 
-// ponytail: blocks literal private IPs and local names only; a public hostname that resolves to a private IP
-// still gets through. Add a dns.lookup check here if /api/check ever runs next to internal services
+function isPrivateIp(ip: string): boolean {
+  const v4 = ip.replace(/^::ffff:/i, "").match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)?.slice(1).map(Number);
+  if (v4) {
+    const [a, b] = v4;
+    return a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) ||
+      (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224;
+  }
+  const v6 = ip.toLowerCase();
+  return v6 === "::" || v6 === "::1" || v6.startsWith("::ffff:") || /^f[cd]/.test(v6) || /^fe[89ab]/.test(v6) || /^ff/.test(v6);
+}
+
+// Sync pre-check for input validation: blocks bad schemes, local names and literal private IPs
 export function isPublicUrl(raw: string): boolean {
   let u: URL;
   try {
@@ -36,13 +47,17 @@ export function isPublicUrl(raw: string): boolean {
     return false;
   }
   if (u.protocol !== "http:" && u.protocol !== "https:") return false;
-  const host = u.hostname.toLowerCase();
-  if (host.startsWith("[") || host === "localhost" || /\.(localhost|local|internal)$/.test(host)) return false;
-  const ip = host.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)?.slice(1).map(Number);
-  if (!ip) return !/^\d+$/.test(host);
-  const [a, b] = ip;
-  return !(a === 0 || a === 10 || a === 127 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) ||
-    (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224);
+  const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (host === "localhost" || /\.(localhost|local|internal)$/.test(host)) return false;
+  return !isPrivateIp(host) && !/^\d+$/.test(host);
+}
+
+// ponytail: DNS is checked before connect, not pinned to the socket, so a rebinding DNS server can still
+// race it; pin the resolved IP with an undici Agent connect hook if /api/check ever runs next to internal services
+async function assertPublic(url: string) {
+  if (!isPublicUrl(url)) throw new Error("blocked address");
+  const addrs = await lookup(new URL(url).hostname.replace(/^\[|\]$/g, ""), { all: true });
+  if (addrs.some((a) => isPrivateIp(a.address))) throw new Error("blocked address");
 }
 
 export function guessPlatform(html: string, host: string, headers: Headers): string {
@@ -90,10 +105,10 @@ export function classify(p: { image?: string; imageOk: boolean; homepageImage?: 
   return "ok";
 }
 
-// Follows redirects by hand so every hop is checked against isPublicUrl
+// Follows redirects by hand so every hop is checked by assertPublic
 async function fetchAs(url: string, ua: string): Promise<{ res: Response; url: string }> {
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-    if (!isPublicUrl(url)) throw new Error("blocked address");
+    await assertPublic(url);
     const res = await fetch(url, { headers: { "User-Agent": ua }, redirect: "manual", signal: AbortSignal.timeout(TIMEOUT_MS) });
     const next = res.headers.get("location");
     if (res.status < 300 || res.status >= 400 || !next) return { res, url };

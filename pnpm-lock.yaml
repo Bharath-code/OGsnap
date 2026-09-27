@@ -135,7 +135,11 @@ importers:
         specifier: workspace:*
         version: link:../core
 
-  packages/core: {}
+  packages/core:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.12
 
   packages/next:
     dependencies:

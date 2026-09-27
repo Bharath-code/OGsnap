@@ -47,7 +47,7 @@ function selfTest() {
   assert.equal(isPublicUrl("https://example.com/a"), true);
   assert.equal(isPublicUrl("https://1.1.1.1/"), true);
   for (const bad of ["http://localhost:3000", "http://127.0.0.1", "http://10.0.0.5", "http://169.254.169.254/latest",
-    "http://192.168.1.1", "http://172.20.0.1", "http://[::1]/", "http://2130706433/", "file:///etc/passwd", "http://db.internal"])
+    "http://192.168.1.1", "http://172.20.0.1", "http://[::1]/", "http://[fd00::1]/", "http://[::ffff:127.0.0.1]/", "http://2130706433/", "file:///etc/passwd", "http://db.internal"])
     assert.equal(isPublicUrl(bad), false, bad);
   console.log("self-test ok");
 }

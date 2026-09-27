@@ -11,5 +11,8 @@
     "lint": "echo 'lint:core not configured'",
     "test": "echo 'test:core not configured'",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2"
   }
 }
