@@ -8,3 +8,8 @@ coverage
 .env.local
 .convex
 .DS_Store
+
+# Rendered film exports (host on R2; re-render with marketing/ogsnap-film/render.mjs)
+marketing/ogsnap-film/*.mp4
+marketing/ogsnap-film/*.webm
+marketing/ogsnap-film/*.gif
