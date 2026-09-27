@@ -2,7 +2,7 @@
 
 import { action } from "../_generated/server";
 import { v } from "convex/values";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import { buildOgHtml } from "./template";
 import { generateSocialMetadata } from "../lib/llm";
 
@@ -11,6 +11,7 @@ export const generateImage = action({
     userId: v.id("users"),
     plan: v.union(v.literal("free"), v.literal("hobby"), v.literal("pro"), v.literal("scale")),
     url: v.string(),
+    brandKitId: v.optional(v.id("brandKits")),
     title: v.optional(v.string()),
     description: v.optional(v.string()),
     width: v.optional(v.number()),
@@ -24,9 +25,9 @@ export const generateImage = action({
       throw new Error("RENDERER_SERVICE_URL is not configured");
     }
 
-    const brandKit = await ctx.runQuery(api.brand.queries.getDefaultBrandKit, {
-      userId: args.userId,
-    });
+    const brandKit = args.brandKitId
+      ? await ctx.runQuery(internal.brand.queries.getById, { brandKitId: args.brandKitId })
+      : await ctx.runQuery(api.brand.queries.getDefaultBrandKit, { userId: args.userId });
 
     const html = buildOgHtml({
       title: args.title ?? "Untitled",

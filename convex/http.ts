@@ -4,6 +4,7 @@ import { dodoWebhook } from "./billing/webhooks";
 import { bootstrapDemo } from "./dev/http";
 import { magicOnboarding } from "./onboarding/http";
 import { createLead } from "./leads/http";
+import { siteImage } from "./sites/http";
 import { syncUserFromIdentity } from "./users/http";
 import { getDashboardData } from "./dashboard/http";
 
@@ -55,6 +56,12 @@ http.route({
   path: "/v1/internal/leads",
   method: "POST",
   handler: createLead,
+});
+
+http.route({
+  pathPrefix: "/v1/site/",
+  method: "GET",
+  handler: siteImage,
 });
 
 export default http;

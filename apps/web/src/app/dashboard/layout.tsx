@@ -7,6 +7,7 @@ import { syncUserToConvex } from "@/lib/user-sync";
 
 const navItems = [
   { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/sites", label: "Sites" },
   { href: "/dashboard/keys", label: "API Keys" },
   { href: "/dashboard/brand", label: "Brand Kit" },
   { href: "/dashboard/renders", label: "Renders" },

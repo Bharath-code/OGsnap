@@ -83,3 +83,31 @@ export function useCreateApiKey(): (args: {
     name: string;
   }) => Promise<{ rawKey: string; keyPrefix: string }>;
 }
+
+export interface DashboardSite {
+  id: string;
+  domain: string;
+  status: "trial" | "active" | "canceled";
+  imageUrl?: string;
+  renderError?: string;
+  createdAt: number;
+}
+
+const listSitesQuery = "sites/queries:listMine" as unknown as FunctionReference<"query">;
+const createSiteMutation = "sites/mutations:create" as unknown as FunctionReference<"mutation">;
+
+export function useSites(signedIn: boolean): DashboardSite[] | null | undefined {
+  return useQuery(listSitesQuery, signedIn ? {} : "skip") as DashboardSite[] | null | undefined;
+}
+
+export function useCreateSite(): (args: { domain: string }) => Promise<string> {
+  return useMutation(createSiteMutation) as (args: { domain: string }) => Promise<string>;
+}
+
+// ponytail: HTTP routes live on *.convex.site; set NEXT_PUBLIC_OG_BASE_URL once a custom image domain exists
+export function siteImageUrl(siteId: string): string {
+  const base =
+    process.env.NEXT_PUBLIC_OG_BASE_URL ??
+    (process.env.NEXT_PUBLIC_CONVEX_URL ?? "").replace(".convex.cloud", ".convex.site");
+  return `${base}/v1/site/${siteId}/og.png`;
+}

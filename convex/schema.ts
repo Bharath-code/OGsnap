@@ -76,6 +76,20 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_user_and_month", ["userId", "month"]),
 
+  sites: defineTable({
+    userId: v.id("users"),
+    domain: v.string(),
+    brandKitId: v.optional(v.id("brandKits")),
+    status: v.union(v.literal("trial"), v.literal("active"), v.literal("canceled")),
+    title: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+    renderError: v.optional(v.string()),
+    renderedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_domain", ["userId", "domain"]),
+
   leads: defineTable({
     email: v.string(),
     url: v.string(),
