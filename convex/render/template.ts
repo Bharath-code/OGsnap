@@ -17,75 +17,25 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#039;");
 }
 
+// Inline styles and explicit flex everywhere: Satori ignores <style> blocks and classes, and Chromium renders this the same way.
 export function buildOgHtml(input: BuildTemplateInput): string {
-  const safeTitle = escapeHtml(input.title);
-  const safeDescription = escapeHtml(input.description);
+  const title = escapeHtml(input.title);
+  const description = escapeHtml(input.description);
+  const primary = escapeHtml(input.primaryColor);
+  const background = escapeHtml(input.backgroundColor);
+  const font = escapeHtml(input.fontFamily ?? "Inter, sans-serif");
   const logo = input.logoUrl
-    ? `<img src="${escapeHtml(input.logoUrl)}" alt="logo" style="height:64px;max-width:220px;object-fit:contain"/>`
+    ? `<img src="${escapeHtml(input.logoUrl)}" height="64" style="height:64px;max-width:220px;object-fit:contain"/>`
+    : `<div style="display:flex"></div>`;
+  const badge = input.watermark
+    ? `<div style="display:flex;color:${primary};border:1px solid ${primary};border-radius:9999px;padding:8px 16px;font-size:18px">ogsnap.dev</div>`
     : "";
 
-  return `<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        width: 1200px;
-        height: 630px;
-        font-family: ${input.fontFamily ?? "Inter, system-ui, sans-serif"};
-        background: ${input.backgroundColor};
-        color: white;
-      }
-      .root {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 56px;
-        border: 2px solid ${input.primaryColor};
-      }
-      .title {
-        font-size: 64px;
-        line-height: 1.05;
-        font-weight: 700;
-        margin: 0;
-      }
-      .description {
-        margin-top: 20px;
-        color: rgba(255,255,255,0.9);
-        font-size: 30px;
-        line-height: 1.3;
-        max-width: 900px;
-      }
-      .footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 20px;
-      }
-      .badge {
-        color: ${input.primaryColor};
-        border: 1px solid ${input.primaryColor};
-        border-radius: 9999px;
-        padding: 8px 16px;
-        font-size: 18px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="root og-content">
-      <div>
-        <h1 class="title">${safeTitle}</h1>
-        <p class="description">${safeDescription}</p>
-      </div>
-      <div class="footer">
-        ${logo}
-        ${input.watermark ? '<span class="badge">ogsnap.dev</span>' : ""}
-      </div>
-    </div>
-  </body>
-</html>`;
+  return `<div style="display:flex;flex-direction:column;justify-content:space-between;width:100%;height:100%;padding:56px;background:${background};color:white;border:2px solid ${primary};font-family:${font}">
+  <div style="display:flex;flex-direction:column">
+    <div style="display:flex;font-size:64px;line-height:1.05;font-weight:700">${title}</div>
+    <div style="display:flex;margin-top:20px;color:rgba(255,255,255,0.9);font-size:30px;line-height:1.3;max-width:900px">${description}</div>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center">${logo}${badge}</div>
+</div>`;
 }

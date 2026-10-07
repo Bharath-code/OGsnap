@@ -57,6 +57,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: ^3.744.0
+        version: 3.998.0
       '@clerk/nextjs':
         specifier: ^6.11.1
         version: 6.38.2(next@15.2.3(react-dom@19.0.3(react@19.0.3))(react@19.0.3))(react-dom@19.0.3(react@19.0.3))(react@19.0.3)
@@ -66,6 +69,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.14)(react@19.0.3)
+      '@resvg/resvg-js':
+        specifier: ^2.6.2
+        version: 2.6.2
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -87,6 +93,12 @@ importers:
       react-dom:
         specifier: 19.0.3
         version: 19.0.3(react@19.0.3)
+      satori:
+        specifier: ^0.26.0
+        version: 0.26.0
+      satori-html:
+        specifier: ^0.3.2
+        version: 0.3.2
       tailwind-merge:
         specifier: ^3.5.0
         version: 3.5.0
