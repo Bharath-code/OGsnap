@@ -31,7 +31,7 @@ Set these in root `.env` and `apps/web/.env.local`:
 
 For billing and onboarding extraction:
 
-- `DODO_API_KEY`, `DODO_*_PRICE_ID`
+- `DODO_API_KEY`, `DODO_SITE_PRODUCT_ID`, `DODO_AGENCY_PRODUCT_ID`
 - `DODO_WEBHOOK_SECRET`
 - `FIRECRAWL_API_KEY`
 

@@ -28,10 +28,8 @@ const requiredByTarget = {
       "CLERK_SECRET_KEY",
       "INTERNAL_SERVICE_SECRET",
       "DODO_API_KEY",
-      "DODO_HOBBY_PRICE_ID",
-      "DODO_PRO_PRICE_ID",
-      "DODO_SCALE_PRICE_ID",
       "DODO_SITE_PRODUCT_ID",
+      "DODO_AGENCY_PRODUCT_ID",
       "WEB_BASE_URL",
     ],
     convex: [
@@ -41,6 +39,7 @@ const requiredByTarget = {
       "RENDERER_INTERNAL_TOKEN",
       "DODO_WEBHOOK_SECRET",
       "FIRECRAWL_API_KEY",
+      "CLERK_JWT_ISSUER_DOMAIN",
     ],
     renderer: [
       "R2_ACCOUNT_ID",
