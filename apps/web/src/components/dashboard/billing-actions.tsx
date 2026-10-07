@@ -11,7 +11,7 @@ export function BillingActions() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState<string | null>(null);
 
-  async function startCheckout(plan: "hobby" | "pro" | "scale") {
+  async function startCheckout(plan: "agency") {
     setMessage("Opening checkout...");
 
     const response = await fetch("/api/billing/create-checkout", {
@@ -55,12 +55,8 @@ export function BillingActions() {
       </label>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <Button type="button" onClick={() => startCheckout("hobby")}>
-          Start Hobby (${PLAN_PRICES.hobby})
-          <ArrowRight className="h-4 w-4" />
-        </Button>
-        <Button type="button" onClick={() => startCheckout("pro")} variant="secondary">
-          Start Pro (${PLAN_PRICES.pro})
+        <Button type="button" onClick={() => startCheckout("agency")}>
+          Start Agency (${PLAN_PRICES.agency})
           <ArrowRight className="h-4 w-4" />
         </Button>
       </div>

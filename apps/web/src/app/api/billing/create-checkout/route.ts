@@ -4,9 +4,6 @@ import { createCheckoutSession } from "@/lib/dodo";
 import { syncUserToConvex } from "@/lib/user-sync";
 
 const PLAN_TO_PRICE_ENV: Record<string, string> = {
-  hobby: "DODO_HOBBY_PRICE_ID",
-  pro: "DODO_PRO_PRICE_ID",
-  scale: "DODO_SCALE_PRICE_ID",
   agency: "DODO_AGENCY_PRODUCT_ID",
 };
 
@@ -17,7 +14,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = (await request.json()) as {
-    plan?: "hobby" | "pro" | "scale" | "agency";
+    plan?: "agency";
     siteId?: string;
     email?: string;
   };
