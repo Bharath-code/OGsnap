@@ -188,22 +188,28 @@ Sizes: XS under 30 min, S 30–90 min, M 2–4 h.
 **Verify:** upload a test object with the token and fetch it via `R2_PUBLIC_BASE_URL` (HTTP 200). Closes T1's open check: `POST /v1/onboarding/magic` on 10 URLs (3 Lovable, 3 Framer, 2 Webflow, 2 SaaS) returns a loadable logo for ≥8 and a non-default primary colour for ≥8; results pasted into the PR.
 **Deps:** none.
 
-### L4: Renderer deployed · M · you + me
-- [ ] Dockerfile (Playwright base image) and host config committed (me)
-- [ ] Deployed with `RENDERER_INTERNAL_TOKEN`, all `R2_*`, `NODE_ENV=production`
-**Verify:** `GET /health` returns `{"ok":true}`; `POST /render` without the bearer token returns 401; one satori render and one playwright render each return a 1200×630 image reachable on the R2 public URL; 20 sequential renders complete with 0 failures; cold start time and per-render time recorded in the runbook.
-**Deps:** L3. **Files:** `apps/renderer/Dockerfile`, host config.
+### L4: Render route in the web app (replaces the separate Chromium renderer) · M · me + you
+Decided 2026-10-07: render with Satori + resvg inside `apps/web` (`POST /api/render`), no extra host. `apps/renderer` (Playwright) stays in the repo as the Chromium option if templates outgrow Satori's CSS subset.
+- [x] `apps/web/src/app/api/render/route.ts`: bearer auth (token required, constant-time compare), zod validation, Satori → PNG → R2; retries once without images when a logo fails
+- [x] Font embedded (Inter 400/700, OFL) instead of fetched: the old cdnjs font URL returned 404
+- [x] Template rewritten with inline styles and flex (`convex/render/template.ts`); the old one was invalid for Satori, so every earlier "Satori" render had silently fallen back to Chromium
+- [x] resvg system-font scan disabled: 2.2 s → 44 ms per render
+- [x] Convex always requests `engine: "satori"`
+- [ ] R2 vars and `RENDERER_INTERNAL_TOKEN` set in the Vercel project; Convex `RENDERER_SERVICE_URL` = `https://<web domain>/api`
+**Verify (local, done):** no token → 401, bad body → 400, valid → 1200×630 PNG; real logo renders; dead logo URL still renders; 1080×1080 renders; 20 sequential renders, 0 failures, p50 69 ms.
+**Verify (deployed, open):** the same 401/400/200 checks against the Vercel URL; the returned `imageUrl` loads from the R2 public URL; 20 sequential renders on Vercel with 0 failures and the p50 recorded here; compare 5 real sites' output by eye against the old look.
+**Deps:** L3. **Files:** `apps/web/src/app/api/render/route.ts`, `apps/web/src/lib/render/*`.
 
 ### L5: Convex production env and deploy · S · you + me
-- [ ] All of `INTERNAL_SERVICE_SECRET`, `RENDERER_INTERNAL_TOKEN`, `RENDERER_SERVICE_URL`, `DODO_WEBHOOK_SECRET`, `FIRECRAWL_API_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, `WEB_BASE_URL` set with `npx convex env set --prod`; `DEV_BOOTSTRAP_SECRET` **not** set
+- [ ] All of `INTERNAL_SERVICE_SECRET`, `RENDERER_INTERNAL_TOKEN`, `RENDERER_SERVICE_URL` (= `https://<web domain>/api`), `DODO_WEBHOOK_SECRET`, `FIRECRAWL_API_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, `WEB_BASE_URL` set with `npx convex env set --prod`; `DEV_BOOTSTRAP_SECRET` **not** set
 - [ ] `npx convex deploy` succeeds; `pnpm convex:codegen:check` passes
 **Verify:** `npx convex env list --prod` shows each name; the 8 internal functions reject unauthenticated external calls (curl returns 4xx); `/webhooks/dodo` unsigned returns 401.
-**Deps:** L1, L2 (secret), L4 (renderer URL).
+**Deps:** L1, L2 (secret), L6 (the render URL is the web domain).
 
 ### L6: Web deployed · S · you
 - [ ] Vercel project, root `apps/web`, production env as in the runbook table; domain attached
 **Verify:** `pnpm preflight:prod` exits 0 with the production values; landing page loads over https; sign-up and sign-in work; `/check` returns a verdict for a public URL and returns 429 after the rate limit (T11: 21 requests); Lighthouse accessibility ≥90 on the live landing page.
-**Deps:** L0, L1, L5.
+**Deps:** L0, L1, L3, L4.
 
 ### L7: Production API key and smoke test · S · me
 - [ ] Smoke user and key created with `npx convex run --prod` on the internal functions (`/v1/dev/bootstrap` is disabled in production)

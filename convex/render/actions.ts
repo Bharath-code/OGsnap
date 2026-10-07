@@ -71,7 +71,7 @@ export const generateImageInternal = internalAction({
             width: dim.width,
             height: dim.height,
             addWatermark: args.plan === "free",
-            engine: args.plan === "free" ? "satori" : "playwright",
+            engine: "satori",
           }),
         });
 
@@ -109,7 +109,7 @@ export const generateImageInternal = internalAction({
         width: args.width ?? 1200,
         height: args.height ?? 630,
         addWatermark: args.plan === "free",
-        engine: args.plan === "free" ? "satori" : "playwright",
+        engine: "satori",
       }),
     });
 
