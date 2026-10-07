@@ -1,0 +1,35 @@
+url,platform_guess,has_og_image,image_status,width,height,has_og_title,verdict
+https://referable.dev/,other,true,200,1200,630,true,ok
+https://sellerassistant.io/,other,true,200,1920,1080,true,ok
+https://relokato.com/,other,true,200,1200,630,true,ok
+https://aastudioweb.fr,other,true,200,500,263,true,ok
+http://donckelektro.nl,other,true,200,1200,630,true,ok
+http://snake-survival.lovable.app,other,true,200,1920,1080,true,ok
+https://weightlossprotips.com,other,true,200,1344,768,true,ok
+https://luna-vos.lovable.app/,lovable,true,200,720,378,true,ok
+https://adarena.app,lovable,true,200,1672,941,true,ok
+https://gunsvszombies.lovable.app/,lovable,true,200,1920,1080,true,ok
+https://sakura-name-sparkle.lovable.app,lovable,true,200,1920,1080,true,ok
+https://DoneDone.Run,other,false,,,,false,missing
+https://asc2.lovable.app,lovable,true,200,1200,630,true,ok
+https://phone-verif.com,other,true,200,1000,524,true,ok
+https://quote-gems-daily.lovable.app,lovable,true,200,1344,768,true,ok
+https://ben-hashmashot.com,other,false,,,,true,missing
+https://ai-animal-lab.com/,other,true,200,1344,768,true,ok
+https://missdopamine.fr,other,true,200,1344,768,true,ok
+https://kaiventrouville.fr,other,true,200,1920,1080,true,ok
+https://ag-whisperer.lovable.app/,lovable,true,200,1920,1080,true,ok
+https://browsingmode.com,framer,true,200,2400,1260,true,ok
+https://danmall.com,framer,true,200,1200,630,true,ok
+https://nickclement.com,framer,true,200,2400,1260,true,ok
+https://jam.dev,framer,true,200,2400,1260,true,ok
+https://flighty.com,framer,true,200,1200,639,true,ok
+https://aboardhr.com,framer,true,200,2880,1520,true,ok
+https://kastle.ai,framer,true,200,1200,630,true,ok
+https://ai.work,framer,true,200,1200,630,true,ok
+https://ankar.ai,framer,true,200,1200,630,true,ok
+https://basedash.com,other,true,200,1200,630,true,ok
+https://cartesia.ai,other,true,200,1200,630,true,ok
+https://45-cafe.com,,false,getaddrinfo ENOTFOUND 45-cafe.com,,,false,broken
+https://alegriatapasbar.se,other,true,200,1600,900,true,ok
+https://alesfarm.it,,false,getaddrinfo ENOTFOUND alesfarm.it,,,false,broken
