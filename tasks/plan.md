@@ -27,6 +27,10 @@ Test whether people who build sites with no-code and vibe-coding tools (Lovable,
 | 2. Concierge delivery and payment | Days 8–14 | T8–T9 | ≥3 paying |
 | 3. Per-page and channel | Days 15–21 | T10–T12 | ≥50 checker runs/week; first per-page install live |
 | 4. Agencies and MCP | Days 22–30 | T13–T15 | Day 30 gate |
+| L. Launch readiness | Now (added 2026-10-07) | L0–L12, then T7b | Checkpoint L: deployed, one live $9 charge made and refunded, then first DMs |
+
+## Status note (2026-10-07)
+Code for T1–T6, T8–T11 and T13 is merged; nothing is deployed and no DM has been sent. Outreach batches 1 and 2 (`.claudedocs/outreach/`) changed the targeting: Lovable now generates a social image, so the pitch is per-page previews for sites with many shareable pages. Phase L in `tasks/todo.md` is the critical path; the day-30 clock should be counted from the first DM sent, and the Decision log records that choice.
 
 ## Dependency graph
 ```
@@ -37,6 +41,7 @@ T6 ─> T8 site image endpoint ─> T9 site billing ─> T13 agency multi-site
 T8 ─> T10 per-page worker
 T4 ─> T11 public checker
 T7 reply data ─> T12 channel spike (Framer vs Lovable)
+L0–L12 launch readiness ─> T7b outreach (needs deployed backend for before/after images)
 T1 + T8 + T4 ─> T14 MCP server
 ```
 

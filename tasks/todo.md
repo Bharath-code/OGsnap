@@ -158,5 +158,107 @@ Pick the channel with more T7 replies.
 
 ---
 
+## Phase L: Launch readiness (added 2026-10-07; blocks T7 sends, T9b and the day-30 count)
+
+Details and commands are in `.claudedocs/launch-runbook.md`. Owner: **you** = needs your accounts, **me** = Claude Code in-session. "Verify" lines are the acceptance tests; a task is done only when every box is ticked with evidence (command output or screenshot noted in the box).
+Sizes: XS under 30 min, S 30–90 min, M 2–4 h.
+
+### L0: Decisions · XS · you
+- [ ] Domain: confirm you own `ogsnap.dev` (hard-coded in `robots.ts`, `/check` canonical, watermark text, SDK default `api.ogsnap.dev`), or pick another and list the strings to change
+- [ ] Hosts chosen: web (Vercel), renderer (Fly / Railway / VPS)
+- [ ] Final image domain decided before any customer installs (`NEXT_PUBLIC_OG_BASE_URL`); snippets pasted by customers cannot be changed centrally later
+**Verify:** `dig +short <domain>` resolves to your host; the three choices are written in the Decision log.
+**Deps:** none.
+
+### L1: Clerk with Convex JWT · S · you
+- [ ] Clerk app created; publishable and secret keys stored
+- [ ] JWT template named exactly `convex`; issuer URL stored as `CLERK_JWT_ISSUER_DOMAIN`
+**Verify:** on a dev deployment, a signed-in browser session makes `/dashboard` load the user's data (the query sees a non-null identity); signed out, the same query is refused.
+**Deps:** none.
+
+### L2: Dodo products and webhook (test mode) · S · you
+- [ ] Subscription products "Site" $9/mo and "Agency" $49/mo exist; ids stored as `DODO_SITE_PRODUCT_ID` and `DODO_AGENCY_PRODUCT_ID`
+- [ ] Webhook endpoint `https://fearless-gazelle-27.convex.site/webhooks/dodo` subscribed to `subscription.active`, `.renewed`, `.cancelled`; signing secret stored
+**Verify:** an unsigned `curl -X POST` to the endpoint returns 401 (not 500, which means the secret is missing); a Dodo "send test event" returns 200 and creates one `webhookEvents` row.
+**Deps:** L5 for the secret to be set.
+
+### L3: R2 bucket and Firecrawl key · S · you
+- [ ] Separate render bucket (not `ogsnap-marketing`) with a public URL; token with object read/write
+- [ ] `FIRECRAWL_API_KEY` stored
+**Verify:** upload a test object with the token and fetch it via `R2_PUBLIC_BASE_URL` (HTTP 200). Closes T1's open check: `POST /v1/onboarding/magic` on 10 URLs (3 Lovable, 3 Framer, 2 Webflow, 2 SaaS) returns a loadable logo for ≥8 and a non-default primary colour for ≥8; results pasted into the PR.
+**Deps:** none.
+
+### L4: Renderer deployed · M · you + me
+- [ ] Dockerfile (Playwright base image) and host config committed (me)
+- [ ] Deployed with `RENDERER_INTERNAL_TOKEN`, all `R2_*`, `NODE_ENV=production`
+**Verify:** `GET /health` returns `{"ok":true}`; `POST /render` without the bearer token returns 401; one satori render and one playwright render each return a 1200×630 image reachable on the R2 public URL; 20 sequential renders complete with 0 failures; cold start time and per-render time recorded in the runbook.
+**Deps:** L3. **Files:** `apps/renderer/Dockerfile`, host config.
+
+### L5: Convex production env and deploy · S · you + me
+- [ ] All of `INTERNAL_SERVICE_SECRET`, `RENDERER_INTERNAL_TOKEN`, `RENDERER_SERVICE_URL`, `DODO_WEBHOOK_SECRET`, `FIRECRAWL_API_KEY`, `CLERK_JWT_ISSUER_DOMAIN`, `WEB_BASE_URL` set with `npx convex env set --prod`; `DEV_BOOTSTRAP_SECRET` **not** set
+- [ ] `npx convex deploy` succeeds; `pnpm convex:codegen:check` passes
+**Verify:** `npx convex env list --prod` shows each name; the 8 internal functions reject unauthenticated external calls (curl returns 4xx); `/webhooks/dodo` unsigned returns 401.
+**Deps:** L1, L2 (secret), L4 (renderer URL).
+
+### L6: Web deployed · S · you
+- [ ] Vercel project, root `apps/web`, production env as in the runbook table; domain attached
+**Verify:** `pnpm preflight:prod` exits 0 with the production values; landing page loads over https; sign-up and sign-in work; `/check` returns a verdict for a public URL and returns 429 after the rate limit (T11: 21 requests); Lighthouse accessibility ≥90 on the live landing page.
+**Deps:** L0, L1, L5.
+
+### L7: Production API key and smoke test · S · me
+- [ ] Smoke user and key created with `npx convex run --prod` on the internal functions (`/v1/dev/bootstrap` is disabled in production)
+- [ ] GitHub secrets set: `API_BASE_URL`, `OGSNAP_SMOKE_API_KEY`, `INTERNAL_SERVICE_SECRET` and the optional smoke ones
+**Verify:** `pnpm smoke:deploy` exits 0; the `deploy-smoke` workflow is green in Actions.
+**Deps:** L5, L6.
+
+### L8: Billing end to end, test mode · M · you + me
+- [ ] Site purchase: webhook 200, `sites.status` goes `trial` → `active`, next image has no watermark
+- [ ] Replaying the same webhook changes nothing (one `webhookEvents` row, status unchanged)
+- [ ] Agency purchase: a 10th site is accepted, an 11th refused with the upgrade message
+- [ ] "Manage billing" opens the Dodo customer portal
+- [ ] Cancel in the portal: `cancelled` webhook sets status `canceled`; the og.png then serves the fallback image, not an error
+**Verify:** each box ticked with a screenshot or log line; closes T9 and T13 open checks.
+**Deps:** L2, L6, L7.
+
+### L9: Go live · S · you
+- [ ] `DODO_ENVIRONMENT=live_mode`, live API key, live product ids, live webhook endpoint and secret (Dodo test and live are separate environments)
+- [ ] One real $9 purchase with your own card completes the full flow, then is refunded in Dodo
+**Verify:** webhook delivery shows 200 in the Dodo live dashboard; site flips to `active`; refund recorded.
+**Deps:** L8, L12 (Dodo may require legal pages before approving live mode).
+
+### L10: Lovable fresh-project test (T12) · S · you + me
+- [ ] New Lovable project; "Copy Lovable prompt" pasted; published
+- [ ] Preview correct in opengraph.xyz, LinkedIn Post Inspector, X card validator, Slack unfurl (fresh URL each time)
+- [ ] Recorded: does Lovable's own generated social image conflict with the pasted tags? (Batch 1 found Lovable now injects one automatically.)
+- [ ] go/no-go note of 1-3 lines in the Decision log
+**Deps:** L8 (a trial site is enough; payment not required).
+
+### L11: Edge worker deployed (T10 remainder) · S · you
+- [ ] KV namespace created and its id in `wrangler.toml`; `CONVEX_URL` set to the production `.convex.site`; `npx wrangler deploy`
+**Verify:** on a test site, 3 routes return 3 distinct images in opengraph.xyz; JS/CSS/images byte-identical through the proxy (`curl | shasum` compare); HTML overhead p50 <50 ms measured against the deployed worker (README reports ~5 ms against a local origin).
+**Deps:** L8.
+
+### L12: Compliance and operations minimum · M · me (code) + you (accounts)
+- [ ] `/privacy` and `/terms` pages exist and are linked in the footer (me)
+- [ ] Support email address shown on the site and set in Dodo (you)
+- [ ] Billing webhook maps failed/expired/on-hold subscription events to a non-active status; event names confirmed against Dodo's current docs first; covered by a test (me)
+- [ ] Error alerting: one channel notified on Convex function errors or a failing deploy-smoke (you pick the tool)
+**Verify:** pages return 200 and are in the sitemap; the new webhook test passes; a deliberately failing smoke run triggers the alert.
+**Deps:** L5. **Files:** `apps/web/src/app/{privacy,terms}/page.tsx`, `convex/billing/webhooks.ts`, test.
+
+### ✅ Checkpoint L (launch ready)
+- [ ] L0-L12 ticked with evidence; `pnpm typecheck && pnpm build` pass on `main`
+- [ ] Only now: generate before/after images (T5 against production) and send the first DMs
+
+### T7b: Outreach batch 2 execution (replaces the original T7 targeting) · not code · you
+Batch 1 (34 showcase sites) found only 4 gaps, and Lovable now injects a social image itself; batch 2 (76 content-heavy sites) found 22 qualified of 65 reachable. Targets and templates: `.claudedocs/outreach/`.
+- [ ] Owner contact (email or X handle) found for the top 10 in `tracker.csv` (about 20 min each)
+- [ ] Before/after image per site made from one **inner page** (not the homepage)
+- [ ] 10 DMs sent (template A or B), max 10 per day; replies logged in `tracker.csv` with a one-line reason for every "no"
+**Exit signal:** ≥3 replies out of 10 → batch 3 of 30. 0-1 replies out of 10 → rewrite the message once. If still <10 replies per 30 DMs after the rewrite, trigger the gate early (see `plan.md`).
+**Deps:** Checkpoint L.
+
 ## Decision log
 <!-- one line per checkpoint -->
+- 2026-10-07 Checkpoint 1 (adjusted): batch 1 audit of 34 showcase sites: 30 ok, 2 missing, 2 DNS errors. Lovable now generates a social image; the remaining gap is per-page (same image and title on every route). Decision: do not DM homepage-ok sites; target sites with many inner pages.
+- 2026-10-07 batch 2: 76 content-heavy sites, 13 qualify (inner pages show the homepage preview), 9 have no image. Next: Phase L, then T7b.
