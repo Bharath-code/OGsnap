@@ -1,0 +1,857 @@
+<title>OGSnap Market Verdict</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@75..150,500..900&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout concept: a spec sheet for a 1200×630 link card. Crop marks, dimension rules and a cobalt proof sheet. Hero and key moments keep the 1.91:1 card ratio. */
+:root{
+  --paper:#F3F5FC;--surface:#FFFFFF;--ink:#11163A;--muted:#535B82;--line:#D5DAEE;
+  --link:#2B3BCB;--hero:#2430C8;--hero-ink:#FFFFFF;--hero-soft:#C9D0FF;
+  --c1:#3B4FE0;--c2:#D9480F;--c3:#0B8A72;
+  --good:#0A7A63;--warn:#9A6200;--bad:#C2380A;--tint:#E7EAFA;
+  --display:"Anybody","Arial Black",system-ui,sans-serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0B0F27;--surface:#141A3C;--ink:#EDF0FF;--muted:#A6ADD6;--line:#2C3363;
+  --link:#A4B1FF;--hero:#1B2496;--hero-soft:#C9D0FF;
+  --c1:#6478F0;--c2:#D9622B;--c3:#1FA98A;
+  --good:#45CFAE;--warn:#E9B44C;--bad:#FF8A5C;--tint:#1D2450;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0B0F27;--surface:#141A3C;--ink:#EDF0FF;--muted:#A6ADD6;--line:#2C3363;
+  --link:#A4B1FF;--hero:#1B2496;--hero-soft:#C9D0FF;
+  --c1:#6478F0;--c2:#D9622B;--c3:#1FA98A;
+  --good:#45CFAE;--warn:#E9B44C;--bad:#FF8A5C;--tint:#1D2450;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--body);margin:0}
+a{color:var(--link);text-underline-offset:2px}
+:focus-visible{outline:3px solid var(--c2);outline-offset:2px;border-radius:3px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);line-height:1.05;text-wrap:balance;margin:0}
+h2{font-size:clamp(30px,5vw,52px);font-weight:800;font-stretch:112%;letter-spacing:-.01em}
+h3{font-size:19px;font-weight:700;font-stretch:100%;line-height:1.2}
+p{margin:0;max-width:68ch}
+.eyebrow{font:600 12px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+section{padding-block:72px;border-top:1px solid var(--line)}
+.head{display:grid;gap:14px;margin-bottom:34px}
+.lede{font-size:20px;line-height:1.5;max-width:60ch}
+.mono{font-family:var(--mono);font-size:.86em}
+.muted{color:var(--muted)}
+small,.note{font-size:14px;color:var(--muted);line-height:1.5}
+.ev{display:inline-block;font:600 10px/16px var(--mono);min-width:16px;text-align:center;border-radius:3px;border:1px solid currentColor;margin-left:3px;text-decoration:none;vertical-align:1px}
+.ev.m{color:var(--good)}.ev.p{color:var(--link)}.ev.s{color:var(--warn)}.ev.v{color:var(--bad)}.ev.j{color:var(--muted)}
+#bar{position:fixed;inset:0 0 auto;height:calc(3px + env(safe-area-inset-top,0px));z-index:30;pointer-events:none}
+#bar i{display:block;height:100%;width:0;background:var(--c2)}
+nav.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+nav.top .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:9px;scrollbar-width:none}
+nav.top a{font:600 12px/1 var(--mono);white-space:nowrap;padding:7px 9px;border-radius:5px;color:var(--ink);text-decoration:none}
+nav.top a:hover{background:var(--tint)}
+
+/* hero */
+.hero{background:var(--hero);color:var(--hero-ink);padding-block:42px 56px;overflow:hidden}
+.hero .eyebrow{color:var(--hero-soft)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:44px;align-items:center;margin-top:18px}
+.hero h1{font-size:clamp(40px,6.6vw,82px);font-weight:900;font-stretch:118%;letter-spacing:-.02em;line-height:.98}
+.hero p{margin-top:20px;font-size:20px;line-height:1.45;color:#E8EBFF}
+.hero a{color:#fff}
+.stage{position:relative;padding:22px}
+.crop{position:absolute;width:16px;height:16px;border:0 solid var(--hero-soft)}
+.crop.tl{top:0;left:0;border-top-width:1px;border-left-width:1px}.crop.tr{top:0;right:0;border-top-width:1px;border-right-width:1px}
+.crop.bl{bottom:0;left:0;border-bottom-width:1px;border-left-width:1px}.crop.br{bottom:0;right:0;border-bottom-width:1px;border-right-width:1px}
+.dim{position:absolute;left:22px;right:22px;bottom:4px;text-align:center;font:400 11px var(--mono);color:var(--hero-soft)}
+.urlbar{font:400 14px var(--mono);background:#fff;color:#11163A;padding:10px 12px;border-radius:8px;white-space:nowrap;overflow:hidden}
+.urlbar b{display:inline-block;overflow:hidden;vertical-align:bottom;white-space:nowrap;font-weight:400;animation:type 9s steps(28) infinite}
+.card{margin-top:10px;background:#fff;color:#11163A;border-radius:10px;overflow:hidden;animation:unfurl 9s cubic-bezier(.2,.8,.2,1) infinite;transform-origin:top}
+.card .art{aspect-ratio:1.91/1;background:#FF6B35;position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:7%;color:#fff;overflow:hidden}
+.card .art::before{content:"";position:absolute;right:-12%;top:-30%;width:62%;aspect-ratio:1;border-radius:50%;background:#2430C8;animation:orb 9s ease-in-out infinite}
+.card .art strong{font:800 clamp(18px,3.1vw,36px)/1.02 var(--display);font-stretch:110%;position:relative}
+.card .art span{font:400 12px var(--mono);position:relative;margin-top:8px}
+.card .meta{padding:9px 12px;font-size:13px;line-height:1.35}
+.card .meta em{display:block;font-style:normal;color:#535B82;font-size:12px}
+@keyframes type{0%,4%{max-width:0}24%,100%{max-width:100%}}
+@keyframes unfurl{0%,26%{transform:scaleY(.02);opacity:.15}36%,100%{transform:scaleY(1);opacity:1}}
+@keyframes orb{0%,30%{transform:translate(40%,-30%)}48%,100%{transform:none}}
+.status{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:0}
+.status div{background:var(--surface);padding:16px}
+.status b{font:800 34px/1 var(--display);display:block;font-variant-numeric:tabular-nums}
+.status span{font-size:13px;color:var(--muted);line-height:1.35;display:block;margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted);align-items:center}
+
+/* generic */
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.g2>*,.g3>*{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:20px;display:grid;gap:9px;align-content:start}
+.panel p{font-size:15.5px;line-height:1.5}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.42}
+th{font:600 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;text-align:left;color:var(--muted);padding:11px 13px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td b{font-weight:700}
+.pill{display:inline-block;font:600 11px/1.5 var(--mono);padding:1px 7px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.pill.high{color:var(--bad)}.pill.med{color:var(--warn)}.pill.low{color:var(--good)}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+button{font:600 13px/1 var(--mono);padding:9px 12px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--c1)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.quote{font-family:var(--display);font-weight:800;font-stretch:108%;font-size:clamp(22px,3.2vw,34px);line-height:1.15;max-width:26ch}
+details{margin-top:10px;font-size:14px}summary{cursor:pointer;color:var(--link)}
+.callout{background:var(--hero);color:#fff;border-radius:8px;padding:26px;display:grid;gap:10px}
+.callout a{color:#fff}.callout .eyebrow{color:var(--hero-soft)}
+.callout p{color:#EEF0FF}
+
+/* charts */
+.chart{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px}
+.chart svg{display:block;width:100%;height:auto}
+.axis{fill:var(--muted);font:400 11px var(--mono)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--paper);font:400 12px/1.5 var(--mono);padding:7px 9px;border-radius:5px;white-space:nowrap;z-index:3}
+.swatch{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.rate{display:grid;grid-template-columns:minmax(0,1fr);gap:7px}
+.track{display:flex;gap:2px;height:22px;border-radius:4px;overflow:hidden;background:var(--tint)}
+.track i{display:block;height:100%}
+.dotrow{display:grid;grid-template-columns:150px minmax(0,1fr) 170px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.dotrow:last-of-type{border-bottom:0}
+.dotline{position:relative;height:12px;background-image:linear-gradient(to right,var(--line) 1px,transparent 1px);background-size:25% 100%}
+.dotline i{position:absolute;top:0;width:12px;height:12px;border-radius:50%;margin-left:-6px;outline:2px solid var(--surface)}
+.dotaxis{display:grid;grid-template-columns:150px minmax(0,1fr) 170px;gap:10px;font:400 11px var(--mono);color:var(--muted)}
+.dotaxis div:nth-child(2){display:flex;justify-content:space-between}
+
+/* voices */
+.voice{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;display:grid;gap:8px;align-content:start}
+.voice header{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.voice h3{font-size:17px}
+.score{font:800 22px/1 var(--display);font-variant-numeric:tabular-nums}
+.meter{height:6px;background:var(--tint);border-radius:3px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--c1);border-radius:3px;animation:grow 1.2s ease-out}
+.voice p{font-size:15px;line-height:1.48}
+.voice .do{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
+@keyframes grow{from{width:0}}
+
+/* swot */
+.swot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.swot>div{background:var(--surface);padding:22px;min-width:0}
+.swot h3{font-size:24px;font-stretch:115%;margin-bottom:12px}
+.swot ul{margin:0;padding:0;list-style:none;display:grid;gap:11px;font-size:15px;line-height:1.45}
+.swot li span{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.swot li span::before{content:"→ ";color:var(--c2)}
+
+/* wow */
+#wall{display:block;width:100%;aspect-ratio:1.91/1;background:var(--tint);border-radius:6px}
+.count{font:800 clamp(26px,4vw,44px)/1 var(--display);font-variant-numeric:tabular-nums}
+.sim{background:var(--tint);border-radius:8px;padding:16px;min-height:360px;display:flex;align-items:center;justify-content:center}
+.bubble{width:100%;max-width:400px;background:var(--surface);border-radius:12px;overflow:hidden;border:1px solid var(--line);font-size:14px;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.bubble .who{padding:10px 12px;font-size:13px}
+.bubble .who b{display:block}
+.pv{aspect-ratio:1.91/1;display:flex;flex-direction:column;justify-content:flex-end;padding:18px;background:#0B8A72;color:#fff;position:relative;overflow:hidden}
+.pv strong{font:800 24px/1.05 var(--display);position:relative}
+.pv span{font:400 11px var(--mono);position:relative;margin-top:7px}
+.pv.generic{background:#C9CDDD;color:#4B5270;align-items:center;justify-content:center;text-align:center}
+.pv.generic strong{font:600 15px var(--body)}
+.pv.none{display:none}
+.bubble .tt{padding:9px 12px;font-size:13px;line-height:1.35;border-top:1px solid var(--line)}
+.bubble .tt em{display:block;font-style:normal;color:var(--muted);font-size:12px}
+.radar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:center}
+.radar svg{width:100%;height:auto}
+.radar .flow{stroke:var(--c1);stroke-width:2;fill:none;stroke-dasharray:5 7;animation:flow 1.8s linear infinite}
+.radar .ring{fill:none;stroke:var(--c2);stroke-width:2;animation:ring 2.6s ease-out infinite;transform-origin:210px 120px}
+@keyframes flow{to{stroke-dashoffset:-48}}
+@keyframes ring{0%{transform:scale(.55);opacity:.9}100%{transform:scale(1.4);opacity:0}}
+.log{font:400 12.5px/1.75 var(--mono);background:var(--ink);color:var(--paper);padding:13px;border-radius:6px;overflow-x:auto;white-space:nowrap}
+pre.copy{font:400 13px/1.6 var(--mono);background:var(--ink);color:var(--paper);padding:15px;border-radius:6px;white-space:pre-wrap;margin:0;overflow-wrap:anywhere}
+
+/* map */
+.map text{font:600 12px var(--body);fill:var(--ink)}
+.map .ax{font:400 11px var(--mono);fill:var(--muted)}
+.map .gap{fill:var(--c2);opacity:.12}
+.map .pulse{fill:none;stroke:var(--c2);stroke-width:2;animation:mp 2.4s ease-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes mp{0%{transform:scale(.6);opacity:1}100%{transform:scale(2.2);opacity:0}}
+
+/* timeline */
+.tl{display:grid;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.tl>div{position:relative;padding:0 0 18px 20px}
+.tl>div::before{content:"";position:absolute;left:-7px;top:7px;width:12px;height:12px;border-radius:50%;background:var(--c1);outline:3px solid var(--paper)}
+.tl>div.us::before{background:var(--c2)}
+.tl .d{font:600 12px var(--mono);color:var(--muted)}
+
+/* checklist */
+.ring-wrap{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.check{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:9px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.42}
+.check:last-child{border-bottom:0}
+.check input{width:17px;height:17px;margin:3px 0 0;accent-color:var(--c1)}
+.check small{display:block}
+.ctrl{display:grid;gap:4px;font-size:14px}
+.ctrl output{font:600 14px var(--mono);float:right}
+.ctrl input{width:100%;accent-color:var(--c1)}
+.res{font:800 clamp(30px,4.5vw,48px)/1 var(--display);font-variant-numeric:tabular-nums}
+.src{columns:2;column-gap:30px;font-size:14px;line-height:1.5;padding-left:20px;margin:0}
+.src li{break-inside:avoid;margin-bottom:6px}
+footer{padding-block:34px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+
+@media (max-width:860px){
+  .hero-grid,.g2,.g3,.swot,.radar{grid-template-columns:minmax(0,1fr)}
+  .status{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dotrow,.dotaxis{grid-template-columns:96px minmax(0,1fr) 92px;font-size:12.5px}
+  .src{columns:1}section{padding-block:52px}
+  .check{grid-template-columns:22px minmax(0,1fr)}.check .pill{grid-column:2;justify-self:start}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+
+<div id="bar"><i></i></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">OGSnap · market verdict · 7 Nov 2026 · spec 1200×630</div>
+    <div class="hero-grid">
+      <div>
+        <h1>Real pain. Thin business. Sell it in 14&nbsp;days.</h1>
+        <p>Social previews still break on the sites you found, so the problem is real. But several small tools already sell this cheaply, and few show much traction. Stop selling a $9 image to makers. Sell agencies proof that every client link looks right, and start before the product is fully deployed.</p>
+      </div>
+      <div class="stage" aria-label="Animation: a bare link unfurls into a branded preview card">
+        <i class="crop tl"></i><i class="crop tr"></i><i class="crop bl"></i><i class="crop br"></i>
+        <div class="urlbar"><b>yoursite.com/guides/pricing</b></div>
+        <div class="card">
+          <div class="art"><strong>How pricing works, page by page</strong><span>yoursite.com/guides/pricing</span></div>
+          <div class="meta">How pricing works, page by page<em>yoursite.com</em></div>
+        </div>
+        <div class="dim">1.91 : 1</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<nav class="top" aria-label="Sections"><div class="wrap">
+  <a href="#verdict">Verdict</a><a href="#market">Market</a><a href="#lag">Gaps</a><a href="#trends">Tech</a><a href="#comps">Comps</a><a href="#model">Model</a><a href="#voices">Room</a><a href="#swot">SWOT</a><a href="#wow">Wow</a><a href="#gtm">GTM</a><a href="#live">Go-live</a><a href="#decide">Decide</a><a href="#sources">Sources</a>
+</div></nav>
+
+<div class="wrap" style="padding-block:24px">
+  <div class="status">
+    <div><b>0</b><span>paying customers (<span class="mono" style="display:inline">tracker.csv</span>)</span></div>
+    <div><b>0 / 19</b><span>prospects messaged, though 22 sites qualified</span></div>
+    <div><b>31</b><span>days since the last commit. PR #7 is open with CI green</span></div>
+    <div><b>0</b><span>production web deploys. <span class="mono" style="display:inline">ogsnap.dev</span> lands on a domain-market parking page</span></div>
+  </div>
+  <div class="legend" style="margin-top:12px">
+    <b class="eyebrow">Evidence grades</b>
+    <span><span class="ev m">M</span> measured by us</span>
+    <span><span class="ev p">P</span> primary source</span>
+    <span><span class="ev s">S</span> secondary</span>
+    <span><span class="ev v">V</span> vendor or unverified claim</span>
+    <span><span class="ev j">J</span> my judgement, no data</span>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section id="verdict" style="border-top:0;padding-top:28px">
+  <div class="head">
+    <div class="eyebrow">The answer</div>
+    <h2>Still relevant? Yes for the problem, no for the current pitch.</h2>
+  </div>
+  <div class="g3">
+    <div class="panel">
+      <div class="eyebrow" style="color:var(--good)">Still true</div>
+      <h3>The inner-page gap is live today</h3>
+      <p>I re-probed 8 top prospects as Twitterbot this morning. 7 still have the gap: 4 show no image at all, and the other 3 reuse one image on inner pages (a logo SVG, a home image, Lovable's default). The eighth had no inner page in the sample.<a class="ev m" href="#method" title="Probe method">M</a></p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow" style="color:var(--bad)">No longer true</div>
+      <h3>"Your link has no preview"</h3>
+      <p>Only 2 of 32 reachable showcase sites lacked one.<a class="ev m" href="#method">M</a> Lovable has served pre-rendered tags to social bots since May 2026, and it reviews Open Graph tags inside the product.<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow" style="color:var(--warn)">Unknown</div>
+      <h3>Will anyone pay?</h3>
+      <p>Nobody has been asked. Nor did I find a primary study of how much previews lift clicks: the "2.3×" and "250%" figures trace back to blogs and vendors.<a class="ev v" href="https://seojuice.com/tools/seo-mythbusters/do-og-tags-improve-ctr">V</a> This is the biggest hole in the case.</p>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:20px">
+    <div class="eyebrow">Recommendation</div>
+    <div class="quote" style="max-width:32ch">Narrow the pivot. Don't start a new one.</div>
+    <p>Keep the engine. Change the buyer to people who ship sites for clients, and change the promise from "a nice image" to "every client link verified on every platform". Lovable says more than 800,000 individuals and agencies use it for client work, and a quarter of surveyed paid builders earn most or all of their income that way.<a class="ev p" style="color:#fff" href="https://lovable.dev/blog/introducing-lovable-partner-program">P</a> Expect an indie business: comparable tools suggest roughly $30K to $50K MRR as a good outcome.<a class="ev j" style="color:#fff" href="#comps">J</a> Don't raise money on this.</p>
+  </div>
+</section>
+
+<section id="market">
+  <div class="head">
+    <div class="eyebrow">Market position</div>
+    <h2>The gap is real, but it's crowded with small tools.</h2>
+    <p class="lede">The September review called this niche thin. It's busier than that. The more useful signal: rivals exist with almost no visible pull, which is a warning about demand.</p>
+  </div>
+
+  <div class="g2">
+    <div class="chart map" style="overflow-x:auto">
+      <div class="eyebrow" style="margin-bottom:6px">Positions are my judgement <span class="ev j">J</span></div>
+      <svg viewBox="0 0 560 400" role="img" aria-label="Map of competitors by buyer and work to install. The non-developer, little-work corner holds OG Pilot and OGSnap's intended position." style="min-width:480px">
+        <rect class="gap" x="300" y="24" width="244" height="150" rx="8"/>
+        <line x1="40" y1="360" x2="548" y2="360" stroke="var(--line)"/><line x1="40" y1="16" x2="40" y2="360" stroke="var(--line)"/>
+        <text class="ax" x="40" y="382">More work to install</text><text class="ax" x="548" y="382" text-anchor="end">Paste once, done</text>
+        <text class="ax" transform="translate(16,360) rotate(-90)">Developer</text><text class="ax" transform="translate(16,110) rotate(-90)">Non-developer</text>
+        <g fill="var(--c1)">
+          <circle cx="130" cy="320" r="6"/><circle cx="190" cy="335" r="6"/><circle cx="110" cy="210" r="6"/><circle cx="165" cy="175" r="6"/><circle cx="250" cy="250" r="6"/><circle cx="205" cy="100" r="6"/>
+        </g>
+        <text x="142" y="324">Satori / Takumi</text><text x="202" y="339" dx="60">Agent-written route</text>
+        <text x="122" y="214">Bannerbear</text><text x="177" y="179">Placid</text><text x="262" y="254">Orshot</text><text x="217" y="104">Canva / Pomelli</text>
+        <g fill="var(--c3)"><circle cx="360" cy="150" r="6"/><circle cx="440" cy="65" r="6"/><circle cx="325" cy="110" r="6"/></g>
+        <text x="372" y="154">OG Pilot</text><text x="452" y="69">Lovable built-in</text><text x="337" y="114">SocialSeal, WOG</text>
+        <circle class="pulse" cx="485" cy="120" r="9"/><circle cx="485" cy="120" r="7" fill="var(--c2)"/>
+        <text x="497" y="124" dx="-46" dy="22">OGSnap, target</text>
+        <circle cx="375" cy="230" r="7" fill="none" stroke="var(--c2)" stroke-width="2"/>
+        <text x="387" y="234">OGSnap today</text>
+      </svg>
+      <div class="legend" style="margin-top:8px"><span><i class="swatch" style="background:var(--c1)"></i>Generic image tools</span><span><i class="swatch" style="background:var(--c3)"></i>Direct rivals</span><span><i class="swatch" style="background:var(--c2)"></i>OGSnap</span></div>
+    </div>
+    <div class="panel">
+      <div class="eyebrow">Our own funnel</div>
+      <h3>Qualified sites depend on who you target</h3>
+      <div class="rate">
+        <div><b>Unfiltered showcase:</b> 2 of 32 reachable (6%)<a class="ev m" href="#method">M</a></div>
+        <div class="track" role="img" aria-label="2 of 32"><i style="width:6.25%;background:var(--c2)"></i></div>
+        <div style="margin-top:8px"><b>Content-heavy sites:</b> 22 of 65 reachable (34%)<a class="ev m" href="#method">M</a></div>
+        <div class="track" role="img" aria-label="13 same image, 9 no image, of 65"><i style="width:20%;background:var(--c2)"></i><i style="width:13.85%;background:var(--c1)"></i></div>
+        <div class="legend"><span><i class="swatch" style="background:var(--c2)"></i>Inner pages reuse home (13)</span><span><i class="swatch" style="background:var(--c1)"></i>No image at all (9)</span></div>
+      </div>
+      <p class="note">The second list was chosen for this gap, so 34% is a prospecting yield and tells you nothing about the market rate. Also: <span class="mono">tracker.csv</span> counts 2 sites from batch 1, while the review counted 4. Two of those were DNS errors from reconstructed domains.</p>
+      <div class="eyebrow" style="margin-top:10px">Addressable, illustrated</div>
+      <p>0.1% of the 800,000 client-work users is 800 accounts. At $49 that's $39,200 MRR. The 0.1% is an assumption and the 800,000 is company-reported, so this only sizes the prize.<a class="ev j" href="#model">J</a></p>
+    </div>
+  </div>
+
+  <div style="margin-top:24px">
+    <div class="btns" role="group" aria-label="Filter competitors">
+      <button data-f="all" aria-pressed="true">All</button><button data-f="direct" aria-pressed="false">Direct</button><button data-f="free" aria-pressed="false">Free floor</button><button data-f="platform" aria-pressed="false">Platform</button><button data-f="api" aria-pressed="false">Template API</button><button data-f="adj" aria-pressed="false">Adjacent</button>
+    </div>
+    <div class="tablewrap"><table id="rivals" style="min-width:820px">
+      <thead><tr><th>Player</th><th>Price</th><th>What it does for this job</th><th>Traction seen</th><th>Threat</th></tr></thead>
+      <tbody>
+      <tr data-k="platform"><td><b>Lovable built-in</b></td><td>Included</td><td>Serves tags to social bots, and its SEO review flags duplicate titles with "Try to fix". Docs still ask for a unique image per route.<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></td><td>$500M+ ARR, self-reported<a class="ev s" href="https://www.techtimes.com/articles/318072/20260609/lovable-says-it-hit-500-million-run-rate-vibe-codings-maintenance-test-still-looms.htm">S</a></td><td><span class="pill high">High</span></td></tr>
+      <tr data-k="direct"><td><b>OG Pilot</b></td><td>$50/yr, unlimited domains, 10k pages; $2 one-off</td><td>Connect a domain, brand pulled, refresh every 24h, debugger, MCP. Live guides for Carrd and WordPress; Shopify and Webflow "coming soon".<a class="ev p" href="https://ogpilot.com">P</a></td><td>None shown. Case studies are modelled<a class="ev p" href="https://ogpilot.com">P</a></td><td><span class="pill high">High</span></td></tr>
+      <tr data-k="direct"><td><b>OpenGraph+</b></td><td>Not checked</td><td>"Fixed automatically" link previews.<a class="ev p" href="https://opengraphplus.com">P</a> Same promise as ours</td><td>Not found</td><td><span class="pill med">Med</span></td></tr>
+      <tr data-k="direct"><td><b>Orshot for Framer</b></td><td>Free plugin, quota-based</td><td>One image per CMS item, written back as a native asset. Static pages stay manual.<a class="ev p" href="https://orshot.com/blog/framer-og-images">P</a></td><td>~$8K per 30 days, as of Sept<a class="ev s" href="https://trustmrr.com/startup/orshot-com">S</a></td><td><span class="pill med">Med</span></td></tr>
+      <tr data-k="direct"><td><b>Framer OG Image Generator</b></td><td>Free; Pro $9/mo</td><td>One-click image with AI-suggested titles. Exports a PNG or URL.<a class="ev p" href="https://www.framer.com/community/marketplace/plugins/og-image-generator/">P</a></td><td>Not shown</td><td><span class="pill low">Low</span></td></tr>
+      <tr data-k="direct"><td><b>SocialSeal (Shopify)</b></td><td>≈ $7/mo unlimited</td><td>Automatic images for products, collections, posts.<a class="ev p" href="https://apps.shopify.com/socialseal-og-image-generator">P</a></td><td><b>1 review since June 2023</b><a class="ev p" href="https://apps.shopify.com/socialseal-og-image-generator">P</a></td><td><span class="pill low">Low</span></td></tr>
+      <tr data-k="free"><td><b>Satori, @vercel/og, Takumi</b></td><td>Free</td><td>Any coding agent can write the route.</td><td>7.2M, 3.1M and 0.7M downloads last week<a class="ev m" href="https://api.npmjs.org/downloads/point/last-week/satori">M</a></td><td><span class="pill high">High</span></td></tr>
+      <tr data-k="free"><td><b>WOG (Webflow)</b></td><td>Free</td><td>Image per article from its title. Last updated July 2024.<a class="ev s" href="https://webflow.com/apps/detail/wog">S</a></td><td>Not shown</td><td><span class="pill low">Low</span></td></tr>
+      <tr data-k="api"><td><b>Bannerbear, Placid</b></td><td>$49/mo; $19/mo</td><td>Template APIs. You design and wire them up.<a class="ev v" href="https://www.bannerbear.com/blog/bannerbear-vs-placid/">V</a></td><td>Bannerbear ~$630K ARR, older figure<a class="ev s" href="https://superframeworks.com/blog/bannerbear">S</a></td><td><span class="pill low">Low</span></td></tr>
+      <tr data-k="adj"><td><b>Prerender.io</b></td><td>$59/mo and up</td><td>Prerendering, unlimited domains.<a class="ev p" href="https://prerender.io/pricing/">P</a> Lovable-hosted projects no longer need it.<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></td><td>Over $1M at sale, part of saas.group<a class="ev s" href="https://saas.group/family">S</a></td><td><span class="pill low">Low</span></td></tr>
+      <tr data-k="adj"><td><b>Google Pomelli</b></td><td>Free in many regions</td><td>URL to Business DNA, then campaign assets. Doesn't manage per-URL tags.<a class="ev s" href="https://www.pulse.bot/marketing/news/google-brings-pomelli-in-english-to-small-businesses-in-europe-a4a6041e-4c7f-4a58-a839-6d0060e1733d/">S</a></td><td>170+ regions<a class="ev s" href="https://www.pulse.bot/marketing/news/google-brings-pomelli-in-english-to-small-businesses-in-europe-a4a6041e-4c7f-4a58-a839-6d0060e1733d/">S</a></td><td><span class="pill med">Med</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="note" style="margin-top:10px">The price problem in one line: 10 sites cost $588 a year on our Agency plan, while OG Pilot's listed tier is $50 a year for unlimited domains. Agencies need a reason to pay 11.8× more. Re-check their page first, as a second read of it did not show prices.</p>
+  </div>
+
+  <div class="g2" style="margin-top:24px">
+    <div>
+      <div class="eyebrow" style="margin-bottom:12px">The clock: they shipped, we didn't</div>
+      <div class="tl">
+        <div><span class="d">13 May 2026</span><br>Lovable Discoverability: SSR for new apps, prerendering for older ones.<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></div>
+        <div><span class="d">Aug 2026</span><br>Nearly 100 app connectors, with 1 to 3 new ones each week.<a class="ev p" href="https://lovable.dev/blog/how-we-made-lovable-apps-work-with-the-rest-of-your-stack">P</a></div>
+        <div><span class="d">1 Sep 2026</span><br>Custom Connectors for any HTTP API.<a class="ev s" href="https://www.createwith.com/tool/lovable/updates/lovable-custom-connectors-open-workspaces-to-any-http-api">S</a></div>
+        <div><span class="d">9 Sep 2026</span><br>Partner Program: 500+ Solution Partners signed, Experts earn 10%.<a class="ev p" href="https://lovable.dev/blog/introducing-lovable-partner-program">P</a></div>
+        <div class="us"><span class="d">7 Oct 2026</span><br><b>OGSnap:</b> 22 qualified prospects found. Last commit.<a class="ev m" href="#method">M</a></div>
+        <div class="us"><span class="d">7 Nov 2026</span><br><b>OGSnap:</b> 0 DMs. The prospects still have the gap, for now.<a class="ev m" href="#method">M</a></div>
+      </div>
+    </div>
+    <div class="panel" style="align-self:start">
+      <div class="eyebrow">Reading the threat</div>
+      <h3>Lovable stops one step short, and that step is your opening</h3>
+      <p>Lovable's agent can already fix titles and tags. A generated per-route image isn't documented, though a chat request could plausibly produce a Satori route on the new stack.<a class="ev j" href="#swot">J</a> Assume the single-platform window could close in any release.</p>
+      <p>A cross-platform promise holds up longer: an agency with Lovable, Framer and Shopify clients wants one report covering all of them. No platform has a reason to verify its rivals' sites.</p>
+    </div>
+  </div>
+</section>
+
+<section id="lag">
+  <div class="head">
+    <div class="eyebrow">Where we are lagging</div>
+    <h2>Eleven gaps. Two are urgent bugs in the promise.</h2>
+  </div>
+  <div class="tablewrap"><table style="min-width:780px">
+    <thead><tr><th>Gap</th><th>Evidence</th><th>Fix</th><th>When</th></tr></thead>
+    <tbody>
+    <tr><td><b>Nothing is sold</b></td><td>0 sent of 19 tracked prospects<a class="ev m" href="#method">M</a></td><td>Send 10 gift DMs this week</td><td><span class="pill high">Now</span></td></tr>
+    <tr><td><b>Domain unclear</b></td><td><span class="mono">www.ogsnap.dev</span> serves a parked-domain page with market tracking. It's hard-coded across the repo<a class="ev m" href="#method">M</a></td><td>Confirm you own it. Customer snippets can't be changed later, so settle this before any install</td><td><span class="pill high">Now</span></td></tr>
+    <tr><td><b>Lovable prompt is out of date</b></td><td><span class="mono">site-detail.tsx:25</span> assumes a Vite SPA and edits <span class="mono">index.html</span>. New apps have used TanStack Start since 13 May<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></td><td>Rewrite it to set per-route head tags, then test on both stacks (extends L10)</td><td><span class="pill high">First install</span></td></tr>
+    <tr><td><b>First share can show the wrong image</b></td><td><span class="mono">requestPageImage</span> serves the site image for an unseen path and renders in the background. I found no sitemap pre-render in <span class="mono">convex/</span><a class="ev m" href="#method">M</a> Platforms may cache that first image</td><td>Pre-render from the sitemap at install. Also the base of the Wall demo</td><td><span class="pill high">First install</span></td></tr>
+    <tr><td><b>Per-page needs a proxy</b></td><td>The Worker needs a custom domain behind Cloudflare (<span class="mono">plan.md</span>). Lovable now serves route tags to social bots<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></td><td>Test per-route tags pointing at <span class="mono">og.png?path=</span>. If it works, the proxy drops out for Lovable<a class="ev j" href="#trends">J</a></td><td><span class="pill med">L10</span></td></tr>
+    <tr><td><b>Price looks high</b></td><td>OG Pilot $50/yr; SocialSeal ≈$7/mo<a class="ev p" href="https://ogpilot.com">P</a></td><td>Keep $9 for DMs. Learn which objection appears before changing anything. Then test annual</td><td><span class="pill med">After 10 replies</span></td></tr>
+    <tr><td><b>No proof of value</b></td><td>No primary CTR study found<a class="ev v" href="https://seojuice.com/tools/seo-mythbusters/do-og-tags-improve-ctr">V</a></td><td>A/B one customer's real shared links with UTMs. Publish the result either way</td><td><span class="pill med">First 3 customers</span></td></tr>
+    <tr><td><b>No Framer, Webflow or Shopify install</b></td><td>Orshot has Framer, SocialSeal has Shopify<a class="ev p" href="https://orshot.com/blog/framer-og-images">P</a></td><td>Build only where a paying agency asks</td><td><span class="pill low">Demand-led</span></td></tr>
+    <tr><td><b>Brand extraction unproven</b></td><td>T1's 8-of-10 test is still blocked on the Firecrawl key (<span class="mono">todo.md</span>)<a class="ev m" href="#method">M</a></td><td>Run L3's 10 URLs. For the first 10 DMs, set brand colors by hand</td><td><span class="pill med">L3</span></td></tr>
+    <tr><td><b>Failed payments ignored</b></td><td>Only <span class="mono">active|renewed|cancelled</span> are handled (<span class="mono">CLAUDE.md</span>)<a class="ev m" href="#method">M</a></td><td>Map failure events (L12). A weekly dashboard check covers the first 10 customers</td><td><span class="pill low">Before 10 customers</span></td></tr>
+    <tr><td><b>Too many plans, too little selling</b></td><td>13,337 lines in <span class="mono">docs/</span>, 12,682 in everything else<a class="ev m" href="#method">M</a></td><td>Freeze docs. This report is the last one until the gate</td><td><span class="pill high">Now</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="trends">
+  <div class="head">
+    <div class="eyebrow">Trends and tech</div>
+    <h2>Rendering is free. Install and proof are where value is moving.</h2>
+  </div>
+  <div class="chart" id="npmchart">
+    <h3>Open-source OG rendering keeps growing</h3>
+    <p class="note" style="margin:4px 0 8px">npm weekly downloads, millions, 1 Aug to 30 Oct 2026.<a class="ev m" href="https://api.npmjs.org/downloads/range/2026-08-01:2026-11-05/satori">M</a> Includes CI and bots, and swings a lot week to week, so read the level and not the last spike.</p>
+    <div class="legend" style="margin-bottom:6px"><span><i class="swatch" style="background:var(--c1)"></i>satori</span><span><i class="swatch" style="background:var(--c2)"></i>@vercel/og</span><span><i class="swatch" style="background:var(--c3)"></i>@takumi-rs/core</span></div>
+    <svg id="npm" viewBox="0 0 900 300" role="img" aria-label="Line chart: satori rises from 3.9 to 6.5 million weekly downloads, vercel og is around 2 to 3 million, takumi rises from 0.29 to 0.64 million"></svg>
+    <div class="tip" id="npmtip" hidden></div>
+    <details><summary>View as a table</summary><div style="overflow-x:auto"><table id="npmtable" style="margin-top:8px;min-width:420px"></table></div></details>
+  </div>
+  <div class="tablewrap" style="margin-top:20px"><table style="min-width:780px">
+    <thead><tr><th>Shift</th><th>Data</th><th>How to use it</th><th>Call</th></tr></thead>
+    <tbody>
+    <tr><td><b>Platforms render for bots</b></td><td>Lovable serves HTML to social bots.<a class="ev p" href="https://docs.lovable.dev/features/seo">P</a></td><td>A chat prompt could replace the proxy. Install becomes one sentence.</td><td><span class="pill high">Do now</span></td></tr>
+    <tr><td><b>App connectors</b></td><td>Daily projects using connectors went from 10,000 to 20,000; 18% of the most popular apps use one. Each launch is a partnership.<a class="ev p" href="https://lovable.dev/blog/how-we-made-lovable-apps-work-with-the-rest-of-your-stack">P</a> A Lovable job post names connectors as the top partner priority.<a class="ev s" href="https://www.growthtalent.org/jobs/partnerships/lovable/senior-partner-marketing-manager-lovable">S</a></td><td>Pitch "OGSnap connector" with outreach data as proof. No open submission process is documented, so custom connectors are the fallback.</td><td><span class="pill high">Pitch at 5 customers</span></td></tr>
+    <tr><td><b>The image endpoint is a sensor</b></td><td>Slack, WhatsApp and Discord visits showed as "direct" in SparkToro's 1,000-visit test.<a class="ev p" href="https://sparktoro.com/blog/new-research-dark-social-falsely-attributes-significant-percentages-of-web-traffic-as-direct">P</a> Unfurl bots request the image and identify themselves.</td><td>Log bot user agents per path: "this page was just shared in Slack". Platforms cache, so it detects shares and doesn't count them. See the Wow section.</td><td><span class="pill med">If a prospect bites</span></td></tr>
+    <tr><td><b>Agent installers</b></td><td>Repo has MCP plan T14. OG Pilot already ships an MCP connector.<a class="ev p" href="https://ogpilot.com">P</a></td><td>Publish one <span class="mono">llms.txt</span> and a copy-paste agent prompt first. An MCP server is T14, after the gate.</td><td><span class="pill med">Cheap add</span></td></tr>
+    <tr><td><b>AI search</b></td><td>Ahrefs: AI Overviews correlate with 58% lower top-result CTR.<a class="ev s" href="https://guptadeepak.com/state-of-ai-search-2026-statistics/">S</a> AI platforms send only about 0.32% of web traffic.<a class="ev s" href="https://seranking.com/blog/chatgpt-referral-traffic-may-2026/">S</a></td><td>Pitch shared links as distribution you own. Don't sell "AI visibility": traffic is tiny, Lovable bundles Semrush, and funded rivals are ahead.</td><td><span class="pill low">Don't pivot</span></td></tr>
+    <tr><td><b>X and links</b></td><td>Musk and Bier say no link throttling.<a class="ev s" href="https://ppc.land/x-drops-year-old-link-penalty-musk-tells-zuckerberg-on-platform/">S</a> OpenTweet's 60 accounts: 1.05× for link posts.<a class="ev v" href="https://opentweet.io/answers/does-x-penalize-links-2026">V</a> NiemanLab's 200 tweets: less reach.<a class="ev s" href="https://www.socialmediatoday.com/news/niemanlab-offers-advice-for-posting-news-on-x/817383/">S</a></td><td>Conflicted evidence. Don't make claims about reach.</td><td><span class="pill low">Watch</span></td></tr>
+    <tr><td><b>Markdown for agents</b></td><td>Cloudflare converts pages on request.<a class="ev s" href="https://www.theregister.com/2026/02/13/cloudflare_markdown_for_ai_crawlers/">S</a></td><td>If asked, add "what AI crawlers see" to <span class="mono">/check</span>. It's a grader tab, not a product.</td><td><span class="pill low">Later</span></td></tr>
+    <tr><td><b>Faster renderers</b></td><td>Local Satori p50 is 69 ms (<span class="mono">todo.md</span> L4).<a class="ev m" href="#method">M</a> Takumi is growing.</td><td>Speed already beats crawler limits. Skip the migration.</td><td><span class="pill low">Skip</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="comps">
+  <div class="head">
+    <div class="eyebrow">From nothing to real money</div>
+    <h2>Money rises with the size of the job, not the quality of the image.</h2>
+  </div>
+  <div class="chart">
+    <div class="legend" style="margin-bottom:10px"><span><i class="swatch" style="background:var(--c1)"></i>Sells images or renders</span><span><i class="swatch" style="background:var(--c3)"></i>Owns a wider job</span></div>
+    <div class="dotaxis"><div></div><div><span>$50K</span><span>$500K</span><span>$5M</span><span>$50M</span><span>$500M</span></div><div></div></div>
+    <div id="dots"></div>
+    <p class="note" style="margin-top:10px">Annual revenue on a log scale. Most figures are self-reported or from third parties, dated differently, and some conflict: Peec has been reported from $4M to $10M, so I plotted the low end. AdCreative's numbers carry over from the September review and were not re-verified.</p>
+  </div>
+  <div class="g3" style="margin-top:20px">
+    <div class="panel"><div class="eyebrow">Exit</div><h3>Prerender.io</h3><p>A solo-run technical utility passed $1M in revenue and became an early saas.group acquisition. Terms undisclosed.<a class="ev s" href="https://saas.group/family">S</a> The most realistic template here: a boring fix, then a sale to a software holding company.</p></div>
+    <div class="panel"><div class="eyebrow">Exit</div><h3>Semrush → Adobe</h3><p>Closed 28 April 2026 for $1.87B.<a class="ev p" href="https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000156/adbe-20260828.htm">P</a> Visibility is a job big buyers pay for. It sets the top of the ladder and says nothing about OGSnap's odds.</p></div>
+    <div class="panel"><div class="eyebrow">Exit</div><h3>AdCreative.ai</h3><p>$15.9M ARR, sold for $38.7M, per our September review.<a class="ev s" href="#sources">S</a> Ad creative sells because it sits beside a budget. Previews have no budget line, so attach to one: the agency's client retainer.</p></div>
+    <div class="panel"><div class="eyebrow">Growth</div><h3>Tally</h3><p>Bootstrapped to a reported $5M ARR.<a class="ev v" href="https://reddit.sentinel-team.org/posts/1sm90qa/snapshots/2026-04-15T22%3A27%3A45.943978Z">V</a> Free core, plus a badge on every public form. Reports of the badge's share of signups range from 10% to 40%.<a class="ev v" href="https://medium.com/the-wisdom-project/how-a-nocode-form-builder-reached-8500-mrr-in-a-crowded-market-tally-d3eb41e33f13">V</a></p></div>
+    <div class="panel"><div class="eyebrow">Growth</div><h3>Carrd</h3><p>One person, about $1M ARR on $19 a year.<a class="ev s" href="https://indiehackers.com/post/hi-im-aj-maker-of-carrd-and-after-2-5m-sites-1m-arr-and-a-funding-round-probably-time-for-an-ama-1b7fcf52fe">S</a> Shows low prices can work with huge top-of-funnel. OGSnap has no funnel yet.</p></div>
+    <div class="panel"><div class="eyebrow">Growth</div><h3>Profound</h3><p>$180M Series D at $1.8B reported in Sept 2026.<a class="ev s" href="https://aiweekly.co/alerts/ai-search-marketing-startup-profound-raises-180m-series-d-at-18b-led-by-sequoia">S</a> Capital is chasing AI visibility, with 100+ tools already.<a class="ev s" href="https://guptadeepak.com/geo-compass/guides/geo-tooling-market-2026/">S</a> Too crowded for a solo entrant.</p></div>
+  </div>
+</section>
+
+<section id="model">
+  <div class="head">
+    <div class="eyebrow">Business model</div>
+    <h2>Recurring per-site revenue, with costs near zero. Sales is the constraint.</h2>
+    <p class="lede">Rendering cost barely registers. On a $9 plan the payment fee is the main cost, and in practice the limit is how many people you can reach.</p>
+  </div>
+  <div class="g2">
+    <div class="panel">
+      <h3>Monthly model</h3>
+      <label class="ctrl" for="m-sites">Site customers at $9 <output id="o-sites"></output><input id="m-sites" type="range" min="0" max="500" step="5" value="40"></label>
+      <label class="ctrl" for="m-ag">Agency customers at $49 <output id="o-ag"></output><input id="m-ag" type="range" min="0" max="500" step="1" value="8"></label>
+      <label class="ctrl" for="m-churn">Monthly churn, assumed <output id="o-churn"></output><input id="m-churn" type="range" min="1" max="15" step="1" value="6"></label>
+      <label class="ctrl" for="m-fixed">Fixed costs per month, estimate <output id="o-fixed"></output><input id="m-fixed" type="range" min="50" max="500" step="10" value="100"></label>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:8px">
+        <div><div class="eyebrow">Net per month</div><div class="res" id="r-net"></div></div>
+        <div><div class="eyebrow">Gross MRR</div><div class="res" id="r-gross"></div></div>
+      </div>
+      <p id="r-note" class="note"></p>
+      <p class="note">Fees use Dodo's international subscription rate, 5.5% + 40¢.<a class="ev p" href="https://dodopayments.com/pricing">P</a> Its payout terms conflict on the page, so payout fees are excluded. Fixed costs come from the September estimate; churn is a placeholder until real customers exist.</p>
+    </div>
+    <div class="panel">
+      <h3>Gate math: your plan's numbers don't add up</h3>
+      <label class="ctrl" for="g-dm">DMs sent <output id="o-dm"></output><input id="g-dm" type="range" min="10" max="300" step="10" value="30"></label>
+      <label class="ctrl" for="g-rep">Reply rate <output id="o-rep"></output><input id="g-rep" type="range" min="5" max="40" step="1" value="20"></label>
+      <label class="ctrl" for="g-close">Replies who pay <output id="o-close"></output><input id="g-close" type="range" min="5" max="60" step="1" value="30"></label>
+      <div style="margin-top:8px"><div class="eyebrow">Expected paying customers</div><div class="res" id="g-res"></div></div>
+      <p id="g-note" class="note"></p>
+      <p style="font-size:15px">The plan expects 10+ replies from 30 DMs, which is 33%. <span class="mono">batch2-findings.md</span> estimates 10 to 30%. And 22 qualified sites won't reach 76 sends. Fix this before starting the clock: source more sites and add agencies, since one agency can bring several sites.</p>
+    </div>
+  </div>
+  <div class="tablewrap" style="margin-top:20px"><table style="min-width:640px">
+    <thead><tr><th>Plan</th><th>Price</th><th>Fee share</th><th>Role</th></tr></thead>
+    <tbody>
+    <tr><td><b>Checker</b></td><td>Free</td><td>None</td><td>The lead magnet. Shareable grade per site, no signup.</td></tr>
+    <tr><td><b>Free with mark</b></td><td>Free, small watermark</td><td>None</td><td>Every shared preview advertises the product. Repo already watermarks trials.</td></tr>
+    <tr><td><b>Site</b></td><td>$9/mo</td><td>8.9% to 9.9% of revenue</td><td>Keep for now. Test $59/yr after the first objections: fee drops to 5.2% to 6.2%.</td></tr>
+    <tr><td><b>Agency</b></td><td>$49/mo, 10 sites</td><td>5.3% to 6.3% of revenue</td><td>The real business. Add white-label reports only if the first agencies ask.</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note" style="margin-top:10px">Break-even at the $100 estimate: 13 Site customers or 3 Agency customers, at the international fee. All prices stay in <span class="mono">apps/web/src/lib/pricing.ts</span>; no change is proposed until the gate.</p>
+</section>
+
+<section id="voices">
+  <div class="head">
+    <div class="eyebrow">The room</div>
+    <h2>What they'd likely say.</h2>
+    <p class="lede">These are simulations built from each person's widely reported principles and each role's normal concerns. They are not quotes, none of these people has seen OGSnap, and the scores are my judgement.<span class="ev j">J</span></p>
+  </div>
+  <div class="g3" id="voicegrid"></div>
+</section>
+
+<section id="swot">
+  <div class="head">
+    <div class="eyebrow">SWOT and how to overcome it</div>
+    <h2>Most of the risk is yours to remove this week.</h2>
+  </div>
+  <div class="swot">
+    <div><h3 style="color:var(--good)">Strengths</h3><ul>
+      <li>Fast, cheap rendering: 69 ms local p50, 20 of 20 passing<a class="ev m" href="#method">M</a><span>Prove it on Vercel in L4, then show it in the Wall.</span></li>
+      <li>Customer previews never error: unknown or canceled sites get a fallback<a class="ev m" href="#method">M</a><span>Sell it as a guarantee.</span></li>
+      <li>A scored list of real prospects with evidence<a class="ev m" href="#method">M</a><span>Turn it into the first original dataset on this niche.</span></li>
+      <li>Cross-platform by design<span>Agencies care. Platforms won't copy it.</span></li>
+    </ul></div>
+    <div><h3 style="color:var(--bad)">Weaknesses</h3><ul>
+      <li>No customers, no deploy, no conversations<a class="ev m" href="#method">M</a><span>Send 10 DMs before finishing deployment.</span></li>
+      <li>Solo founder drifting to planning<a class="ev m" href="#method">M</a><span>Public 14-day counter, DMs before code each morning.</span></li>
+      <li>Seven vendors for zero customers<a class="ev m" href="#method">M</a><span>Accept until the gate. No rewrites.</span></li>
+      <li>Single image URL becomes your customers' dependency<span>Settle the domain first and keep the fallback.</span></li>
+    </ul></div>
+    <div><h3 style="color:var(--link)">Opportunities</h3><ul>
+      <li>800,000 client-work users; Experts need differentiation<a class="ev p" href="https://lovable.dev/blog/introducing-lovable-partner-program">P</a><span>Offer a 30% recurring referral and a client handover report.</span></li>
+      <li>Connectors are growing<a class="ev p" href="https://lovable.dev/blog/how-we-made-lovable-apps-work-with-the-rest-of-your-stack">P</a><span>Bring paying users to the pitch.</span></li>
+      <li>Shares are invisible in analytics<a class="ev p" href="https://sparktoro.com/blog/new-research-dark-social-falsely-attributes-significant-percentages-of-web-traffic-as-direct">P</a><span>Share detection could be the unique hook.</span></li>
+      <li>No trustworthy CTR data exists<span>Publish the first real test and own the citation.</span></li>
+    </ul></div>
+    <div><h3 style="color:var(--warn)">Threats</h3><ul>
+      <li>Lovable generates per-route images<a class="ev j" href="#market">J</a><span>Sell cross-platform proof. Treat a launch as a sign to widen scope.</span></li>
+      <li>Coding agents write it for free<a class="ev m" href="https://api.npmjs.org/downloads/point/last-week/satori">M</a><span>Non-developers and agencies buy the outcome and monitoring.</span></li>
+      <li>$50/yr rival<a class="ev p" href="https://ogpilot.com">P</a><span>Win on install and proof. Never get into a price war.</span></li>
+      <li>Vitamin, not a painkiller: SocialSeal has 1 review in 3 years<a class="ev p" href="https://apps.shopify.com/socialseal-og-image-generator">P</a><span>The kill rule handles this. Respect it.</span></li>
+      <li>AI subscription apps retain worse: 21.1% vs 30.7% annually<a class="ev s" href="https://dev.to/zaraai_0b75675ddc9204c716/ai-apps-generate-41-more-revenue-per-user-but-lose-79-of-annual-subscribers-before-month-13-485a">S</a><span>Abandoned sites churn. Agencies with many clients smooth it out.</span></li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="wow">
+  <div class="head">
+    <div class="eyebrow">Holy sh*t moments</div>
+    <h2>Five moments nobody else has combined.</h2>
+    <p class="lede">These are concept demos with sample content. None exists as a shipped flow yet. Under the repo's rule, each one needs a prospect asking before it gets built, except the Gift, which is just how you send DMs.</p>
+  </div>
+
+  <div class="g2">
+    <div class="panel">
+      <div class="eyebrow">1 · The Wall</div>
+      <h3>Paste a URL. Watch every page get its own card.</h3>
+      <canvas id="wall" width="800" height="419" aria-label="Animated grid of 1,081 preview cards filling in"></canvas>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <div><span class="count" id="wallcount">1,081</span> <span class="note">pages, like selected.site</span></div>
+        <button id="wallrun">Run the wall</button>
+      </div>
+      <p class="note">1,081 × 69 ms is 75 s one at a time. 8 at once would be about 9 s, an estimate that assumes local speed holds in production. The animation runs faster for show.</p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow">2 · Phone Proof</div>
+      <h3>See the actual share before anyone else does.</h3>
+      <div class="btns" style="margin:0" role="group" aria-label="Platform">
+        <button data-p="Slack" aria-pressed="true">Slack</button><button data-p="WhatsApp" aria-pressed="false">WhatsApp</button><button data-p="LinkedIn" aria-pressed="false">LinkedIn</button><button data-p="X" aria-pressed="false">X</button>
+        <button id="fix" aria-pressed="true" style="margin-left:auto">Fixed: on</button>
+      </div>
+      <div class="sim"><div class="bubble" id="bub">
+        <div class="who"><b id="bwho">Slack</b><span id="bmsg" class="muted">Check out the pricing guide</span></div>
+        <div class="pv" id="pv"><strong id="pvt">Trail passes, explained</strong><span>northwind-trails.example/guides/passes</span></div>
+        <div class="tt"><span id="btt">Trail passes, explained</span><em>northwind-trails.example</em></div>
+      </div></div>
+      <p class="note">Sample brand. The checker at <span class="mono">/check</span> already shows X, LinkedIn and Slack views, so this is a polish job.</p>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:20px">
+    <div class="panel">
+      <div class="eyebrow">3 · The Share Radar</div>
+      <h3>"Your pricing page was just shared in Slack."</h3>
+      <div class="radar">
+        <svg viewBox="0 0 420 240" role="img" aria-label="Unfurl bots from five platforms flow into one page">
+          <circle class="ring" cx="210" cy="120" r="48"/>
+          <path class="flow" d="M50 30 Q130 60 192 110"/><path class="flow" d="M36 120 H182"/><path class="flow" d="M50 210 Q130 180 192 130"/><path class="flow" d="M370 40 Q290 70 228 110"/><path class="flow" d="M370 200 Q290 170 228 130"/>
+          <rect x="178" y="97" width="64" height="46" rx="5" fill="var(--c2)"/>
+          <text x="210" y="125" text-anchor="middle" fill="#fff" font-size="12" font-family="var(--mono)">/pricing</text>
+          <g font-family="var(--mono)" font-size="12" fill="var(--ink)"><text x="10" y="24">Slack</text><text x="4" y="116">WhatsApp</text><text x="6" y="228">LinkedIn</text><text x="350" y="30">X</text><text x="340" y="218">Discord</text></g>
+        </svg>
+        <div class="log" aria-label="Mock log"><div>mock data</div><div>09:14 Slackbot /pricing</div><div>09:52 WhatsApp /guides/passes</div><div>11:03 LinkedInBot /pricing</div><div>13:27 Discordbot /launch</div></div>
+      </div>
+      <p class="note">Why this could be the 10× hook: Slack, WhatsApp and Discord visits showed as "direct" in analytics.<a class="ev p" href="https://sparktoro.com/blog/new-research-dark-social-falsely-attributes-significant-percentages-of-web-traffic-as-direct">P</a> Limit: platforms cache images, so this flags that a share happened and undercounts how many. OG Pilot lists "social analytics" too, so check what it reports before calling this unique.</p>
+    </div>
+    <div class="panel">
+      <div class="eyebrow">4 · The Gift</div>
+      <h3>The first touch is their own page, already fixed.</h3>
+      <pre class="copy" id="dm">Hi {name}, I shared {inner page} from {site} and it showed {what it showed}.
+
+I made what it could look like instead, attached. It's yours whether or not we ever talk.
+
+I can have this running on all {N} pages by tomorrow. Want it?</pre>
+      <div><button data-copy="dm">Copy DM</button></div>
+      <div class="eyebrow" style="margin-top:10px">5 · One sentence install</div>
+      <pre class="copy" id="prompt">Add a head tag to every route: og:image and twitter:image set to
+https://{image-domain}/v1/site/{siteId}/og.png?path={current route path}
+Also set twitter:card to summary_large_image. Remove any other og:image tags. Change nothing else.</pre>
+      <div><button data-copy="prompt">Copy prompt</button></div>
+      <p class="note">Draft. Untested on either Lovable stack until L10, and the image domain has to be settled first.</p>
+    </div>
+  </div>
+
+  <div class="tablewrap" style="margin-top:20px"><table style="min-width:760px">
+    <thead><tr><th>Layer</th><th>Today</th><th>The delight target</th><th>Test</th></tr></thead>
+    <tbody>
+    <tr><td><b>UI</b></td><td>Before/after demo</td><td>The Wall: full site, not one card</td><td>Most first-time users scroll it, measured with analytics</td></tr>
+    <tr><td><b>UX</b></td><td>URL, then email for snippet</td><td>No form until they want it live</td><td>Under 60 s from paste to first fixed page</td></tr>
+    <tr><td><b>DX</b></td><td>One URL, no SDK</td><td>Deterministic <span class="mono">og.png?path=</span>, documented in one page</td><td>A developer installs without reading anything else</td></tr>
+    <tr><td><b>CX</b></td><td>Fallback image, concierge</td><td>"Your previews held up this week" email, with share events</td><td>Open rate, and cancels after receiving it</td></tr>
+    <tr><td><b>AX</b></td><td>Lovable prompt (needs update)</td><td><span class="mono">llms.txt</span>, agent prompt, then MCP (T14)</td><td>Claude Code or Lovable's agent completes install unaided</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tablewrap" style="margin-top:20px"><table style="min-width:760px">
+    <thead><tr><th>10× claim to prove</th><th>Alternative today</th><th>OGSnap target</th><th>Honest limit</th></tr></thead>
+    <tbody>
+    <tr><td><b>Labour on many-page sites</b></td><td>1,081 images at 5 min each is about 90 hours (assumed pace)</td><td>One prompt, then under a few minutes of machine time</td><td>Near zero value on a one-page site. Skip those prospects.</td></tr>
+    <tr><td><b>Setup across platforms</b></td><td>Template and field mapping per CMS (Orshot); DNS plus guides (OG Pilot)</td><td>One flow, any stack that can set a head tag</td><td>Unproven until L10 and L11 pass</td></tr>
+    <tr><td><b>Seeing what happens</b></td><td>Slack and WhatsApp sharing shows as direct</td><td>Per-page share events</td><td>Detects shares, doesn't count them</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="gtm">
+  <div class="head">
+    <div class="eyebrow">Go to market</div>
+    <h2>Blitz through people who already have the sites.</h2>
+    <p class="lede">Blitzscaling needs capital, and you don't have it or need it. Your version is concentrated: one audience, one proof asset, 14 days.</p>
+  </div>
+  <div class="tablewrap"><table style="min-width:800px">
+    <thead><tr><th>Move</th><th>Why it might work</th><th>Evidence</th><th>Cost</th></tr></thead>
+    <tbody>
+    <tr><td><b>Gift DMs</b><br><small>Proven</small></td><td>Prospect sees their own fixed page. Nothing to imagine.</td><td>22 qualified sites<a class="ev m" href="#method">M</a>; reply rate unknown</td><td>20 min per contact, per repo</td></tr>
+    <tr><td><b>Agency audit drop</b><br><small>Proven</small></td><td>Audit one agency client. Experts can be found in Lovable's directory and Framer's.</td><td>800K client-work users, 25% earn mostly from it<a class="ev p" href="https://lovable.dev/blog/introducing-lovable-partner-program">P</a></td><td>About 30 min each</td></tr>
+    <tr><td><b>Shareable grader</b><br><small>Proven</small></td><td><span class="mono">/check</span> gives a letter grade and a link to share. Same mechanic as HubSpot's Website Grader.</td><td>Reported over 2M sites analyzed.<a class="ev p" href="https://www.hubspot.com/blog/bid/5539/website-grader-analyzes-over-2-million-sites">P</a> Lead results aren't public</td><td>Half a day</td></tr>
+    <tr><td><b>Watermark loop</b><br><small>Proven elsewhere</small></td><td>Each free preview is seen by everyone in the chat. Most viral surface available.</td><td>Tally badge: 10% to 40% of signups.<a class="ev v" href="https://medium.com/the-wisdom-project/how-a-nocode-form-builder-reached-8500-mrr-in-a-crowded-market-tally-d3eb41e33f13">V</a> Unproven on share images, which people may resent</td><td>Exists</td></tr>
+    <tr><td><b>State of Link Previews</b><br><small>Unconventional</small></td><td>Publish the dataset: "% of AI-built sites where every link looks the same". Scale to 1,000 sites. Newsletters and the platforms themselves can cite it.</td><td>Scripts exist. Sample is 110 sites today<a class="ev m" href="#method">M</a></td><td>1 to 2 days</td></tr>
+    <tr><td><b>Give away the fix</b><br><small>Unconventional</small></td><td>Post the free per-route prompt in Lovable communities. Those who want images without effort upgrade.</td><td>Third-party "broken preview" guides exist<a class="ev s" href="https://harvv.com/fix-lovable-seo">S</a></td><td>2 hours</td></tr>
+    <tr><td><b>Client handover report</b><br><small>Unconventional</small></td><td>A branded "every link verified" PDF agencies attach at launch. Makes them look thorough, and it travels to their clients.</td><td>No data. Test with first agency<a class="ev j" href="#swot">J</a></td><td>1 day, on request</td></tr>
+    <tr><td><b>Answer engines</b><br><small>Emerging</small></td><td>Write for "fix og image lovable". Tally reports ChatGPT as its top referral source.<a class="ev v" href="https://be.linkedin.com/in/mariemartens">V</a></td><td>AI still only ~0.32% of web traffic overall<a class="ev s" href="https://seranking.com/blog/chatgpt-referral-traffic-may-2026/">S</a></td><td>A few pages</td></tr>
+    <tr><td><b>Mention bot</b><br><small>Wild card</small></td><td>On X, tag the bot under any link, get the fixed card. Mention-only, never unsolicited, so it isn't spam.</td><td>No data<a class="ev j" href="#swot">J</a></td><td>After gate</td></tr>
+    </tbody>
+  </table></div>
+  <div class="g3" style="margin-top:20px">
+    <div class="panel"><div class="eyebrow">Days 1–3 · 9–11 Nov</div><h3>Send before you deploy</h3><p>Merge PR #7. Settle the domain. Find 20 contacts. Render 10 gift images with the local route and hand-set colors. Send 10 DMs.</p><p class="note">Exit: 10 sent, by Wednesday night.</p></div>
+    <div class="panel"><div class="eyebrow">Days 4–8 · 12–16 Nov</div><h3>Go wider, deploy in parallel</h3><p>Audit and DM 15 agencies. Probe another 200 sites. Publish the first data post. Run Phase L's charge path. Tell anyone who says yes: live within 48 hours.</p><p class="note">Exit: 60+ sends, a live $9 charge.</p></div>
+    <div class="panel"><div class="eyebrow">Days 9–14 · 17–22 Nov</div><h3>Install by hand, charge from day one</h3><p>Do every install yourself, and watch where people get stuck. Record the reason for every no. Start the A/B test with your first customer.</p><p class="note">Early read, 22 Nov: ≥3 paid is on track. Final gate, 9 Dec: ≥5 paid.</p></div>
+  </div>
+</section>
+
+<section id="live">
+  <div class="head">
+    <div class="eyebrow">Required to go live</div>
+    <h2>Roughly 11 to 26 hours between you and a real charge.</h2>
+    <p class="lede">Estimated from Phase L sizes in <span class="mono">tasks/todo.md</span>. I'm challenging one rule there: Checkpoint L blocks all DMs. A gift image only needs the render route, which already works locally. Asking for interest first means you deploy for someone real.</p>
+  </div>
+  <div class="ring-wrap">
+    <svg width="72" height="72" viewBox="0 0 72 72" role="img" aria-label="Checklist progress"><circle cx="36" cy="36" r="30" fill="none" stroke="var(--tint)" stroke-width="8"/><circle id="ring" cx="36" cy="36" r="30" fill="none" stroke="var(--c1)" stroke-width="8" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="188.5" transform="rotate(-90 36 36)"/></svg>
+    <div><div class="res" id="done">0 / 16</div><small>Ticks are saved in this browser only. Nothing is ticked because no task is fully complete in <span class="mono">todo.md</span>.</small></div>
+  </div>
+  <div class="g3" id="checks">
+    <div class="panel"><div class="eyebrow">Before the first DM</div>
+      <label class="check"><input type="checkbox" id="c1"><span>Confirm <span class="mono">ogsnap.dev</span> ownership (L0)<small>It serves a parking page now</small></span><span class="pill high">you</span></label>
+      <label class="check"><input type="checkbox" id="c2"><span>Merge PR #7, Satori route<small>CI <span class="mono">checks</span> pass. Needs your go-ahead</small></span><span class="pill high">you</span></label>
+      <label class="check"><input type="checkbox" id="c3"><span>Local gift images for 10 sites<small>Brand colors by hand</small></span><span class="pill med">me + you</span></label>
+      <label class="check"><input type="checkbox" id="c4"><span>Owner contacts for top 20<small>Manual, about 20 min each</small></span><span class="pill high">you</span></label>
+    </div>
+    <div class="panel"><div class="eyebrow">Before the first charge</div>
+      <label class="check"><input type="checkbox" id="c5"><span>Clerk + Convex JWT (L1)</span><span class="pill high">you</span></label>
+      <label class="check"><input type="checkbox" id="c6"><span>Dodo products and webhook (L2)</span><span class="pill high">you</span></label>
+      <label class="check"><input type="checkbox" id="c7"><span>R2 and Firecrawl keys (L3)<small>Runs the 10-URL brand test</small></span><span class="pill high">you</span></label>
+      <label class="check"><input type="checkbox" id="c8"><span>Vercel deploy, render env, Convex prod (L4–L6)</span><span class="pill med">me + you</span></label>
+      <label class="check"><input type="checkbox" id="c9"><span>Billing test end to end (L8)</span><span class="pill med">me + you</span></label>
+      <label class="check"><input type="checkbox" id="c10"><span>Privacy, terms, support email (L12 part)<small>Dodo may need them for live mode</small></span><span class="pill med">me + you</span></label>
+      <label class="check"><input type="checkbox" id="c11"><span>Live mode, own $9, refund (L9)</span><span class="pill high">you</span></label>
+    </div>
+    <div class="panel"><div class="eyebrow">Before promising per-page</div>
+      <label class="check"><input type="checkbox" id="c12"><span>Update Lovable prompt, test both stacks (L10)</span><span class="pill med">me + you</span></label>
+      <label class="check"><input type="checkbox" id="c13"><span>Pre-render from sitemap at install<small>New repair, not in Phase L</small></span><span class="pill low">me</span></label>
+      <label class="check"><input type="checkbox" id="c14"><span>Edge worker deploy (L11)<small>Only if a site can't use head tags</small></span><span class="pill low">you</span></label>
+      <label class="check"><input type="checkbox" id="c15"><span>Smoke test, alerting (L7, L12)</span><span class="pill low">me + you</span></label>
+      <label class="check"><input type="checkbox" id="c16"><span>Failed-payment events (L12)</span><span class="pill low">me</span></label>
+    </div>
+  </div>
+</section>
+
+<section id="decide">
+  <div class="head">
+    <div class="eyebrow">Pivot or not</div>
+    <h2>Six options, one bet, one exit.</h2>
+  </div>
+  <div class="tablewrap"><table style="min-width:760px">
+    <thead><tr><th>Option</th><th>Evidence for</th><th>Evidence against</th><th>Call</th></tr></thead>
+    <tbody>
+    <tr><td><b>Agency link autopilot</b></td><td>800K client-work users; cross-platform moat; $49 has room for fees</td><td>Zero agency conversations yet; OG Pilot's $50/yr</td><td><span class="pill low">Bet here</span></td></tr>
+    <tr><td><b>Maker autopilot at $9</b></td><td>22 qualified sites</td><td>6% yield unfiltered; Lovable closing in; SocialSeal's single review</td><td><span class="pill med">Secondary</span></td></tr>
+    <tr><td><b>Connector or API for AI builders</b></td><td>Connector growth doubled</td><td>Needs a partnership and proof of users</td><td><span class="pill med">At 5 customers</span></td></tr>
+    <tr><td><b>Pivot to AI visibility</b></td><td>$500M+ flowing in, entry prices $29 to ~$95<a class="ev s" href="https://www.thrivestack.ai/research/ai-visibility-tools-landscape-2026">S</a></td><td>100+ tools, Adobe now owns Semrush, thin AI traffic</td><td><span class="pill high">No</span></td></tr>
+    <tr><td><b>Prerender clone</b></td><td>$59/mo market exists</td><td>Lovable made it unnecessary on its hosting</td><td><span class="pill high">No</span></td></tr>
+    <tr><td><b>Open-source and archive</b></td><td>Your pre-committed rule. Portfolio value</td><td>Abandons the option</td><td><span class="pill med">If gate fails</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="callout" style="margin-top:20px">
+    <div class="eyebrow">Monday morning</div>
+    <div class="quote" style="max-width:30ch">Before any more code, send one DM with one fixed image.</div>
+    <p>If nothing but polite silence comes back after two rounds of messaging, trigger the gate early. You'll have spent two weeks and kept your weekends. A dead demand signal is a fine result, because it's the answer the last 13,000 lines of docs never gave you.</p>
+  </div>
+</section>
+
+<section id="method">
+  <div class="head"><div class="eyebrow">Method and limits</div><h2 style="font-size:32px">What this rests on.</h2></div>
+  <div class="g2">
+    <div class="panel"><h3>Measured by us</h3>
+      <p>Re-probe, 7 Nov 2026: fetched home and one sitemap inner page with a Twitterbot user agent for selected.site, amsterdamtradingjobs.com, hadoseo.com, musebox.io, w3wu.com, easytraveldeal.com, duftkombination.de and willyoumerry.me. Regex on the meta tag, so unusual attribute order may be missed. selected.site and easytraveldeal.com returned no sampled inner page.</p>
+      <p>Repo facts come from <span class="mono">tasks/*.md</span>, <span class="mono">.claudedocs/outreach/*</span>, <span class="mono">convex/sites/*</span>, <span class="mono">site-detail.tsx</span>, git history and <span class="mono">gh pr view 7</span>. Line counts include all tracked non-lock files.</p>
+      <p>Parking evidence: an HTTP fetch of <span class="mono">www.ogsnap.dev</span>. It doesn't establish who owns the domain.</p></div>
+    <div class="panel"><h3>What I couldn't establish</h3>
+      <p>Real willingness to pay. A primary CTR lift figure. Churn for AI-built sites. Bannerbear's current revenue. Whether Lovable's agent can create per-route images on request. What OG Pilot's analytics reports. Whether per-route tags work with <span class="mono">og.png?path=</span> on both Lovable stacks.</p>
+      <p>Search results skew toward vendor blogs. Where sources conflicted I said so and leaned on the primary document, such as the SEC filing's $1.87B over a press figure of $4.5B. Dollar outcomes and 800-account sizing are illustrations, not forecasts.</p></div>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="head"><div class="eyebrow">Sources</div><h2 style="font-size:32px">Every outside link used.</h2></div>
+  <ol class="src">
+    <li><a href="https://docs.lovable.dev/features/seo">Lovable docs: SEO and AI search</a></li>
+    <li><a href="https://lovable.dev/blog/introducing-lovable-partner-program">Lovable Partner Program</a></li>
+    <li><a href="https://lovable.dev/blog/how-we-made-lovable-apps-work-with-the-rest-of-your-stack">Lovable: connectors engineering post</a></li>
+    <li><a href="https://www.createwith.com/tool/lovable/updates/lovable-custom-connectors-open-workspaces-to-any-http-api">Createwith: Custom Connectors</a></li>
+    <li><a href="https://www.growthtalent.org/jobs/partnerships/lovable/senior-partner-marketing-manager-lovable">Lovable job post (via GrowthTalent)</a></li>
+    <li><a href="https://www.techtimes.com/articles/318072/20260609/lovable-says-it-hit-500-million-run-rate-vibe-codings-maintenance-test-still-looms.htm">Tech Times: Lovable $500M</a></li>
+    <li><a href="https://ogpilot.com">OG Pilot</a></li>
+    <li><a href="https://opengraphplus.com">OpenGraph+</a></li>
+    <li><a href="https://orshot.com/blog/framer-og-images">Orshot: Framer OG images</a></li>
+    <li><a href="https://trustmrr.com/startup/orshot-com">TrustMRR: Orshot</a></li>
+    <li><a href="https://www.framer.com/community/marketplace/plugins/og-image-generator/">Framer: OG Image Generator</a></li>
+    <li><a href="https://apps.shopify.com/socialseal-og-image-generator">Shopify App Store: SocialSeal</a></li>
+    <li><a href="https://webflow.com/apps/detail/wog">Webflow: WOG</a></li>
+    <li><a href="https://www.bannerbear.com/blog/bannerbear-vs-placid/">Bannerbear vs Placid</a></li>
+    <li><a href="https://superframeworks.com/blog/bannerbear">Superframeworks: Bannerbear</a></li>
+    <li><a href="https://superframeworks.com/case-study/screenshotone">Superframeworks: ScreenshotOne</a></li>
+    <li><a href="https://prerender.io/pricing/">Prerender.io pricing</a></li>
+    <li><a href="https://saas.group/family">saas.group family</a></li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/0000796343/000079634326000156/adbe-20260828.htm">Adobe 10-Q (Semrush close)</a></li>
+    <li><a href="https://aiweekly.co/alerts/ai-search-marketing-startup-profound-raises-180m-series-d-at-18b-led-by-sequoia">AI Weekly: Profound Series D</a></li>
+    <li><a href="https://www.thrivestack.ai/research/ai-visibility-tools-landscape-2026">ThriveStack: AI visibility landscape</a></li>
+    <li><a href="https://guptadeepak.com/geo-compass/guides/geo-tooling-market-2026/">GEO tooling market 2026</a></li>
+    <li><a href="https://resources.rework.com/tools/aeo-ai-visibility/peec-ai-vs-otterly-vs-rankscale">Rework: Peec vs Otterly pricing</a></li>
+    <li><a href="https://omr.com/en/reviews/product/otterly-ai/pricing">OMR: Otterly pricing</a></li>
+    <li><a href="https://sparktoro.com/blog/new-research-dark-social-falsely-attributes-significant-percentages-of-web-traffic-as-direct">SparkToro: dark social test</a></li>
+    <li><a href="https://www.hubspot.com/blog/bid/5539/website-grader-analyzes-over-2-million-sites">HubSpot: Website Grader, 2M sites</a></li>
+    <li><a href="https://reddit.sentinel-team.org/posts/1sm90qa/snapshots/2026-04-15T22%3A27%3A45.943978Z">Tally founder post (Reddit snapshot)</a></li>
+    <li><a href="https://medium.com/the-wisdom-project/how-a-nocode-form-builder-reached-8500-mrr-in-a-crowded-market-tally-d3eb41e33f13">Tally growth write-up</a></li>
+    <li><a href="https://be.linkedin.com/in/mariemartens">Marie Martens, LinkedIn</a></li>
+    <li><a href="https://indiehackers.com/post/hi-im-aj-maker-of-carrd-and-after-2-5m-sites-1m-arr-and-a-funding-round-probably-time-for-an-ama-1b7fcf52fe">Carrd AMA, Indie Hackers</a></li>
+    <li><a href="https://seranking.com/blog/chatgpt-referral-traffic-may-2026/">SE Ranking: AI referral traffic</a></li>
+    <li><a href="https://guptadeepak.com/state-of-ai-search-2026-statistics/">State of AI search 2026 (cites Ahrefs)</a></li>
+    <li><a href="https://ppc.land/x-drops-year-old-link-penalty-musk-tells-zuckerberg-on-platform/">PPC Land: X link penalty</a></li>
+    <li><a href="https://opentweet.io/answers/does-x-penalize-links-2026">OpenTweet: link penalty data</a></li>
+    <li><a href="https://www.socialmediatoday.com/news/niemanlab-offers-advice-for-posting-news-on-x/817383/">Social Media Today on NiemanLab</a></li>
+    <li><a href="https://www.theregister.com/2026/02/13/cloudflare_markdown_for_ai_crawlers/">The Register: Markdown for Agents</a></li>
+    <li><a href="https://www.pulse.bot/marketing/news/google-brings-pomelli-in-english-to-small-businesses-in-europe-a4a6041e-4c7f-4a58-a839-6d0060e1733d/">Pomelli expansion</a></li>
+    <li><a href="https://seojuice.com/tools/seo-mythbusters/do-og-tags-improve-ctr">SEOJuice: OG tags and CTR</a></li>
+    <li><a href="https://dev.to/zaraai_0b75675ddc9204c716/ai-apps-generate-41-more-revenue-per-user-but-lose-79-of-annual-subscribers-before-month-13-485a">DEV post on RevenueCat retention</a></li>
+    <li><a href="https://harvv.com/fix-lovable-seo">Harvv: fix Lovable SEO</a></li>
+    <li><a href="https://dodopayments.com/pricing">Dodo Payments pricing</a></li>
+    <li><a href="https://api.npmjs.org/downloads/point/last-week/satori">npm downloads API</a></li>
+    <li>In the repo: <span class="mono">.claudedocs/strategy-review-2026-09.md</span> for AdCreative and earlier figures</li>
+  </ol>
+</section>
+</main>
+<footer><div class="wrap">Prepared 7 Nov 2026 for the OGSnap founder. All recommendations are judgement calls resting on the evidence graded above.</div></footer>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const motion=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+addEventListener('scroll',()=>{const h=document.documentElement;$('#bar i').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%'},{passive:true});
+
+$$('[data-f]').forEach(b=>b.onclick=()=>{$$('[data-f]').forEach(x=>x.setAttribute('aria-pressed',x===b));$$('#rivals tbody tr').forEach(r=>r.hidden=b.dataset.f!=='all'&&r.dataset.k!==b.dataset.f)});
+
+/* npm chart */
+const weeks=[...Array(13)].map((_,i)=>{const d=new Date(Date.UTC(2026,7,1+i*7));return d.toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'})});
+const series=[
+ {n:'satori',c:'--c1',v:[3943110,4367602,3724041,3417614,3829493,2846509,3392541,4129975,4798672,4331175,3834849,3054234,6464092]},
+ {n:'@vercel/og',c:'--c2',v:[2578541,2870395,2249622,1868683,2082994,1588487,1783444,2152867,2363282,2144998,1796151,1425752,2737484]},
+ {n:'@takumi-rs/core',c:'--c3',v:[285621,331290,376030,355255,364514,271205,341364,387441,479783,542112,539977,278247,639378]}];
+function npm(){
+ const W=900,H=300,L=44,R=120,T=12,B=28,max=7e6;
+ const x=i=>L+i*(W-L-R)/12,y=v=>H-B-(v/max)*(H-B-T);
+ let s='';
+ [0,2e6,4e6,6e6].forEach(v=>{s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text class="axis" x="${L-8}" y="${y(v)+4}" text-anchor="end">${v/1e6}M</text>`});
+ weeks.forEach((w,i)=>{if(i%3===0)s+=`<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${w}</text>`});
+ series.forEach(o=>{s+=`<polyline fill="none" stroke="var(${o.c})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${o.v.map((v,i)=>x(i)+','+y(v)).join(' ')}"/><circle cx="${x(12)}" cy="${y(o.v[12])}" r="4" fill="var(${o.c})" stroke="var(--surface)" stroke-width="2"/><text x="${x(12)+10}" y="${y(o.v[12])+4}" fill="var(--ink)" font-size="12" font-family="var(--mono)">${o.n}</text>`});
+ s+=`<line id="xh" y1="${T}" y2="${H-B}" stroke="var(--muted)" stroke-dasharray="3 3" visibility="hidden"/>`;
+ const g=$('#npm');g.innerHTML=s;
+ const tip=$('#npmtip'),box=$('#npmchart'),xh=$('#xh');
+ g.onpointermove=e=>{const r=g.getBoundingClientRect(),px=(e.clientX-r.left)/r.width*W;const i=Math.max(0,Math.min(12,Math.round((px-L)/((W-L-R)/12))));
+  xh.setAttribute('x1',x(i));xh.setAttribute('x2',x(i));xh.setAttribute('visibility','visible');
+  tip.hidden=false;tip.innerHTML='Week of '+weeks[i]+'<br>'+series.map(o=>o.n+' '+(o.v[i]/1e6).toFixed(2)+'M').join('<br>');
+  const b=box.getBoundingClientRect();let lx=e.clientX-b.left+14;if(lx>b.width-190)lx-=210;tip.style.left=Math.max(4,lx)+'px';tip.style.top=(r.top-b.top+20)+'px'};
+ g.onpointerleave=()=>{tip.hidden=true;xh.setAttribute('visibility','hidden')};
+ $('#npmtable').innerHTML='<thead><tr><th>Week of</th>'+series.map(o=>'<th>'+o.n+'</th>').join('')+'</tr></thead><tbody>'+weeks.map((w,i)=>'<tr><td>'+w+'</td>'+series.map(o=>'<td>'+o.v[i].toLocaleString('en-US')+'</td>').join('')+'</tr>').join('')+'</tbody>';
+}
+npm();
+
+/* comps dots: log scale, $50K to $500M spans the four 10× intervals */
+const comps=[['Orshot',96e3,'~$96K, annualized','--c1'],['ScreenshotOne',384e3,'$32K MRR','--c1'],['Bannerbear',630e3,'~$630K, older','--c1'],['Carrd',1e6,'~$1M','--c3'],['Prerender.io',1e6,'$1M+ at sale','--c3'],['Peec AI',4e6,'$4M+, disputed','--c3'],['Tally',5e6,'$5M reported','--c3'],['Profound',11e6,'$11M, unverified','--c3'],['AdCreative.ai',15.9e6,'$15.9M; sold $38.7M','--c1'],['Lovable',5e8,'$500M+ reported','--c3']];
+$('#dots').innerHTML=comps.map(c=>{const p=(Math.log10(c[1])-Math.log10(5e4))/4*100;return `<div class="dotrow" title="${c[0]}: ${c[2]}"><div>${c[0]}</div><div class="dotline"><i style="left:${p}%;background:var(${c[3]})"></i></div><div class="muted">${c[2]}</div></div>`}).join('');
+
+/* voices */
+const V=[
+['Elon Musk lens',2,'First-principles reduction','Question the requirement. Why are there seven vendors, a plan, a runbook and 28 docs for a product with no customer? Delete until it hurts, then add back only what breaks.','Delete Clerk from the first installs if a DM and a payment link get you paid.'],
+['Jeff Bezos lens',5,'Working backwards, what won\'t change','People will always want shared links to look right. Good. Now write the press release from an agency owner\'s side. If the customer quote sounds weak, the product is. Their margin is OG Pilot\'s opportunity, and yours is proof.','Write a one-page PR/FAQ for the agency buyer. Show it to 3 agencies.'],
+['Steve Jobs lens',6,'Experience first, focus means no','The moment is watching your whole site come alive. That part is good. Everything around it, plans, MCP, proxies, is noise. Pick one thing the user feels and make it perfect.','Cut the landing page to a URL box and the Wall.'],
+['Staff engineer',6,'Failure modes','The stable-URL design is right, and the fallback is smart. Two things worry me: a first request can return the site image and get cached by platforms, and the Lovable prompt assumes a stack new apps no longer use.','Sitemap pre-render at install. Rewrite the prompt. Test both stacks.'],
+['AI product manager',6,'Agents as users','No LLM is needed in the render path, and that\'s a feature. The user interface is increasingly someone else\'s agent, so the real onboarding is whether Lovable\'s agent can install you from one sentence. Measure that as an eval.','10-project install eval, pass rate as the metric.'],
+['CEO',4,'Focus and decision quality','I see good thinking and no market contact. You\'ve already pre-committed to a kill rule, which is rare. The risk is that the clock never starts because the rule says it starts at the first DM.','Start it Monday.'],
+['CFO',5,'Unit economics','Costs are trivial and fees are not: 8.9% to 9.9% on $9, 5.3% to 6.3% on $49. Three agencies or 13 sites cover estimated fixed costs. Cash risk is tiny, so the real cost is your time. Value that honestly.','Set a weekly hour budget. Test annual after the gate.'],
+['CTO',7,'Architecture','Satori on Vercel removes a host, and 69 ms is plenty. PR #7 has passed CI and has sat for a month. Don\'t touch the stack. Merge it, deploy it, and put an alert on it.','Merge, deploy, smoke test.'],
+['CMO',5,'Positioning','"Every page looks great when shared" is clear but soft, and the proof is vendor folklore. Buy credibility with your own data. A study of 1,000 AI-built sites is more defensible than any ad.','Ship the State of Link Previews post.'],
+['GTM lead',6,'Channel fit','Makers are a scattered audience. Agencies concentrate sites, sit in directories, and repeat. Lovable\'s 800,000 client-work figure is the most useful number here, and 81% of survey respondents are outside the US, so don\'t assume US-only hours or prices.','Build a 50-name agency list by Wednesday.'],
+['Head of sales',3,'Pipeline','There is no pipeline, so there\'s nothing for me to judge. Twenty-two names without one contact isn\'t a list. The gift DM is strong. Now I need your objections log.','10 sends a day, log every no.']];
+$('#voicegrid').innerHTML=V.map(v=>`<article class="voice"><header><h3>${v[0]}</h3><span class="score">${v[1]}/10</span></header><div class="meter" role="img" aria-label="${v[1]} out of 10"><i style="width:${v[1]*10}%"></i></div><div class="eyebrow">${v[2]}</div><p>${v[3]}</p><p class="do"><b>Next step:</b> ${v[4]}</p></article>`).join('');
+
+/* wall */
+const cv=$('#wall'),cx=cv.getContext('2d');const N=1081;
+function drawWall(n){
+ const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;if(!r.width)return;cv.width=r.width*d;cv.height=r.height*d;cx.setTransform(d,0,0,d,0,0);
+ const a=r.width/r.height,rows=Math.ceil(Math.sqrt(N/(a/1.91))),cols=Math.ceil(N/rows),w=r.width/cols,h=r.height/rows;
+ const pal=[css('--c1'),css('--c2'),css('--c3')],bg=css('--line');
+ for(let i=0;i<N;i++){const X=(i%cols)*w,Y=Math.floor(i/cols)*h;cx.fillStyle=i<n?pal[(i*7+Math.floor(i/5))%3]:bg;cx.fillRect(X+.5,Y+.5,Math.max(1,w-1),Math.max(1,h-1))}
+}
+let raf;function run(){if(!motion){drawWall(N);return}cancelAnimationFrame(raf);const t0=performance.now(),D=3200;(function f(t){const p=Math.min(1,(t-t0)/D),n=Math.floor(N*p*p*(3-2*p));drawWall(n);$('#wallcount').textContent=n.toLocaleString('en-US');if(p<1)raf=requestAnimationFrame(f)})(t0)}
+drawWall(N);$('#wallrun').onclick=run;addEventListener('resize',()=>drawWall(N));
+if(motion&&'IntersectionObserver'in window){let once=false;new IntersectionObserver((e,o)=>{if(e[0].isIntersecting&&!once){once=true;run();o.disconnect()}},{threshold:.5}).observe(cv)}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>drawWall(N));
+
+/* simulator */
+let plat='Slack',fixed=true;const msg={Slack:'Check out the passes guide',WhatsApp:'This is the one I meant',LinkedIn:'New guide from our team',X:'Finally wrote this up'};
+function sim(){$('#bwho').textContent=plat;$('#bmsg').textContent=msg[plat];const pv=$('#pv');pv.className='pv'+(fixed?'':' generic');$('#pvt').textContent=fixed?'Trail passes, explained':'Northwind Trails home image';pv.querySelector('span').textContent=fixed?'northwind-trails.example/guides/passes':'same image on every page';$('#btt').textContent=fixed?'Trail passes, explained':'Northwind Trails | Home';const fx=$('#fix');fx.textContent='Fixed: '+(fixed?'on':'off');fx.setAttribute('aria-pressed',fixed);if(motion){$('#bub').style.transform='scale(.97)';setTimeout(()=>$('#bub').style.transform='',120)}}
+$$('[data-p]').forEach(b=>b.onclick=()=>{plat=b.dataset.p;$$('[data-p]').forEach(x=>x.setAttribute('aria-pressed',x===b));sim()});$('#fix').onclick=()=>{fixed=!fixed;sim()};
+
+/* copy */
+$$('[data-copy]').forEach(b=>b.onclick=()=>{const el=document.getElementById(b.dataset.copy),t=b.textContent;const done=m=>{b.textContent=m;setTimeout(()=>b.textContent=t,1400)};
+ navigator.clipboard.writeText(el.textContent).then(()=>done('Copied')).catch(()=>{const s=getSelection(),r=document.createRange();r.selectNodeContents(el);s.removeAllRanges();s.addRange(r);done('Selected. Press copy')})});
+
+/* model: international subscription fee, 5.5% + 40c per charge */
+function model(){const s=+$('#m-sites').value,a=+$('#m-ag').value,c=+$('#m-churn').value,f=+$('#m-fixed').value;
+ $('#o-sites').textContent=s;$('#o-ag').textContent=a;$('#o-churn').textContent=c+'%';$('#o-fixed').textContent='$'+f;
+ const g=s*9+a*49,fee=g*.055+(s+a)*.4,n=g-fee-f;$('#r-gross').textContent=fmt(g);$('#r-net').textContent=(n<0?'-':'')+fmt(Math.abs(n));
+ const rep=Math.ceil((s+a)*c/100);$('#r-note').textContent=`Fees ${fmt(fee)}. To hold steady you must add about ${rep} new customer${rep===1?'':'s'} a month.`}
+['m-sites','m-ag','m-churn','m-fixed'].forEach(i=>$('#'+i).oninput=model);model();
+function gate(){const d=+$('#g-dm').value,r=+$('#g-rep').value,c=+$('#g-close').value;$('#o-dm').textContent=d;$('#o-rep').textContent=r+'%';$('#o-close').textContent=c+'%';
+ const e=d*r/100*c/100;$('#g-res').textContent=e.toFixed(1);const need=Math.ceil(5/(r/100*c/100));$('#g-note').textContent=(e>=5?'Clears the gate of 5. ':'Below the gate of 5. ')+`These rates need ${need} DMs, or about ${Math.ceil(need/.34)} probed sites at the 34% yield. Rates are assumptions.`}
+['g-dm','g-rep','g-close'].forEach(i=>$('#'+i).oninput=gate);gate();
+
+/* checklist */
+const boxes=$$('#checks input');function prog(){const n=boxes.filter(b=>b.checked).length;$('#done').textContent=n+' / '+boxes.length;$('#ring').setAttribute('stroke-dashoffset',188.5*(1-n/boxes.length))}
+let saved={};try{saved=JSON.parse(localStorage.getItem('ogsnap-golive')||'{}')}catch(e){}
+boxes.forEach(b=>{b.checked=!!saved[b.id];b.onchange=()=>{saved[b.id]=b.checked;try{localStorage.setItem('ogsnap-golive',JSON.stringify(saved))}catch(e){}prog()}});prog();
+})();
+</script>

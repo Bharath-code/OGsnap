@@ -237,6 +237,8 @@ Decided 2026-10-07: render with Satori + resvg inside `apps/web` (`POST /api/ren
 - [ ] Preview correct in opengraph.xyz, LinkedIn Post Inspector, X card validator, Slack unfurl (fresh URL each time)
 - [ ] Recorded: does Lovable's own generated social image conflict with the pasted tags? (Batch 1 found Lovable now injects one automatically.)
 - [ ] go/no-go note of 1-3 lines in the Decision log
+- [ ] Test on both stacks: a new TanStack Start project and an older React + Vite project; 2 inner pages each return their own `og.png?path=` tag as a social crawler
+  - 2026-11-07: prompt rewritten for both stacks and per-page paths; untested on Lovable
 **Deps:** L8 (a trial site is enough; payment not required).
 
 ### L11: Edge worker deployed (T10 remainder) · S · you
