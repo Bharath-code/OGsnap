@@ -22,15 +22,18 @@ const snippetFor = (siteId: string) => {
   ].join("\n");
 };
 
-// ponytail: Lovable is a Vite SPA, and crawlers only read index.html, so the prompt pins the edit there
-const lovablePromptFor = (snippet: string) =>
-  [
-    "Update this site's social share image. Edit index.html only; social crawlers don't run JavaScript, so don't use react-helmet or any React component for this.",
-    "1. In <head>, delete every existing og:image, twitter:image and twitter:card meta tag, including the default lovable.dev opengraph image.",
-    "2. Add exactly these tags inside <head>:",
-    snippet,
-    "3. Don't change anything else and don't add packages.",
-  ].join("\n");
+// ponytail: the Lovable agent picks the stack branch and the route wiring, so results vary until the install check covers inner pages
+const lovablePromptFor = (siteId: string) => {
+  const url = siteImageUrl(siteId);
+  return [
+    "Give every page of this site its own social share image. Don't add packages and don't change anything else.",
+    `Image URL: the home page uses ${url}. Every other page uses ${url}?path=<its path>, for example ${url}?path=/pricing. For dynamic routes use the real path (/blog/my-post, not /blog/$slug), with no query string or hash.`,
+    "Every page must end up with exactly one og:image and one twitter:image, both set to its image URL, plus twitter:card set to summary_large_image. Remove any others, including the default lovable.dev image.",
+    "If this project uses TanStack Start (src/routes with createFileRoute): set these tags with the home page URL in the root route's head, then override both image tags in the head of each page route, using params for dynamic paths.",
+    "If this project uses React and Vite: put these tags with the home page URL in index.html as the fallback, then update both image tags on every route change, using the project's existing head manager or, if it has none, one small component inside the router.",
+    "When you finish, tell me which of the two setups you used and list the routes you covered.",
+  ].join("\n\n");
+};
 
 export async function openCheckout(body: { siteId: string } | { plan: "agency" }) {
   const response = await fetch("/api/billing/create-checkout", {
@@ -160,7 +163,7 @@ export function SiteDetail({ site }: { site: DashboardSite }) {
   }
 
   async function copy() {
-    const text = install === "lovable" ? lovablePromptFor(snippet) : snippet;
+    const text = install === "lovable" ? lovablePromptFor(site.id) : snippet;
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
@@ -250,7 +253,7 @@ export function SiteDetail({ site }: { site: DashboardSite }) {
               : "Paste these lines into your site's <head>, then publish."}
           </p>
           <pre className="max-h-44 overflow-auto rounded-lg border border-border bg-background p-3 font-mono text-[11.5px] leading-relaxed">
-            <code className="whitespace-pre-wrap break-all">{install === "lovable" ? lovablePromptFor(snippet) : snippet}</code>
+            <code className="whitespace-pre-wrap break-all">{install === "lovable" ? lovablePromptFor(site.id) : snippet}</code>
           </pre>
           <Button type="button" variant="outline" size="sm" onClick={copy}>
             {copied ? "Copied" : install === "lovable" ? "Copy prompt" : "Copy lines"}

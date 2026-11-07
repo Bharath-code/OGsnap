@@ -21,8 +21,7 @@ After any `convex dev --configure`, run `git status` and restore `convex/README.
 | Decision | Default I'd use | Why it matters |
 |---|---|---|
 | Domain | `ogsnap.dev` (hard-coded in code, `robots.ts`, `/check` canonical, watermark text, SDK default `api.ogsnap.dev`) | **[you]** confirm you own it. If not, buy it or change those strings. |
-| Web host | Vercel | Next.js app, no config in repo yet |
-| Renderer host | Fly.io, Railway or a ~$5–40 VPS | Fastify + Playwright Chromium. **No Dockerfile exists in the repo**, see step 6 |
+| Web host | Vercel | Next.js app and the render route (no separate renderer host) |
 | Dodo mode | Test mode first, live later | `DODO_ENVIRONMENT=live_mode` switches API base to `live.dodopayments.com`; anything else uses test |
 
 ## 1. Generate secrets locally (2 min) [you]
@@ -31,7 +30,7 @@ After any `convex dev --configure`, run `git status` and restore `convex/README.
 echo "INTERNAL_SERVICE_SECRET=$(openssl rand -hex 32)"
 echo "RENDERER_INTERNAL_TOKEN=$(openssl rand -hex 32)"
 ```
-Keep both in a password manager. The same `INTERNAL_SERVICE_SECRET` goes to **Convex and web**; the same `RENDERER_INTERNAL_TOKEN` goes to **Convex and renderer**.
+Keep both in a password manager. The same `INTERNAL_SERVICE_SECRET` and the same `RENDERER_INTERNAL_TOKEN` go to **both Convex and the web app**.
 Do **not** set `DEV_BOOTSTRAP_SECRET` in production. The bootstrap route returns 404 when `NODE_ENV=production` anyway (see step 9 for minting an API key).
 
 ## 2. Clerk (10 min) [you]
@@ -63,7 +62,7 @@ Do **not** set `DEV_BOOTSTRAP_SECRET` in production. The bootstrap route returns
 cd convex
 npx convex env set --prod INTERNAL_SERVICE_SECRET <secret>
 npx convex env set --prod RENDERER_INTERNAL_TOKEN <token>
-npx convex env set --prod RENDERER_SERVICE_URL https://<renderer-host>      # after step 6
+npx convex env set --prod RENDERER_SERVICE_URL https://<web domain>/api
 npx convex env set --prod DODO_WEBHOOK_SECRET <whsec>
 npx convex env set --prod FIRECRAWL_API_KEY <key>
 npx convex env set --prod CLERK_JWT_ISSUER_DOMAIN <issuer url>
@@ -74,14 +73,15 @@ npx convex env list --prod
 `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` are optional. They only feed alt-text and social copy; without them that step returns null.
 **Order matters:** `CLERK_JWT_ISSUER_DOMAIN` must be set before the deploy in step 7, because `auth.config.ts` reads it at push time.
 
-## 6. Deploy the renderer (30–60 min) [you + me]
+## 6. Rendering (no separate host) [done in code]
 
-The renderer is a Fastify server (`apps/renderer`, `pnpm build` then `pnpm start`, listens on `$PORT`, default 4001; `GET /health`; `POST /render` with `Authorization: Bearer $RENDERER_INTERNAL_TOKEN`).
-Playwright needs Chromium plus system libraries, and the repo has no Dockerfile or `fly.toml`. [me] I'll write a small Dockerfile based on the Playwright image if you pick Fly or Railway.
-
-Env on the renderer: `RENDERER_INTERNAL_TOKEN`, all `R2_*`, `NODE_ENV=production`, `PORT` if your host needs it.
-Check: `curl https://<renderer-host>/health` returns `{"ok":true}`; a render without the bearer token returns 401.
-Then go back and set `RENDERER_SERVICE_URL` in step 5.
+Rendering now runs inside the web app: `POST /api/render` (Satori + resvg, Node runtime, 30 s max). It needs `RENDERER_INTERNAL_TOKEN` and all `R2_*` on the **web** project (step 8) and `RENDERER_SERVICE_URL=https://<web domain>/api` on Convex (step 5; Convex calls `${RENDERER_SERVICE_URL}/render`).
+Checks after the web deploy:
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -X POST https://<web domain>/api/render -H 'content-type: application/json' -d '{"html":"<div style=\"display:flex\">x</div>"}'   # 401
+curl -s -X POST https://<web domain>/api/render -H "authorization: Bearer $RENDERER_INTERNAL_TOKEN" -H 'content-type: application/json' -d '{"html":"<div style=\"display:flex;font-size:60px\">hello</div>"}'   # {"imageUrl":"https://<r2 public>/renders/..."}
+```
+Why no Chromium host: the old renderer's Satori path never worked (dead font URL, template invalid for Satori), so everything had fallen back to Chromium. `apps/renderer` is kept for a Chromium option later; it is no longer part of `preflight`.
 
 ## 7. Deploy Convex to production (5 min)
 
@@ -102,6 +102,8 @@ Vercel → import the repo → Root Directory `apps/web` (pnpm monorepo; `@ogsna
 | `API_BASE_URL` | `https://fearless-gazelle-27.convex.site` |
 | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY` | from step 2 |
 | `INTERNAL_SERVICE_SECRET` | same as Convex |
+| `RENDERER_INTERNAL_TOKEN` | same as Convex (authorizes `/api/render`; required, the route refuses everything without it) |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_BASE_URL` (+ optional `R2_PREFIX`) | from step 4 |
 | `DODO_API_KEY`, `DODO_SITE_PRODUCT_ID`, `DODO_AGENCY_PRODUCT_ID` | from step 3 |
 | `DODO_ENVIRONMENT` | unset (test) until step 11 |
 | `WEB_BASE_URL`, `NEXT_PUBLIC_SITE_URL` | your https domain |
@@ -180,5 +182,5 @@ The README records ~5 ms measured overhead on a local origin, so the p50 under 5
 
 ## Time estimate
 
-About 3–4 hours of focused work if accounts exist; the renderer hosting is the long pole.
+About 2–3 hours of focused work if accounts exist; account setup is the long pole.
 Everything here is **not yet executed**, so treat step times as estimates.

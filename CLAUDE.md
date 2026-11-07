@@ -8,12 +8,12 @@ Social-preview autopilot for sites built with no-code and vibe-coding tools: pas
 - `docs/` is the older v1 doc set (28 files); do not add to it, parts are stale.
 
 ## Layout
-- `apps/web` Next.js (landing, `/check`, dashboard; Clerk auth) · `apps/renderer` Fastify + Playwright/Satori → R2 · `convex` backend (schema, HTTP routes, billing, sites) · `packages/core` shared logic (preview audit, meta parsing, agency limits) · `packages/edge-worker` Cloudflare Worker proxy · `scripts/` audits and checks.
+- `apps/web` Next.js (landing, `/check`, dashboard; Clerk auth) · rendering is `POST /api/render` in `apps/web` (Satori + resvg → R2; bearer `RENDERER_INTERNAL_TOKEN`) · `apps/renderer` legacy Fastify + Playwright, kept as the Chromium option, not deployed · `convex` backend (schema, HTTP routes, billing, sites) · `packages/core` shared logic (preview audit, meta parsing, agency limits) · `packages/edge-worker` Cloudflare Worker proxy · `scripts/` audits and checks.
 
 ## Commands
 - Use Node 22: `export PATH="$HOME/.nvm/versions/node/v22.21.1/bin:$PATH"` (machine default Node 26 breaks the Convex CLI).
 - `pnpm install` · `pnpm typecheck` · `pnpm test` · `pnpm build` (CI runs typecheck and build).
-- `pnpm dev:convex | dev:renderer | dev:web` · `pnpm preflight:local | preflight:prod` · `pnpm smoke:deploy` · `pnpm convex:codegen` then `pnpm convex:codegen:check`.
+- `pnpm dev:convex | dev:web` (local `RENDERER_SERVICE_URL=http://localhost:3000/api`) · `pnpm preflight:local | preflight:prod` · `pnpm smoke:deploy` · `pnpm convex:codegen` then `pnpm convex:codegen:check`.
 - Convex CLI runs from `convex/`. After `convex dev --configure`, restore `convex/README.md` and `convex/tsconfig.json` if overwritten.
 - Scripts: `node --no-warnings scripts/audit-previews.ts urls.txt`, `node scripts/probe-inner-pages.mjs urls.txt`, `scripts/before-after.ts` (needs a deployed backend).
 
@@ -25,6 +25,7 @@ Social-preview autopilot for sites built with no-code and vibe-coding tools: pas
 - Convex functions that take a user id must derive it from `ctx.auth` or be `internal`; never trust a caller-supplied `userId` (8 such holes were fixed, keep it that way).
 - One price table: `apps/web/src/lib/pricing.ts` (`PLAN_PRICES`). No claims on the landing page for frameworks or features that are not shipped.
 - Never commit secrets; `.env`, `.env.local`, `.env.mcp` are ignored. `DEV_BOOTSTRAP_SECRET` must not be set in production.
+- Render templates (`convex/render/template.ts`) must stay Satori-valid: inline styles only, `display:flex` on every div (even empty ones), no `<style>`/classes, no whitespace text between tags.
 - Do not touch `convex/_generated/`; regenerate with `pnpm convex:codegen`.
 - Mark deliberate shortcuts with a `// ponytail:` comment naming the ceiling.
 - A task is done only when its acceptance criteria in `tasks/todo.md` are met with evidence; tick the box and note blockers inline.

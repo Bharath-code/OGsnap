@@ -12,7 +12,7 @@ const target = getArg("--target", "production");
 const serviceArg = getArg("--service", "all");
 const requestedServices = serviceArg.split(",").map((value) => value.trim()).filter(Boolean);
 const services = requestedServices.includes("all")
-  ? ["web", "convex", "renderer"]
+  ? ["web", "convex"]
   : requestedServices;
 
 const requiredByTarget = {
@@ -31,6 +31,12 @@ const requiredByTarget = {
       "DODO_SITE_PRODUCT_ID",
       "DODO_AGENCY_PRODUCT_ID",
       "WEB_BASE_URL",
+      "RENDERER_INTERNAL_TOKEN",
+      "R2_ACCOUNT_ID",
+      "R2_ACCESS_KEY_ID",
+      "R2_SECRET_ACCESS_KEY",
+      "R2_BUCKET_NAME",
+      "R2_PUBLIC_BASE_URL",
     ],
     convex: [
       "CONVEX_DEPLOYMENT",
